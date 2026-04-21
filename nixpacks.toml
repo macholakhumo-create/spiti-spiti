@@ -4,8 +4,5 @@ nixPkgs = ["nodejs_18", "npm"]
 [phases.install]
 cmds = ["npm install"]
 
-[phases.build]
-cmds = []
-
 [start]
 cmd = "node server.js"
