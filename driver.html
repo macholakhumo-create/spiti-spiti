@@ -151,4 +151,358 @@
   <div class="stats">
     <div class="stat-card">
       <div class="stat-num" id="total-rides">0</div>
-      <div class
+      <div class="stat-label">Total Rides</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="completed-rides">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="total-earnings">P0</div>
+      <div class="stat-label">Earnings</div>
+    </div>
+  </div>
+
+  <!-- Live Location -->
+  <div class="card">
+    <div class="card-label">Your Location</div>
+    <div id="driver-map"></div>
+    <div class="location-status">
+      <div class="location-dot" id="location-dot"></div>
+      <span id="location-text">Location not sharing</span>
+    </div>
+    <button class="btn-full btn-start" id="start-tracking-btn" onclick="startTracking()">📍 Start Sharing Location</button>
+    <button class="btn-full btn-complete" id="stop-tracking-btn" style="display:none" onclick="stopTracking()">⏹ Stop Sharing</button>
+  </div>
+
+  <!-- Incoming Ride -->
+  <div class="incoming" id="incoming-card">
+    <div class="incoming-header">
+      <div class="incoming-icon">🔔</div>
+      <div>
+        <div class="incoming-title">New Ride Request</div>
+        <div class="incoming-sub">Set your fare and offer to the rider</div>
+      </div>
+    </div>
+    <div class="route">
+      <div class="route-point">
+        <div class="route-icon pickup">📍</div>
+        <div><div class="route-label">Pickup</div><div class="route-text" id="inc-pickup">—</div></div>
+      </div>
+      <div class="route-point">
+        <div class="route-icon dropoff">🏁</div>
+        <div><div class="route-label">Dropoff</div><div class="route-text" id="inc-dropoff">—</div></div>
+      </div>
+    </div>
+    <div class="fare-input-section">
+      <div class="fare-input-label">Your fare offer to the rider</div>
+      <div class="fare-input-row">
+        <span class="fare-prefix">P</span>
+        <input class="fare-input" id="fare-offer-input" type="number" placeholder="0.00" min="0" step="0.50" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-accept" onclick="offerFare()">Send Offer →</button>
+      <button class="btn btn-decline" onclick="declineRide()">Decline</button>
+    </div>
+  </div>
+
+  <!-- Waiting for fare acceptance -->
+  <div class="card" id="waiting-card" style="display:none">
+    <div class="card-label">Fare Sent</div>
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:2rem;margin-bottom:12px">⏳</div>
+      <div style="font-size:0.88rem;color:#888">Waiting for rider to accept your fare offer of</div>
+      <div style="font-size:1.8rem;font-weight:700;color:#22c55e;margin:8px 0" id="sent-fare-amount">P0</div>
+      <button class="btn-full btn-decline" style="margin-top:12px;background:#1e1e28;color:#888;border:1px solid #2a2a3a" onclick="withdrawOffer()">Withdraw Offer</button>
+    </div>
+  </div>
+
+  <!-- Active Ride -->
+  <div class="active-ride" id="active-card">
+    <div class="card-label">Current Ride</div>
+    <div class="route" style="margin-bottom:16px">
+      <div class="route-point">
+        <div class="route-icon pickup">📍</div>
+        <div><div class="route-label" style="color:#555">Pickup</div><div class="route-text" id="act-pickup">—</div></div>
+      </div>
+      <div class="route-point">
+        <div class="route-icon dropoff">🏁</div>
+        <div><div class="route-label" style="color:#555">Dropoff</div><div class="route-text" id="act-dropoff">—</div></div>
+      </div>
+    </div>
+    <div class="fare-display">
+      <div class="fare-display-label">Agreed Fare</div>
+      <div class="fare-display-amount" id="act-fare">P0</div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="chat-section">
+      <div class="card-label" style="margin-bottom:10px">💬 Chat with Rider</div>
+      <div class="chat-box" id="chat-box">
+        <div class="chat-empty">No messages yet</div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button class="chat-send" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+
+    <div class="status-row">
+      <button class="status-btn" onclick="updateStatus('in_progress')">▶ Start Ride</button>
+      <button class="status-btn" onclick="updateStatus('completed')">✓ Complete</button>
+    </div>
+  </div>
+
+  <!-- All Rides -->
+  <div class="card">
+    <div class="card-label">All Rides</div>
+    <div id="rides-list"><div class="empty">No rides yet</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const BASE = "https://spiti-spiti-production.up.railway.app";
+  const DRIVER_ID = 1;
+  let pendingRide = null;
+  let activeRide  = null;
+  let trackingInterval = null;
+  let driverMap = null;
+  let driverMarker = null;
+
+  window.addEventListener("load", () => {
+    driverMap = L.map("driver-map").setView([-24.6541, 25.9087], 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(driverMap);
+  });
+
+  const socket = io(BASE);
+  socket.on("connect", () => {
+    document.getElementById("dot").classList.add("live");
+    document.getElementById("conn-label").textContent = "Live";
+    socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
+  });
+  socket.on("disconnect", () => {
+    document.getElementById("dot").classList.remove("live");
+    document.getElementById("conn-label").textContent = "Offline";
+  });
+  socket.on("new-ride", (ride) => {
+    pendingRide = ride;
+    document.getElementById("inc-pickup").textContent  = ride.pickup;
+    document.getElementById("inc-dropoff").textContent = ride.dropoff;
+    document.getElementById("incoming-card").classList.add("visible");
+    document.getElementById("waiting-card").style.display = "none";
+    showToast("New ride request!");
+    loadRides();
+  });
+  socket.on("ride-updated", (ride) => {
+    if (ride.status === "accepted" && ride.driver_id == DRIVER_ID) {
+      activeRide = ride;
+      document.getElementById("waiting-card").style.display = "none";
+      document.getElementById("active-card").classList.add("visible");
+      document.getElementById("act-pickup").textContent  = ride.pickup;
+      document.getElementById("act-dropoff").textContent = ride.dropoff;
+      document.getElementById("act-fare").textContent    = "P" + parseFloat(ride.fare || 0).toFixed(2);
+      socket.emit("join-ride", { rideId: ride.id });
+      loadMessages();
+      showToast("Rider accepted your fare! 🎉");
+    }
+    if (activeRide && ride.id === activeRide.id && ride.status === "completed") {
+      document.getElementById("active-card").classList.remove("visible");
+      activeRide = null;
+      showToast("Ride completed!");
+      loadRides();
+    }
+    loadRides();
+  });
+  socket.on("new-message", (msg) => {
+    if (!activeRide || msg.ride_id !== activeRide.id) return;
+    appendMessage(msg);
+  });
+
+  async function offerFare() {
+    if (!pendingRide) return;
+    const fareInput = document.getElementById("fare-offer-input").value;
+    if (!fareInput || parseFloat(fareInput) <= 0) return showToast("Enter a fare amount", true);
+    try {
+      await fetch(`${BASE}/rides/${pendingRide.id}/offer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fare_offer: parseFloat(fareInput), driverId: DRIVER_ID })
+      });
+      document.getElementById("incoming-card").classList.remove("visible");
+      document.getElementById("waiting-card").style.display = "block";
+      document.getElementById("sent-fare-amount").textContent = "P" + parseFloat(fareInput).toFixed(2);
+      document.getElementById("fare-offer-input").value = "";
+      showToast("Fare offer sent to rider!");
+    } catch(e) { showToast("Failed to send offer", true); }
+  }
+
+  async function withdrawOffer() {
+    if (!pendingRide) return;
+    try {
+      await fetch(`${BASE}/rides/${pendingRide.id}/decline-fare`, { method: "POST" });
+      document.getElementById("waiting-card").style.display = "none";
+      pendingRide = null;
+      showToast("Offer withdrawn");
+    } catch(e) { showToast("Failed", true); }
+  }
+
+  function declineRide() {
+    pendingRide = null;
+    document.getElementById("incoming-card").classList.remove("visible");
+    showToast("Ride declined");
+  }
+
+  async function updateStatus(status) {
+    if (!activeRide) return;
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      if (status === "completed") {
+        document.getElementById("active-card").classList.remove("visible");
+        activeRide = null;
+        loadRides();
+      }
+      showToast("Status: " + status.replace("_", " "));
+    } catch(e) { showToast("Failed", true); }
+  }
+
+  function toggleAvailability() {
+    const on = document.getElementById("avail-toggle").checked;
+    document.getElementById("avail-sub").textContent = on ? "You are online" : "You are offline";
+    showToast(on ? "You are now online 🟢" : "You are now offline");
+  }
+
+  // LOCATION
+  function startTracking() {
+    if (!navigator.geolocation) return showToast("Geolocation not supported", true);
+    document.getElementById("location-dot").classList.add("tracking");
+    document.getElementById("location-text").textContent = "Sharing location...";
+    document.getElementById("stop-tracking-btn").style.display = "block";
+    document.getElementById("start-tracking-btn").style.display = "none";
+    sendLocation();
+    trackingInterval = setInterval(sendLocation, 5000);
+    showToast("Location sharing started");
+  }
+
+  function stopTracking() {
+    clearInterval(trackingInterval);
+    trackingInterval = null;
+    document.getElementById("location-dot").classList.remove("tracking");
+    document.getElementById("location-text").textContent = "Location not sharing";
+    document.getElementById("stop-tracking-btn").style.display = "none";
+    document.getElementById("start-tracking-btn").style.display = "block";
+    showToast("Location sharing stopped");
+  }
+
+  function sendLocation() {
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      if (driverMap) {
+        if (driverMarker) {
+          driverMarker.setLatLng([lat, lng]);
+        } else {
+          driverMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: "",
+              html: '<div style="background:#22c55e;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(34,197,94,0.8)"></div>',
+              iconSize: [16, 16], iconAnchor: [8, 8]
+            })
+          }).addTo(driverMap);
+        }
+        driverMap.setView([lat, lng], 15);
+      }
+      document.getElementById("location-text").textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+      try {
+        await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lng })
+        });
+      } catch(e) {}
+    }, () => showToast("Could not get location", true));
+  }
+
+  // CHAT
+  async function loadMessages() {
+    if (!activeRide) return;
+    try {
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/messages`);
+      const msgs = await res.json();
+      const box = document.getElementById("chat-box");
+      box.innerHTML = "";
+      if (!msgs.length) {
+        box.innerHTML = '<div class="chat-empty">No messages yet</div>';
+        return;
+      }
+      msgs.forEach(m => appendMessage(m));
+    } catch(e) {}
+  }
+
+  function appendMessage(msg) {
+    const box = document.getElementById("chat-box");
+    const empty = box.querySelector(".chat-empty");
+    if (empty) empty.remove();
+    const div = document.createElement("div");
+    div.className = `chat-msg ${msg.sender_role === "driver" ? "driver" : "rider"}`;
+    const time = new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    div.innerHTML = `${msg.message}<div class="chat-msg-time">${time}</div>`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function sendMessage() {
+    if (!activeRide) return;
+    const input = document.getElementById("chat-input");
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = "";
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender_role: "driver", message })
+      });
+    } catch(e) { showToast("Failed to send", true); }
+  }
+
+  async function loadRides() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const el = document.getElementById("rides-list");
+      el.innerHTML = rides.length ? rides.map(r => `
+        <div class="ride-item">
+          <div>
+            <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="ride-id">Ride #${r.id} · ${r.fare ? "P" + parseFloat(r.fare).toFixed(2) : "No fare"}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
+        </div>
+      `).join("") : '<div class="empty">No rides yet</div>';
+      document.getElementById("total-rides").textContent = rides.length;
+      document.getElementById("completed-rides").textContent = rides.filter(r => r.status === "completed").length;
+      const earnings = rides.filter(r => r.status === "completed" && r.driver_id == DRIVER_ID)
+                           .reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
+      document.getElementById("total-earnings").textContent = "P" + earnings.toFixed(2);
+    } catch(e) {}
+  }
+
+  function showToast(msg, error = false) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (error ? " error" : "");
+    setTimeout(() => t.className = "toast", 3000);
+  }
+
+  loadRides();
+</script>
+</body>
+</html>
