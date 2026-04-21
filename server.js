@@ -76,7 +76,7 @@ app.post("/rides/:id/offer", async (req, res) => {
       [fare_offer, driverId, req.params.id]
     );
     const ride = result.rows[0];
-    io.to("rider").emit("fare-offered", ride);
+   io.emit("fare-offered", ride);
     io.to("drivers").emit("ride-updated", ride);
     res.json(ride);
   } catch (err) {
