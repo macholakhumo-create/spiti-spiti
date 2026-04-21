@@ -159,7 +159,7 @@
   let driverMarker = null;
   let mapInitialized = false;
 
-  const socket = io(BASE);
+  const socket = io("https://spiti-spiti-production.up.railway.app");
 
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
