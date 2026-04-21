@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiti-Spiti Rider</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e8e8f0; min-height: 100vh; }
+    nav {
+      background: #16161d; border-bottom: 1px solid #2a2a3a;
+      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em; }
+    .brand span { color: #6c63ff; }
+    .conn-badge { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #666; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; }
+    .dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .container { max-width: 480px; margin: 0 auto; padding: 32px 20px; }
+    .page-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 6px; }
+    .page-sub { font-size: 0.85rem; color: #555; margin-bottom: 32px; }
+    .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .card-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6c63ff; margin-bottom: 16px; }
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 5px; }
+    input { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 12px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #6c63ff; }
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary { background: #6c63ff; color: #fff; }
+    .btn-danger  { background: #ef4444; color: #fff; }
+    .status-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 24px; margin-bottom: 20px; display: none; }
+    .status-card.visible { display: block; }
+    .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .status-title { font-size: 0.95rem; font-weight: 600; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .badge-requested  { background: #1e293b; color: #94a3b8; }
+    .badge-accepted   { background: #14532d; color: #22c55e; }
+    .badge-in_progress{ background: #451a03; color: #f59e0b; }
+    .badge-completed  { background: #1e1b4b; color: #818cf8; }
+    .route { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .route-point { display: flex; align-items: center; gap: 12px; }
+    .route-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .route-icon.pickup  { background: #1e293b; }
+    .route-icon.dropoff { background: #14532d; }
+    .route-text { font-size: 0.88rem; color: #ccc; }
+    .route-label { font-size: 0.68rem; color: #555; margin-bottom: 2px; }
+    .driver-info { background: #0f0f13; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+    .driver-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #6c63ff, #22c55e); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #fff; flex-shrink: 0; }
+    .driver-name { font-size: 0.88rem; font-weight: 600; }
+    .driver-label { font-size: 0.72rem; color: #555; margin-top: 2px; }
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .history-item { background: #0f0f13; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .history-route { font-size: 0.83rem; color: #ccc; }
+    .history-id { font-size: 0.7rem; color: #444; margin-top: 3px; }
+    .empty { text-align: center; color: #444; font-size: 0.83rem; padding: 20px; }
+
+    /* MAP */
+    #rider-map { height: 260px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2a2a3a; }
+    .map-status { font-size: 0.75rem; color: #555; display: flex; align-items: center; gap: 6px; }
+    .map-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
+    .map-dot.active { background: #22c55e; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.83rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #ef4444; }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="brand">Spiti-Spiti<span>.</span></div>
+  <div class="conn-badge">
+    <div class="dot" id="dot"></div>
+    <span id="conn-label">Connecting...</span>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-title">Hey Rider 👋</div>
+  <div class="page-sub">Where are you headed today?</div>
+
+  <!-- Request Form -->
+  <div class="card" id="request-card">
+    <div class="card-label">Request a Ride</div>
+    <div class="field">
+      <label>Pickup Location</label>
+      <input id="pickup" placeholder="Where are you?" />
+    </div>
+    <div class="field">
+      <label>Dropoff Location</label>
+      <input id="dropoff" placeholder="Where to?" />
+    </div>
+    <button class="btn btn-primary" onclick="createRide()">Request Ride →</button>
+  </div>
+
+  <!-- Active Ride -->
+  <div class="status-card" id="status-card">
+    <div class="status-header">
+      <div class="status-title">Active Ride</div>
+      <span class="badge badge-requested" id="status-badge">Requested</span>
+    </div>
+    <div class="route">
+      <div class="route-point">
+        <div class="route-icon pickup">📍</div>
+        <div>
+          <div class="route-label">Pickup</div>
+          <div class="route-text" id="r-pickup">—</div>
+        </div>
+      </div>
+      <div class="route-point">
+        <div class="route-icon dropoff">🏁</div>
+        <div>
+          <div class="route-label">Dropoff</div>
+          <div class="route-text" id="r-dropoff">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Driver tracking map -->
+    <div id="rider-map" style="display:none"></div>
+    <div class="map-status" id="map-status" style="display:none;margin-bottom:16px">
+      <div class="map-dot" id="map-dot"></div>
+      <span id="map-text">Waiting for driver location...</span>
+    </div>
+
+    <div class="driver-info" id="driver-info" style="display:none">
+      <div class="driver-avatar" id="driver-avatar">D</div>
+      <div>
+        <div class="driver-name" id="driver-name">Driver assigned</div>
+        <div class="driver-label">Your driver is on the way</div>
+      </div>
+    </div>
+    <button class="btn btn-danger" style="margin-top:16px" onclick="cancelRide()">Cancel Ride</button>
+  </div>
+
+  <!-- Ride History -->
+  <div class="card">
+    <div class="card-label">Recent Rides</div>
+    <div class="history-list" id="history"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const BASE = "http://localhost:5000";
+  const RIDER_ID = 1;
+  let activeRide = null;
+  let riderMap   = null;
+  let driverMarker = null;
+  let mapInitialized = false;
+
+  const socket = io(BASE);
+
+  socket.on("connect", () => {
+    document.getElementById("dot").classList.add("live");
+    document.getElementById("conn-label").textContent = "Live";
+    socket.emit("join-role", { role: "rider", userId: RIDER_ID });
+  });
+  socket.on("disconnect", () => {
+    document.getElementById("dot").classList.remove("live");
+    document.getElementById("conn-label").textContent = "Offline";
+  });
+  socket.on("ride-created", (ride) => {
+    activeRide = ride;
+    showActiveRide(ride);
+    showToast("Ride requested! Looking for a driver...");
+  });
+  socket.on("ride-updated", (ride) => {
+    if (activeRide && ride.id === activeRide.id) {
+      activeRide = ride;
+      updateRideStatus(ride);
+      if (ride.status === "accepted") showToast("Driver is on the way! 🚗");
+      if (ride.status === "completed") {
+        showToast("Ride completed! Thanks for riding.");
+        setTimeout(() => { cancelRide(); loadHistory(); }, 2000);
+      }
+    }
+  });
+
+  // REAL TIME DRIVER LOCATION
+  socket.on("driver-location", (data) => {
+    if (!activeRide) return;
+    updateDriverOnMap(data.lat, data.lng);
+  });
+
+  function initMap() {
+    if (mapInitialized) return;
+    mapInitialized = true;
+    document.getElementById("rider-map").style.display = "block";
+    document.getElementById("map-status").style.display = "flex";
+    riderMap = L.map("rider-map").setView([-24.6541, 25.9087], 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(riderMap);
+  }
+
+  function updateDriverOnMap(lat, lng) {
+    initMap();
+    document.getElementById("map-dot").classList.add("active");
+    document.getElementById("map-text").textContent = "Driver location updating live";
+    if (driverMarker) {
+      driverMarker.setLatLng([lat, lng]);
+    } else {
+      driverMarker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: "",
+          html: '<div style="background:#6c63ff;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(108,99,255,0.8)"></div>',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        })
+      }).addTo(riderMap).bindPopup("Your Driver");
+    }
+    riderMap.setView([lat, lng], 15);
+  }
+
+  function showActiveRide(ride) {
+    document.getElementById("request-card").style.display = "none";
+    document.getElementById("status-card").classList.add("visible");
+    document.getElementById("r-pickup").textContent  = ride.pickup;
+    document.getElementById("r-dropoff").textContent = ride.dropoff;
+    updateRideStatus(ride);
+  }
+
+  function updateRideStatus(ride) {
+    const badge = document.getElementById("status-badge");
+    badge.className = `badge badge-${ride.status}`;
+    badge.textContent = ride.status.replace("_", " ");
+    if (ride.driver_id) {
+      document.getElementById("driver-info").style.display = "flex";
+      document.getElementById("driver-name").textContent   = "Driver #" + ride.driver_id;
+      document.getElementById("driver-avatar").textContent = "D" + ride.driver_id;
+      initMap();
+    }
+  }
+
+  function cancelRide() {
+    activeRide = null;
+    mapInitialized = false;
+    driverMarker = null;
+    riderMap = null;
+    document.getElementById("request-card").style.display = "block";
+    document.getElementById("status-card").classList.remove("visible");
+    document.getElementById("rider-map").style.display = "none";
+    document.getElementById("map-status").style.display = "none";
+    document.getElementById("driver-info").style.display = "none";
+  }
+
+  async function createRide() {
+    const pickup  = document.getElementById("pickup").value.trim();
+    const dropoff = document.getElementById("dropoff").value.trim();
+    if (!pickup || !dropoff) return showToast("Enter pickup and dropoff", true);
+    try {
+      const res = await fetch(`${BASE}/rides`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pickup, dropoff, riderId: RIDER_ID })
+      });
+      const ride = await res.json();
+      activeRide = ride;
+      showActiveRide(ride);
+      showToast("Ride requested!");
+      loadHistory();
+    } catch(e) { showToast("Failed to create ride", true); }
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const el = document.getElementById("history");
+      el.innerHTML = rides.length ? rides.slice(0, 5).map(r => `
+        <div class="history-item">
+          <div>
+            <div class="history-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="history-id">Ride #${r.id}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
+        </div>
+      `).join("") : '<div class="empty">No rides yet</div>';
+    } catch(e) {}
+  }
+
+  function showToast(msg, error = false) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (error ? " error" : "");
+    setTimeout(() => t.className = "toast", 3000);
+  }
+
+  loadHistory();
+</script>
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiti-Spiti Admin</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e8e8f0; min-height: 100vh; display: flex; }
+    .sidebar { width: 220px; background: #111118; border-right: 1px solid #1e1e2e; display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-brand { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.04em; padding: 0 20px 24px; border-bottom: 1px solid #1e1e2e; }
+    .sidebar-brand span { color: #f59e0b; }
+    .sidebar-nav { padding: 16px 0; flex: 1; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; font-size: 0.82rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: #e8e8f0; background: #16161d; }
+    .nav-item.active { color: #f59e0b; border-left-color: #f59e0b; background: #1a1a10; }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid #1e1e2e; }
+    .conn-badge { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: #555; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; flex-shrink: 0; }
+    .dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .main { margin-left: 220px; flex: 1; padding: 32px; min-height: 100vh; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .page-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; }
+    .page-sub { font-size: 0.8rem; color: #555; margin-top: 3px; }
+    .refresh-btn { background: #16161d; border: 1px solid #2a2a3a; color: #888; padding: 8px 16px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+    .refresh-btn:hover { border-color: #f59e0b; color: #f59e0b; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: #16161d; border: 1px solid #1e1e2e; border-radius: 14px; padding: 20px; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .stat-card.amber::before { background: #f59e0b; }
+    .stat-card.green::before { background: #22c55e; }
+    .stat-card.blue::before  { background: #6c63ff; }
+    .stat-card.red::before   { background: #ef4444; }
+    .stat-card.purple::before { background: #a855f7; }
+    .stat-icon { font-size: 1.4rem; margin-bottom: 12px; }
+    .stat-num { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
+    .stat-card.amber .stat-num  { color: #f59e0b; }
+    .stat-card.green .stat-num  { color: #22c55e; }
+    .stat-card.blue  .stat-num  { color: #818cf8; }
+    .stat-card.red   .stat-num  { color: #ef4444; }
+    .stat-card.purple .stat-num { color: #a855f7; }
+    .stat-label { font-size: 0.72rem; color: #555; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .card { background: #16161d; border: 1px solid #1e1e2e; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .card-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #f59e0b; }
+    .card-count { font-size: 0.72rem; color: #444; background: #0f0f13; padding: 3px 10px; border-radius: 20px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { text-align: left; padding: 10px 14px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #444; border-bottom: 1px solid #1e1e2e; }
+    td { padding: 12px 14px; border-bottom: 1px solid #111118; color: #ccc; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #111118; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+    .badge-requested   { background: #1e293b; color: #94a3b8; }
+    .badge-accepted    { background: #14532d; color: #22c55e; }
+    .badge-in_progress { background: #451a03; color: #f59e0b; }
+    .badge-completed   { background: #1e1b4b; color: #818cf8; }
+    .badge-cancelled   { background: #2d1515; color: #ef4444; }
+    .badge-online      { background: #14532d; color: #22c55e; }
+    .badge-offline     { background: #1e1e2e; color: #555; }
+    .badge-pending     { background: #1e293b; color: #94a3b8; }
+    .badge-picked_up   { background: #451a03; color: #f59e0b; }
+    .badge-in_transit  { background: #1e1b4b; color: #a855f7; }
+    .badge-delivered   { background: #14532d; color: #22c55e; }
+    .action-btn { padding: 5px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #888; font-family: 'Inter', sans-serif; transition: all 0.2s; margin-right: 4px; }
+    .action-btn:hover { border-color: #f59e0b; color: #f59e0b; }
+    .action-btn.danger:hover  { border-color: #ef4444; color: #ef4444; }
+    .action-btn.success:hover { border-color: #22c55e; color: #22c55e; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 0.72rem; color: #555; }
+    .field input, .field select, .field textarea { background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.83rem; outline: none; transition: border-color 0.2s; resize: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: #f59e0b; }
+    .field select option { background: #16161d; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-amber { background: #f59e0b; color: #000; }
+    .btn-green { background: #22c55e; color: #fff; }
+    .btn-red   { background: #ef4444; color: #fff; }
+    .btn-ghost { background: #1e1e2e; color: #888; border: 1px solid #2a2a3a; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 28px; width: 500px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+    .inline-select { background: #0f0f13; border: 1px solid #2a2a3a; color: #ccc; padding: 4px 8px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.72rem; outline: none; cursor: pointer; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: #000; flex-shrink: 0; }
+    .avatar-lg { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #000; flex-shrink: 0; }
+    .empty { text-align: center; color: #333; font-size: 0.83rem; padding: 30px; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #22c55e; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+    .toast.show  { opacity: 1; }
+    .toast.error { background: #ef4444; }
+    .toast.warn  { background: #f59e0b; color: #000; }
+    @media (max-width: 900px) {
+      .sidebar { width: 60px; }
+      .nav-item span { display: none; }
+      .main { margin-left: 60px; padding: 20px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-brand">Spiti-Spiti<span>.</span></div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showPage('overview', this)"><span class="nav-icon">📊</span><span>Overview</span></div>
+    <div class="nav-item" onclick="showPage('rides', this)"><span class="nav-icon">🚗</span><span>Rides</span></div>
+    <div class="nav-item" onclick="showPage('deliveries', this)"><span class="nav-icon">📦</span><span>Deliveries</span></div>
+    <div class="nav-item" onclick="showPage('drivers', this)"><span class="nav-icon">👤</span><span>Drivers</span></div>
+    <div class="nav-item" onclick="showPage('fleet', this)"><span class="nav-icon">🚙</span><span>Fleet</span></div>
+    <div class="nav-item" onclick="showPage('revenue', this)"><span class="nav-icon">💰</span><span>Revenue</span></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="conn-badge">
+      <div class="dot" id="dot"></div>
+      <span id="conn-label">Connecting...</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="topbar">
+      <div><div class="page-title">Overview</div><div class="page-sub" id="last-updated">Loading...</div></div>
+      <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card amber"><div class="stat-icon">🚗</div><div class="stat-num" id="stat-total-rides">0</div><div class="stat-label">Total Rides</div></div>
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num" id="stat-completed">0</div><div class="stat-label">Completed Rides</div></div>
+      <div class="stat-card purple"><div class="stat-icon">📦</div><div class="stat-num" id="stat-deliveries">0</div><div class="stat-label">Deliveries</div></div>
+      <div class="stat-card blue"><div class="stat-icon">👤</div><div class="stat-num" id="stat-drivers">0</div><div class="stat-label">Total Drivers</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Live Rides</div><div class="card-count" id="live-count">0</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Route</th><th>Status</th><th>Driver</th></tr></thead>
+            <tbody id="live-rides-body"><tr><td colspan="4" class="empty">No active rides</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Driver Status</div><div class="card-count" id="online-count">0 online</div></div>
+        <div id="driver-status-list"><div class="empty">No drivers</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Recent Deliveries</div><div class="card-count" id="delivery-count">0</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>From</th><th>To</th><th>Package</th><th>Status</th><th>Driver</th></tr></thead>
+          <tbody id="recent-deliveries-body"><tr><td colspan="6" class="empty">No deliveries</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIDES -->
+  <div class="page" id="page-rides">
+    <div class="topbar">
+      <div><div class="page-title">All Rides</div><div class="page-sub">Manage and monitor every ride</div></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <select class="inline-select" id="status-filter" onchange="filterRides()">
+          <option value="">All Statuses</option>
+          <option value="requested">Requested</option>
+          <option value="accepted">Accepted</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+        <button class="refresh-btn" onclick="loadRides()">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Pickup</th><th>Dropoff</th><th>Status</th><th>Driver</th><th>Fare</th><th>Actions</th></tr></thead>
+          <tbody id="all-rides-body"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELIVERIES -->
+  <div class="page" id="page-deliveries">
+    <div class="topbar">
+      <div><div class="page-title">Deliveries</div><div class="page-sub">Manage all package deliveries</div></div>
+      <div style="display:flex;gap:10px">
+        <button class="refresh-btn" onclick="loadDeliveries()">↻ Refresh</button>
+        <button class="btn btn-amber" onclick="openModal('add-delivery-modal')">+ New Delivery</button>
+      </div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card amber"><div class="stat-icon">📦</div><div class="stat-num" id="del-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-card blue"><div class="stat-icon">🔄</div><div class="stat-num" id="del-transit">0</div><div class="stat-label">In Transit</div></div>
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num" id="del-delivered">0</div><div class="stat-label">Delivered</div></div>
+      <div class="stat-card red"><div class="stat-icon">⏳</div><div class="stat-num" id="del-pending">0</div><div class="stat-label">Pending</div></div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Sender</th><th>Recipient</th><th>Pickup</th><th>Dropoff</th><th>Package</th><th>Status</th><th>Driver</th><th>Actions</th></tr></thead>
+          <tbody id="deliveries-body"><tr><td colspan="9" class="empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRIVERS -->
+  <div class="page" id="page-drivers">
+    <div class="topbar">
+      <div><div class="page-title">Drivers</div><div class="page-sub">Manage your driver fleet</div></div>
+      <button class="btn btn-amber" onclick="openModal('add-driver-modal')">+ Add Driver</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="drivers-body"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLEET -->
+  <div class="page" id="page-fleet">
+    <div class="topbar">
+      <div><div class="page-title">Fleet Management</div><div class="page-sub">Manage vehicles and assignments</div></div>
+      <button class="btn btn-amber" onclick="openModal('add-vehicle-modal')">+ Add Vehicle</button>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card amber"><div class="stat-icon">🚙</div><div class="stat-num" id="fleet-total">0</div><div class="stat-label">Total Vehicles</div></div>
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num" id="fleet-available">0</div><div class="stat-label">Available</div></div>
+      <div class="stat-card red"><div class="stat-icon">🔧</div><div class="stat-num" id="fleet-maintenance">0</div><div class="stat-label">In Maintenance</div></div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Plate</th><th>Make / Model</th><th>Type</th><th>Status</th><th>Assigned Driver</th><th>Actions</th></tr></thead>
+          <tbody id="fleet-body"><tr><td colspan="7" class="empty">No vehicles yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE -->
+  <div class="page" id="page-revenue">
+    <div class="topbar">
+      <div><div class="page-title">Revenue</div><div class="page-sub">Earnings overview</div></div>
+      <button class="refresh-btn" onclick="loadRevenue()">↻ Refresh</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card amber"><div class="stat-icon">💰</div><div class="stat-num" id="rev-total">P0</div><div class="stat-label">Total Revenue</div></div>
+      <div class="stat-card green"><div class="stat-icon">📅</div><div class="stat-num" id="rev-today">P0</div><div class="stat-label">Today</div></div>
+      <div class="stat-card blue"><div class="stat-icon">📈</div><div class="stat-num" id="rev-avg">P0</div><div class="stat-label">Avg per Ride</div></div>
+      <div class="stat-card red"><div class="stat-icon">🏆</div><div class="stat-num" id="rev-completed">0</div><div class="stat-label">Paid Rides</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Revenue by Ride</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ride ID</th><th>Route</th><th>Status</th><th>Fare (BWP)</th></tr></thead>
+          <tbody id="revenue-body"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD DRIVER MODAL -->
+<div class="modal-overlay" id="add-driver-modal">
+  <div class="modal">
+    <div class="modal-title">Add New Driver</div>
+    <div class="form-row">
+      <div class="field"><label>Full Name</label><input id="new-driver-name" placeholder="John Doe" /></div>
+      <div class="field"><label>Phone Number</label><input id="new-driver-phone" placeholder="71234567" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="addDriver()">Add Driver</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD VEHICLE MODAL -->
+<div class="modal-overlay" id="add-vehicle-modal">
+  <div class="modal">
+    <div class="modal-title">Add New Vehicle</div>
+    <div class="form-row">
+      <div class="field"><label>Plate Number</label><input id="v-plate" placeholder="e.g. B 1234 ABC" /></div>
+      <div class="field"><label>Type</label>
+        <select id="v-type">
+          <option value="sedan">Sedan</option>
+          <option value="suv">SUV</option>
+          <option value="truck">Truck</option>
+          <option value="van">Van</option>
+          <option value="motorcycle">Motorcycle</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Make</label><input id="v-make" placeholder="e.g. Toyota" /></div>
+      <div class="field"><label>Model</label><input id="v-model" placeholder="e.g. Hilux" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="addVehicle()">Add Vehicle</button>
+    </div>
+  </div>
+</div>
+
+<!-- REASSIGN MODAL -->
+<div class="modal-overlay" id="reassign-modal">
+  <div class="modal">
+    <div class="modal-title">Reassign Ride</div>
+    <input type="hidden" id="reassign-ride-id" />
+    <div class="field"><label>Select Driver</label><select id="reassign-driver-select"></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="confirmReassign()">Reassign</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DELIVERY MODAL -->
+<div class="modal-overlay" id="add-delivery-modal">
+  <div class="modal">
+    <div class="modal-title">New Delivery</div>
+    <div class="form-row">
+      <div class="field"><label>Sender Name</label><input id="d-sender-name" placeholder="John Doe" /></div>
+      <div class="field"><label>Sender Phone</label><input id="d-sender-phone" placeholder="71234567" /></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Recipient Name</label><input id="d-recipient-name" placeholder="Jane Doe" /></div>
+      <div class="field"><label>Recipient Phone</label><input id="d-recipient-phone" placeholder="71234567" /></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Pickup Address</label><input id="d-pickup" placeholder="e.g. Main Mall" /></div>
+      <div class="field"><label>Dropoff Address</label><input id="d-dropoff" placeholder="e.g. Airport" /></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Package Description</label><textarea id="d-description" placeholder="e.g. Documents, fragile" rows="2"></textarea></div>
+      <div class="field"><label>Weight (kg)</label><input id="d-weight" type="number" placeholder="e.g. 2.5" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-amber" onclick="addDelivery()">Create Delivery</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const BASE = "http://localhost:5000";
+  let allRides = [], allDrivers = [], allVehicles = [], allDeliveries = [];
+
+  const socket = io(BASE);
+  socket.on("connect", () => {
+    document.getElementById("dot").classList.add("live");
+    document.getElementById("conn-label").textContent = "Live";
+    socket.emit("join-role", { role: "admin", userId: 0 });
+    loadAll();
+  });
+  socket.on("disconnect", () => {
+    document.getElementById("dot").classList.remove("live");
+    document.getElementById("conn-label").textContent = "Offline";
+  });
+  socket.on("new-ride",         () => { loadAll(); showToast("New ride request!", "warn"); });
+  socket.on("ride-updated",     () => { loadAll(); });
+  socket.on("new-delivery",     () => { loadAll(); showToast("New delivery request!", "warn"); });
+  socket.on("delivery-updated", () => { loadAll(); });
+
+  function showPage(name, el) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    document.getElementById("page-" + name).classList.add("active");
+    if (el) el.classList.add("active");
+    if (name === "rides")      loadRides();
+    if (name === "deliveries") loadDeliveries();
+    if (name === "drivers")    loadDrivers();
+    if (name === "fleet")      { loadDrivers(); loadFleet(); }
+    if (name === "revenue")    loadRevenue();
+  }
+
+  async function loadAll() {
+    await Promise.all([loadOverview(), loadRides(), loadDrivers(), loadDeliveries()]);
+    document.getElementById("last-updated").textContent = "Last updated: " + new Date().toLocaleTimeString();
+  }
+
+  async function loadOverview() {
+    try {
+      const [ridesRes, driversRes, deliveriesRes] = await Promise.all([
+        fetch(`${BASE}/rides`), fetch(`${BASE}/drivers`), fetch(`${BASE}/deliveries`)
+      ]);
+      const rides = await ridesRes.json();
+      const drivers = await driversRes.json();
+      const deliveries = await deliveriesRes.json();
+      allRides = rides; allDrivers = drivers; allDeliveries = deliveries;
+
+      const completed = rides.filter(r => r.status === "completed").length;
+      const active = rides.filter(r => ["accepted","in_progress"].includes(r.status));
+      document.getElementById("stat-total-rides").textContent = rides.length;
+      document.getElementById("stat-completed").textContent   = completed;
+      document.getElementById("stat-deliveries").textContent  = deliveries.length;
+      document.getElementById("stat-drivers").textContent     = drivers.length;
+      document.getElementById("live-count").textContent       = active.length;
+      document.getElementById("delivery-count").textContent   = deliveries.filter(d => ["pending","picked_up","in_transit"].includes(d.status)).length;
+
+      document.getElementById("live-rides-body").innerHTML = active.length ? active.map(r => `
+        <tr>
+          <td style="color:#555">#${r.id}</td>
+          <td>${r.pickup} → ${r.dropoff}</td>
+          <td><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></td>
+          <td>${r.driver_id || "—"}</td>
+        </tr>
+      `).join("") : '<tr><td colspan="4" class="empty">No active rides</td></tr>';
+
+      const online = drivers.filter(d => d.available);
+      document.getElementById("online-count").textContent = online.length + " online";
+      document.getElementById("driver-status-list").innerHTML = drivers.length ? drivers.map(d => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #111118">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="avatar-lg">${d.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <div style="font-size:0.83rem;font-weight:500">${d.name}</div>
+              <div style="font-size:0.7rem;color:#444">${d.phone || "No phone"}</div>
+            </div>
+          </div>
+          <span class="badge ${d.available ? 'badge-online' : 'badge-offline'}">${d.available ? 'Online' : 'Offline'}</span>
+        </div>
+      `).join("") : '<div class="empty">No drivers</div>';
+
+      document.getElementById("recent-deliveries-body").innerHTML = deliveries.length ? deliveries.slice(0,5).map(d => `
+        <tr>
+          <td style="color:#555">#${d.id}</td>
+          <td>${d.sender_name || "—"}</td>
+          <td>${d.recipient_name || "—"}</td>
+          <td>${d.pickup_address}</td>
+          <td>${d.dropoff_address}</td>
+          <td>${d.package_description || "—"}</td>
+          <td><span class="badge badge-${d.status}">${d.status.replace("_"," ")}</span></td>
+          <td>${d.driver_name || "—"}</td>
+        </tr>
+      `).join("") : '<tr><td colspan="6" class="empty">No deliveries</td></tr>';
+    } catch(e) { showToast("Failed to load overview", "error"); }
+  }
+
+  async function loadRides() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      allRides = await res.json();
+      renderRides(allRides);
+    } catch(e) {}
+  }
+
+  function filterRides() {
+    const filter = document.getElementById("status-filter").value;
+    renderRides(filter ? allRides.filter(r => r.status === filter) : allRides);
+  }
+
+  function renderRides(rides) {
+    document.getElementById("all-rides-body").innerHTML = rides.length ? rides.map(r => `
+      <tr>
+        <td style="color:#555">#${r.id}</td>
+        <td>${r.pickup}</td>
+        <td>${r.dropoff}</td>
+        <td><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></td>
+        <td>${r.driver_id || "—"}</td>
+        <td>${r.fare ? "P" + parseFloat(r.fare).toFixed(2) : "—"}</td>
+        <td>
+          <button class="action-btn success" onclick="updateRideStatus(${r.id},'completed')">Complete</button>
+          <button class="action-btn" onclick="openReassign(${r.id})">Reassign</button>
+          <button class="action-btn danger" onclick="cancelRide(${r.id})">Cancel</button>
+        </td>
+      </tr>
+    `).join("") : '<tr><td colspan="7" class="empty">No rides found</td></tr>';
+  }
+
+  async function updateRideStatus(id, status) {
+    try {
+      await fetch(`${BASE}/rides/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      showToast("Ride updated"); loadAll();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function cancelRide(id) {
+    if (!confirm("Cancel ride #" + id + "?")) return;
+    await updateRideStatus(id, "cancelled");
+  }
+
+  function openReassign(rideId) {
+    document.getElementById("reassign-ride-id").value = rideId;
+    document.getElementById("reassign-driver-select").innerHTML = allDrivers.map(d => `<option value="${d.id}">${d.name}</option>`).join("");
+    openModal("reassign-modal");
+  }
+
+  async function confirmReassign() {
+    const rideId = document.getElementById("reassign-ride-id").value;
+    const driverId = document.getElementById("reassign-driver-select").value;
+    try {
+      await fetch(`${BASE}/rides/${rideId}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driver_id: driverId }) });
+      showToast("Driver reassigned"); closeModal(); loadAll();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  // DELIVERIES
+  async function loadDeliveries() {
+    try {
+      const res = await fetch(`${BASE}/deliveries`);
+      allDeliveries = await res.json();
+      renderDeliveries(allDeliveries);
+      document.getElementById("del-total").textContent     = allDeliveries.length;
+      document.getElementById("del-transit").textContent   = allDeliveries.filter(d => d.status === "in_transit").length;
+      document.getElementById("del-delivered").textContent = allDeliveries.filter(d => d.status === "delivered").length;
+      document.getElementById("del-pending").textContent   = allDeliveries.filter(d => d.status === "pending").length;
+    } catch(e) {}
+  }
+
+  function renderDeliveries(deliveries) {
+    document.getElementById("deliveries-body").innerHTML = deliveries.length ? deliveries.map(d => `
+      <tr>
+        <td style="color:#555">#${d.id}</td>
+        <td>${d.sender_name || "—"}<br><small style="color:#444">${d.sender_phone || ""}</small></td>
+        <td>${d.recipient_name || "—"}<br><small style="color:#444">${d.recipient_phone || ""}</small></td>
+        <td>${d.pickup_address}</td>
+        <td>${d.dropoff_address}</td>
+        <td>${d.package_description || "—"}<br><small style="color:#444">${d.weight ? d.weight + "kg" : ""}</small></td>
+        <td>
+          <select class="inline-select" onchange="updateDeliveryStatus(${d.id}, this.value)">
+            <option value="pending"    ${d.status==='pending'    ? 'selected':''}>Pending</option>
+            <option value="picked_up"  ${d.status==='picked_up'  ? 'selected':''}>Picked Up</option>
+            <option value="in_transit" ${d.status==='in_transit' ? 'selected':''}>In Transit</option>
+            <option value="delivered"  ${d.status==='delivered'  ? 'selected':''}>Delivered</option>
+            <option value="cancelled"  ${d.status==='cancelled'  ? 'selected':''}>Cancelled</option>
+          </select>
+        </td>
+        <td>
+          <select class="inline-select" onchange="assignDelivery(${d.id}, this.value)">
+            <option value="">Unassigned</option>
+            ${allDrivers.map(dr => `<option value="${dr.id}" ${d.driver_id==dr.id?'selected':''}>${dr.name}</option>`).join("")}
+          </select>
+        </td>
+        <td>
+          <button class="action-btn danger" onclick="deleteDelivery(${d.id})">Delete</button>
+        </td>
+      </tr>
+    `).join("") : '<tr><td colspan="9" class="empty">No deliveries yet</td></tr>';
+  }
+
+  async function addDelivery() {
+    const body = {
+      sender_name: document.getElementById("d-sender-name").value.trim(),
+      sender_phone: document.getElementById("d-sender-phone").value.trim(),
+      recipient_name: document.getElementById("d-recipient-name").value.trim(),
+      recipient_phone: document.getElementById("d-recipient-phone").value.trim(),
+      pickup_address: document.getElementById("d-pickup").value.trim(),
+      dropoff_address: document.getElementById("d-dropoff").value.trim(),
+      package_description: document.getElementById("d-description").value.trim(),
+      weight: document.getElementById("d-weight").value
+    };
+    if (!body.pickup_address || !body.dropoff_address) return showToast("Enter pickup and dropoff", "error");
+    try {
+      await fetch(`${BASE}/deliveries`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      showToast("Delivery created!"); closeModal(); loadDeliveries();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function updateDeliveryStatus(id, status) {
+    try {
+      await fetch(`${BASE}/deliveries/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      showToast("Delivery updated"); loadDeliveries();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function assignDelivery(id, driverId) {
+    try {
+      await fetch(`${BASE}/deliveries/${id}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driver_id: driverId || null }) });
+      showToast("Driver assigned"); loadDeliveries();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function deleteDelivery(id) {
+    if (!confirm("Delete delivery #" + id + "?")) return;
+    try {
+      await fetch(`${BASE}/deliveries/${id}`, { method: "DELETE" });
+      showToast("Delivery deleted"); loadDeliveries();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  // DRIVERS
+  async function loadDrivers() {
+    try {
+      const res = await fetch(`${BASE}/drivers`);
+      allDrivers = await res.json();
+      renderDrivers(allDrivers);
+    } catch(e) {}
+  }
+
+  function renderDrivers(drivers) {
+    document.getElementById("drivers-body").innerHTML = drivers.length ? drivers.map(d => `
+      <tr>
+        <td style="color:#555">#${d.id}</td>
+        <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">${d.name.charAt(0).toUpperCase()}</div>${d.name}</div></td>
+        <td>${d.phone || "—"}</td>
+        <td><span class="badge ${d.available ? 'badge-online' : 'badge-offline'}">${d.available ? 'Online' : 'Offline'}</span></td>
+        <td>
+          <button class="action-btn ${d.available ? 'danger' : 'success'}" onclick="toggleDriver(${d.id}, ${!d.available})">${d.available ? 'Set Offline' : 'Set Online'}</button>
+          <button class="action-btn danger" onclick="deleteDriver(${d.id})">Remove</button>
+        </td>
+      </tr>
+    `).join("") : '<tr><td colspan="5" class="empty">No drivers yet</td></tr>';
+  }
+
+  async function addDriver() {
+    const name  = document.getElementById("new-driver-name").value.trim();
+    const phone = document.getElementById("new-driver-phone").value.trim();
+    if (!name) return showToast("Enter driver name", "error");
+    try {
+      await fetch(`${BASE}/drivers`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, phone }) });
+      showToast("Driver added!"); closeModal();
+      document.getElementById("new-driver-name").value = "";
+      document.getElementById("new-driver-phone").value = "";
+      loadAll();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function toggleDriver(id, available) {
+    try {
+      await fetch(`${BASE}/drivers/${id}/availability`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ available }) });
+      showToast("Driver updated"); loadAll();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function deleteDriver(id) {
+    if (!confirm("Remove driver #" + id + "?")) return;
+    try {
+      await fetch(`${BASE}/drivers/${id}`, { method: "DELETE" });
+      showToast("Driver removed"); loadAll();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  // FLEET
+  async function loadFleet() {
+    try {
+      const res = await fetch(`${BASE}/vehicles`);
+      allVehicles = await res.json();
+      document.getElementById("fleet-total").textContent       = allVehicles.length;
+      document.getElementById("fleet-available").textContent   = allVehicles.filter(v => v.status === "available").length;
+      document.getElementById("fleet-maintenance").textContent = allVehicles.filter(v => v.status === "maintenance").length;
+      document.getElementById("fleet-body").innerHTML = allVehicles.length ? allVehicles.map(v => `
+        <tr>
+          <td style="color:#555">#${v.id}</td>
+          <td style="font-weight:600;color:#f59e0b">${v.plate}</td>
+          <td>${v.make || "—"} ${v.model || ""}</td>
+          <td>${v.type || "—"}</td>
+          <td>
+            <select class="inline-select" onchange="updateVehicleStatus(${v.id}, this.value)">
+              <option value="available"   ${v.status==='available'   ?'selected':''}>Available</option>
+              <option value="on_trip"     ${v.status==='on_trip'     ?'selected':''}>On Trip</option>
+              <option value="maintenance" ${v.status==='maintenance' ?'selected':''}>Maintenance</option>
+            </select>
+          </td>
+          <td>
+            <select class="inline-select" onchange="assignVehicle(${v.id}, this.value)">
+              <option value="">Unassigned</option>
+              ${allDrivers.map(d => `<option value="${d.id}" ${v.driver_id==d.id?'selected':''}>${d.name}</option>`).join("")}
+            </select>
+          </td>
+          <td><button class="action-btn danger" onclick="deleteVehicle(${v.id})">Remove</button></td>
+        </tr>
+      `).join("") : '<tr><td colspan="7" class="empty">No vehicles yet</td></tr>';
+    } catch(e) { showToast("Failed to load fleet", "error"); }
+  }
+
+  async function addVehicle() {
+    const plate = document.getElementById("v-plate").value.trim();
+    const make  = document.getElementById("v-make").value.trim();
+    const model = document.getElementById("v-model").value.trim();
+    const type  = document.getElementById("v-type").value;
+    if (!plate) return showToast("Enter plate number", "error");
+    try {
+      await fetch(`${BASE}/vehicles`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plate, make, model, type }) });
+      showToast("Vehicle added!"); closeModal();
+      document.getElementById("v-plate").value = "";
+      document.getElementById("v-make").value  = "";
+      document.getElementById("v-model").value = "";
+      loadFleet();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function updateVehicleStatus(id, status) {
+    try {
+      await fetch(`${BASE}/vehicles/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      showToast("Vehicle updated"); loadFleet();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function assignVehicle(id, driverId) {
+    try {
+      await fetch(`${BASE}/vehicles/${id}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driver_id: driverId || null }) });
+      showToast("Vehicle assigned"); loadFleet();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function deleteVehicle(id) {
+    if (!confirm("Remove vehicle #" + id + "?")) return;
+    try {
+      await fetch(`${BASE}/vehicles/${id}`, { method: "DELETE" });
+      showToast("Vehicle removed"); loadFleet();
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  // REVENUE
+  async function loadRevenue() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const completed = rides.filter(r => r.status === "completed");
+      const total = completed.reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
+      const avg   = completed.length ? total / completed.length : 0;
+      const today = completed.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString())
+                             .reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
+      document.getElementById("rev-total").textContent     = "P" + total.toFixed(2);
+      document.getElementById("rev-today").textContent     = "P" + today.toFixed(2);
+      document.getElementById("rev-avg").textContent       = "P" + avg.toFixed(2);
+      document.getElementById("rev-completed").textContent = completed.length;
+      document.getElementById("revenue-body").innerHTML = rides.length ? rides.map(r => `
+        <tr>
+          <td style="color:#555">#${r.id}</td>
+          <td>${r.pickup} → ${r.dropoff}</td>
+          <td><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></td>
+          <td>${r.fare ? "P" + parseFloat(r.fare).toFixed(2) : "—"}</td>
+        </tr>
+      `).join("") : '<tr><td colspan="4" class="empty">No rides yet</td></tr>';
+    } catch(e) { showToast("Failed to load revenue", "error"); }
+  }
+
+  function openModal(id)  { document.getElementById(id).classList.add("open"); }
+  function closeModal()   { document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open")); }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " " + type : "");
+    setTimeout(() => t.className = "toast", 3000);
+  }
+
+  setInterval(loadAll, 30000);
+</script>
+</body>
+</html>
