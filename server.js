@@ -83,9 +83,13 @@ app.patch("/rides/:id/status", async (req, res) => {
   const allowed = ["requested", "accepted", "in_progress", "completed", "cancelled"];
   if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
   try {
+    let fare = null;
+    if (status === "completed") {
+      fare = (Math.random() * 50 + 20).toFixed(2); // Replace with real calculation later
+    }
     const result = await pool.query(
-      "UPDATE rides SET status=$1 WHERE id=$2 RETURNING *",
-      [status, req.params.id]
+      "UPDATE rides SET status=$1, fare=COALESCE($2, fare) WHERE id=$3 RETURNING *",
+      [status, fare, req.params.id]
     );
     const ride = result.rows[0];
     io.to("drivers").emit("ride-updated", ride);
