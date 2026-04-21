@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
+<head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Rider</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,10 +14,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e8e8f0; min-height: 100vh; }
-    nav {
-      background: #16161d; border-bottom: 1px solid #2a2a3a;
-      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
-    }
+    nav { background: #16161d; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em; }
     .brand span { color: #6c63ff; }
     .conn-badge { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #666; }
@@ -36,23 +32,27 @@
     .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
     .btn-primary { background: #6c63ff; color: #fff; }
-    .btn-danger  { background: #ef4444; color: #fff; }
+    .btn-danger { background: #ef4444; color: #fff; }
     .status-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 24px; margin-bottom: 20px; display: none; }
     .status-card.visible { display: block; }
     .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .status-title { font-size: 0.95rem; font-weight: 600; }
     .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-    .badge-requested  { background: #1e293b; color: #94a3b8; }
-    .badge-accepted   { background: #14532d; color: #22c55e; }
-    .badge-in_progress{ background: #451a03; color: #f59e0b; }
-    .badge-completed  { background: #1e1b4b; color: #818cf8; }
+    .badge-requested { background: #1e293b; color: #94a3b8; }
+    .badge-accepted { background: #14532d; color: #22c55e; }
+    .badge-in_progress { background: #451a03; color: #f59e0b; }
+    .badge-completed { background: #1e1b4b; color: #818cf8; }
+    .badge-cancelled { background: #2d1515; color: #ef4444; }
     .route { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
     .route-point { display: flex; align-items: center; gap: 12px; }
     .route-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
-    .route-icon.pickup  { background: #1e293b; }
+    .route-icon.pickup { background: #1e293b; }
     .route-icon.dropoff { background: #14532d; }
     .route-text { font-size: 0.88rem; color: #ccc; }
     .route-label { font-size: 0.68rem; color: #555; margin-bottom: 2px; }
+    .fare-box { background: #0f0f13; border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 16px; display: none; }
+    .fare-amount { font-size: 2rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
+    .fare-label { font-size: 0.72rem; color: #555; margin-top: 4px; }
     .driver-info { background: #0f0f13; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; }
     .driver-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #6c63ff, #22c55e); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #fff; flex-shrink: 0; }
     .driver-name { font-size: 0.88rem; font-weight: 600; }
@@ -60,22 +60,21 @@
     .history-list { display: flex; flex-direction: column; gap: 10px; }
     .history-item { background: #0f0f13; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
     .history-route { font-size: 0.83rem; color: #ccc; }
-    .history-id { font-size: 0.7rem; color: #444; margin-top: 3px; }
+    .history-meta { font-size: 0.7rem; color: #444; margin-top: 3px; }
     .empty { text-align: center; color: #444; font-size: 0.83rem; padding: 20px; }
-
-    /* MAP */
-    #rider-map { height: 260px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2a2a3a; }
-    .map-status { font-size: 0.75rem; color: #555; display: flex; align-items: center; gap: 6px; }
+    #rider-map { height: 260px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2a2a3a; display: none; }
+    .map-status { font-size: 0.75rem; color: #555; display: none; align-items: center; gap: 6px; margin-bottom: 16px; }
     .map-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
     .map-dot.active { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.83rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
+    .toast.warn { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
+
 <nav>
   <div class="brand">Spiti-Spiti<span>.</span></div>
   <div class="conn-badge">
@@ -125,9 +124,13 @@
       </div>
     </div>
 
-    <!-- Driver tracking map -->
-    <div id="rider-map" style="display:none"></div>
-    <div class="map-status" id="map-status" style="display:none;margin-bottom:16px">
+    <div class="fare-box" id="fare-box">
+      <div class="fare-amount" id="fare-amount">P0.00</div>
+      <div class="fare-label">Ride Fare</div>
+    </div>
+
+    <div id="rider-map"></div>
+    <div class="map-status" id="map-status">
       <div class="map-dot" id="map-dot"></div>
       <span id="map-text">Waiting for driver location...</span>
     </div>
@@ -139,13 +142,14 @@
         <div class="driver-label">Your driver is on the way</div>
       </div>
     </div>
+
     <button class="btn btn-danger" style="margin-top:16px" onclick="cancelRide()">Cancel Ride</button>
   </div>
 
   <!-- Ride History -->
   <div class="card">
     <div class="card-label">Recent Rides</div>
-    <div class="history-list" id="history"></div>
+    <div class="history-list" id="history"><div class="empty">No rides yet</div></div>
   </div>
 </div>
 
@@ -155,39 +159,49 @@
   const BASE = "https://spiti-spiti-production.up.railway.app";
   const RIDER_ID = 1;
   let activeRide = null;
-  let riderMap   = null;
+  let riderMap = null;
   let driverMarker = null;
   let mapInitialized = false;
 
-  const socket = io("https://spiti-spiti-production.up.railway.app");
+  const socket = io(BASE);
 
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
     document.getElementById("conn-label").textContent = "Live";
-    socket.emit("join-role", { role: "rider", userId: RIDER_ID });
+    socket.emit("join-role", { role: `rider${RIDER_ID}`, userId: RIDER_ID });
+    loadHistory();
   });
+
   socket.on("disconnect", () => {
     document.getElementById("dot").classList.remove("live");
     document.getElementById("conn-label").textContent = "Offline";
   });
+
   socket.on("ride-created", (ride) => {
     activeRide = ride;
     showActiveRide(ride);
-    showToast("Ride requested! Looking for a driver...");
+    showToast("Ride requested! Looking for a driver...", "warn");
   });
+
   socket.on("ride-updated", (ride) => {
-    if (activeRide && ride.id === activeRide.id) {
-      activeRide = ride;
-      updateRideStatus(ride);
-      if (ride.status === "accepted") showToast("Driver is on the way! 🚗");
-      if (ride.status === "completed") {
-        showToast("Ride completed! Thanks for riding.");
-        setTimeout(() => { cancelRide(); loadHistory(); }, 2000);
-      }
+    if (!activeRide || ride.id !== activeRide.id) return;
+    activeRide = ride;
+    updateRideStatus(ride);
+    if (ride.status === "accepted") showToast("Driver is on the way! 🚗");
+    if (ride.status === "in_progress") showToast("Your ride has started! 🚀");
+    if (ride.status === "completed") {
+      const fare = ride.fare ? "P" + parseFloat(ride.fare).toFixed(2) : "";
+      document.getElementById("fare-box").style.display = "block";
+      document.getElementById("fare-amount").textContent = fare || "P0.00";
+      showToast("Ride completed! " + fare + " Thanks for riding 🎉");
+      setTimeout(() => { resetRide(); loadHistory(); }, 4000);
+    }
+    if (ride.status === "cancelled") {
+      showToast("Ride was cancelled", "error");
+      setTimeout(() => { resetRide(); loadHistory(); }, 2000);
     }
   });
 
-  // REAL TIME DRIVER LOCATION
   socket.on("driver-location", (data) => {
     if (!activeRide) return;
     updateDriverOnMap(data.lat, data.lng);
@@ -215,8 +229,7 @@
         icon: L.divIcon({
           className: "",
           html: '<div style="background:#6c63ff;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(108,99,255,0.8)"></div>',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+          iconSize: [16, 16], iconAnchor: [8, 8]
         })
       }).addTo(riderMap).bindPopup("Your Driver");
     }
@@ -226,7 +239,7 @@
   function showActiveRide(ride) {
     document.getElementById("request-card").style.display = "none";
     document.getElementById("status-card").classList.add("visible");
-    document.getElementById("r-pickup").textContent  = ride.pickup;
+    document.getElementById("r-pickup").textContent = ride.pickup;
     document.getElementById("r-dropoff").textContent = ride.dropoff;
     updateRideStatus(ride);
   }
@@ -234,16 +247,16 @@
   function updateRideStatus(ride) {
     const badge = document.getElementById("status-badge");
     badge.className = `badge badge-${ride.status}`;
-    badge.textContent = ride.status.replace("_", " ");
+    badge.textContent = ride.status.replace(/_/g, " ");
     if (ride.driver_id) {
       document.getElementById("driver-info").style.display = "flex";
-      document.getElementById("driver-name").textContent   = "Driver #" + ride.driver_id;
+      document.getElementById("driver-name").textContent = "Driver #" + ride.driver_id;
       document.getElementById("driver-avatar").textContent = "D" + ride.driver_id;
       initMap();
     }
   }
 
-  function cancelRide() {
+  function resetRide() {
     activeRide = null;
     mapInitialized = false;
     driverMarker = null;
@@ -253,12 +266,15 @@
     document.getElementById("rider-map").style.display = "none";
     document.getElementById("map-status").style.display = "none";
     document.getElementById("driver-info").style.display = "none";
+    document.getElementById("fare-box").style.display = "none";
   }
 
+  function cancelRide() { resetRide(); }
+
   async function createRide() {
-    const pickup  = document.getElementById("pickup").value.trim();
+    const pickup = document.getElementById("pickup").value.trim();
     const dropoff = document.getElementById("dropoff").value.trim();
-    if (!pickup || !dropoff) return showToast("Enter pickup and dropoff", true);
+    if (!pickup || !dropoff) return showToast("Enter pickup and dropoff", "error");
     try {
       const res = await fetch(`${BASE}/rides`, {
         method: "POST",
@@ -270,7 +286,7 @@
       showActiveRide(ride);
       showToast("Ride requested!");
       loadHistory();
-    } catch(e) { showToast("Failed to create ride", true); }
+    } catch(e) { showToast("Failed to create ride", "error"); }
   }
 
   async function loadHistory() {
@@ -282,22 +298,20 @@
         <div class="history-item">
           <div>
             <div class="history-route">${r.pickup} → ${r.dropoff}</div>
-            <div class="history-id">Ride #${r.id}</div>
+            <div class="history-meta">Ride #${r.id} ${r.fare ? "· P" + parseFloat(r.fare).toFixed(2) : ""}</div>
           </div>
-          <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
+          <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
         </div>
       `).join("") : '<div class="empty">No rides yet</div>';
     } catch(e) {}
   }
 
-  function showToast(msg, error = false) {
+  function showToast(msg, type = "") {
     const t = document.getElementById("toast");
     t.textContent = msg;
-    t.className = "toast show" + (error ? " error" : "");
-    setTimeout(() => t.className = "toast", 3000);
+    t.className = "toast show" + (type ? " " + type : "");
+    setTimeout(() => t.className = "toast", 3500);
   }
-
-  loadHistory();
 </script>
 </body>
 </html>
