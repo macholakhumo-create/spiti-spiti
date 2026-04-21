@@ -352,6 +352,3 @@ app.delete("/deliveries/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-server.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
