@@ -11,12 +11,14 @@
   {
   "name": "spiti-spiti",
   "version": "1.0.0",
+  "description": "Spiti-Spiti logistics app",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": "9.x"
   }
 }
   "keywords": [],
