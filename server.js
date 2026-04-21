@@ -5,7 +5,6 @@ const { Server } = require("socket.io");
 const pool = require("./db");
 
 const app = express();
-app.use(express.static(__dirname));
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -21,10 +20,7 @@ io.on("connection", (socket) => {
     if (role.startsWith("rider")) socket.join(`rider:${userId}`);
     console.log("ROLE JOIN:", role, userId);
   });
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-  });
+});
 
 // GET all rides
 app.get("/rides", async (req, res) => {
@@ -231,6 +227,7 @@ app.delete("/vehicles/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // UPDATE driver location
 app.patch("/drivers/:id/location", async (req, res) => {
   const { lat, lng } = req.body;
@@ -240,7 +237,6 @@ app.patch("/drivers/:id/location", async (req, res) => {
       [lat, lng, req.params.id]
     );
     const driver = result.rows[0];
-    // Broadcast to all riders and admin
     io.emit("driver-location", { driverId: driver.id, lat: driver.lat, lng: driver.lng });
     res.json(driver);
   } catch (err) {
@@ -261,6 +257,7 @@ app.get("/drivers/:id/location", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // GET all deliveries
 app.get("/deliveries", async (req, res) => {
   try {
@@ -350,4 +347,9 @@ app.delete("/deliveries/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
