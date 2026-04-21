@@ -5,10 +5,10 @@ const { Server } = require("socket.io");
 const pool = require("./db");
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(__dirname));
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
