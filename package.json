@@ -8,6 +8,17 @@
     "start": "node server.js"
   }
 }
+  {
+  "name": "spiti-spiti",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
   "keywords": [],
   "author": "",
   "license": "ISC",
