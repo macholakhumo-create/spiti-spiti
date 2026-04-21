@@ -370,7 +370,7 @@
   const BASE = "https://spiti-spiti-production.up.railway.app";
   let allRides = [], allDrivers = [], allVehicles = [], allDeliveries = [];
 
-  const socket = io(BASE);
+  const socket = io("https://spiti-spiti-production.up.railway.app");
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
     document.getElementById("conn-label").textContent = "Live";
