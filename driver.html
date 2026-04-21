@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spiti-Spiti Driver</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,9 +14,12 @@
     nav { background: #16161d; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em; }
     .brand span { color: #22c55e; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
     .conn-badge { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #666; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; }
     .dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .emergency-btn { display: flex; align-items: center; gap: 6px; background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; animation: emergencyPulse 2s infinite; text-decoration: none; }
+    @keyframes emergencyPulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)} 50%{box-shadow:0 0 0 8px rgba(239,68,68,0)} }
     .container { max-width: 520px; margin: 0 auto; padding: 32px 20px; }
     .page-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 6px; }
     .page-sub { font-size: 0.85rem; color: #555; margin-bottom: 32px; }
@@ -34,9 +34,15 @@
     .slider:before { content: ""; position: absolute; width: 20px; height: 20px; left: 4px; bottom: 4px; background: #fff; border-radius: 50%; transition: 0.3s; }
     input:checked + .slider { background: #22c55e; }
     input:checked + .slider:before { transform: translateX(24px); }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 12px; padding: 18px; }
+    .stat-num { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; color: #22c55e; }
+    .stat-label { font-size: 0.72rem; color: #555; margin-top: 4px; }
+
+    /* INCOMING */
     .incoming { background: linear-gradient(135deg, #14532d, #166534); border: 1px solid #22c55e44; border-radius: 16px; padding: 24px; margin-bottom: 20px; display: none; animation: pulse 2s infinite; }
     .incoming.visible { display: block; }
-    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.2); } 50% { box-shadow: 0 0 0 12px rgba(34,197,94,0); } }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.2)} 50%{box-shadow:0 0 0 12px rgba(34,197,94,0)} }
     .incoming-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
     .incoming-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(34,197,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
     .incoming-title { font-size: 0.95rem; font-weight: 600; }
@@ -48,56 +54,80 @@
     .route-icon.dropoff { background: rgba(34,197,94,0.2); }
     .route-label { font-size: 0.68rem; color: #86efac; margin-bottom: 2px; }
     .route-text { font-size: 0.85rem; }
+
+    /* FARE INPUT */
+    .fare-input-section { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 14px; margin-bottom: 16px; }
+    .fare-input-label { font-size: 0.72rem; color: #86efac; margin-bottom: 8px; }
+    .fare-input-row { display: flex; gap: 8px; align-items: center; }
+    .fare-prefix { font-size: 1.1rem; font-weight: 700; color: #22c55e; }
+    .fare-input { flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; outline: none; }
+    .fare-input:focus { border-color: #22c55e; }
+
     .btn-row { display: flex; gap: 10px; }
     .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-accept { background: #22c55e; color: #fff; }
+    .btn-accept  { background: #22c55e; color: #fff; }
     .btn-decline { background: #1e1e28; color: #888; border: 1px solid #2a2a3a; }
     .btn-full { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; margin-bottom: 8px; }
     .btn-full:hover { opacity: 0.88; }
-    .btn-start { background: #f59e0b; color: #000; }
+    .btn-start    { background: #f59e0b; color: #000; }
     .btn-complete { background: #22c55e; color: #fff; }
+
+    /* ACTIVE RIDE */
     .active-ride { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 24px; margin-bottom: 20px; display: none; }
     .active-ride.visible { display: block; }
+    .fare-display { background: #0f0f13; border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .fare-display-label { font-size: 0.72rem; color: #555; }
+    .fare-display-amount { font-size: 1.2rem; font-weight: 700; color: #22c55e; }
     .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .status-btn { padding: 8px 14px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #666; transition: all 0.2s; }
     .status-btn:hover { border-color: #22c55e; color: #22c55e; }
-    .fare-box { background: #0f0f13; border-radius: 10px; padding: 14px; text-align: center; margin-top: 16px; display: none; }
-    .fare-amount { font-size: 2rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
-    .fare-label { font-size: 0.72rem; color: #555; margin-top: 4px; }
-    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .stat-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 12px; padding: 18px; }
-    .stat-num { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; color: #22c55e; }
-    .stat-label { font-size: 0.72rem; color: #555; margin-top: 4px; }
-    .ride-item { background: #0f0f13; border-radius: 10px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .ride-item:last-child { margin-bottom: 0; }
-    .ride-route { font-size: 0.83rem; }
-    .ride-meta { font-size: 0.7rem; color: #444; margin-top: 3px; }
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    .badge-requested { background: #1e293b; color: #94a3b8; }
-    .badge-accepted { background: #14532d; color: #22c55e; }
-    .badge-in_progress { background: #451a03; color: #f59e0b; }
-    .badge-completed { background: #1e1b4b; color: #818cf8; }
-    .badge-cancelled { background: #2d1515; color: #ef4444; }
-    .empty { text-align: center; color: #444; font-size: 0.83rem; padding: 20px; }
+
+    /* MAP */
     #driver-map { height: 200px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2a2a3a; }
     .location-status { font-size: 0.75rem; color: #555; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
     .location-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
     .location-dot.tracking { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* CHAT */
+    .chat-section { margin-top: 16px; }
+    .chat-box { background: #0f0f13; border-radius: 12px; padding: 14px; height: 200px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .chat-msg { max-width: 75%; padding: 8px 12px; border-radius: 12px; font-size: 0.82rem; line-height: 1.4; }
+    .chat-msg.driver { background: #22c55e; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .chat-msg.rider  { background: #1e1e2e; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .chat-msg-time { font-size: 0.6rem; opacity: 0.6; margin-top: 3px; }
+    .chat-input-row { display: flex; gap: 8px; }
+    .chat-input { flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 10px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.83rem; outline: none; }
+    .chat-input:focus { border-color: #22c55e; }
+    .chat-send { background: #22c55e; border: none; border-radius: 10px; padding: 10px 16px; color: #fff; font-size: 0.9rem; cursor: pointer; transition: opacity 0.2s; }
+    .chat-send:hover { opacity: 0.85; }
+    .chat-empty { text-align: center; color: #333; font-size: 0.78rem; padding: 20px; }
+
+    .ride-item { background: #0f0f13; border-radius: 10px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .ride-route { font-size: 0.83rem; }
+    .ride-id { font-size: 0.7rem; color: #444; margin-top: 3px; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-requested  { background: #1e293b; color: #94a3b8; }
+    .badge-offered    { background: #1e1b4b; color: #818cf8; }
+    .badge-accepted   { background: #14532d; color: #22c55e; }
+    .badge-in_progress{ background: #451a03; color: #f59e0b; }
+    .badge-completed  { background: #1e1b4b; color: #818cf8; }
+    .empty { text-align: center; color: #444; font-size: 0.83rem; padding: 20px; }
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.83rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
-    .toast.warn { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
-
 <nav>
   <div class="brand">Spiti-Spiti<span>.</span> Driver</div>
-  <div class="conn-badge">
-    <div class="dot" id="dot"></div>
-    <span id="conn-label">Connecting...</span>
+  <div class="nav-right">
+    <a href="tel:999" class="emergency-btn">🚨 999</a>
+    <div class="conn-badge">
+      <div class="dot" id="dot"></div>
+      <span id="conn-label">Connecting...</span>
+    </div>
   </div>
 </nav>
 
@@ -121,305 +151,4 @@
   <div class="stats">
     <div class="stat-card">
       <div class="stat-num" id="total-rides">0</div>
-      <div class="stat-label">Total Rides</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="completed-rides">0</div>
-      <div class="stat-label">Completed</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="total-earnings">P0</div>
-      <div class="stat-label">Earnings</div>
-    </div>
-  </div>
-
-  <!-- Live Location -->
-  <div class="card">
-    <div class="card-label">Your Location</div>
-    <div id="driver-map"></div>
-    <div class="location-status">
-      <div class="location-dot" id="location-dot"></div>
-      <span id="location-text">Location not sharing</span>
-    </div>
-    <button class="btn-full btn-start" id="start-tracking-btn" onclick="startTracking()">📍 Start Sharing Location</button>
-    <button class="btn-full btn-complete" onclick="stopTracking()" style="display:none" id="stop-tracking-btn">⏹ Stop Sharing</button>
-  </div>
-
-  <!-- Incoming Ride -->
-  <div class="incoming" id="incoming-card">
-    <div class="incoming-header">
-      <div class="incoming-icon">🔔</div>
-      <div>
-        <div class="incoming-title">New Ride Request</div>
-        <div class="incoming-sub">Tap accept to take this ride</div>
-      </div>
-    </div>
-    <div class="route">
-      <div class="route-point">
-        <div class="route-icon pickup">📍</div>
-        <div>
-          <div class="route-label">Pickup</div>
-          <div class="route-text" id="inc-pickup">—</div>
-        </div>
-      </div>
-      <div class="route-point">
-        <div class="route-icon dropoff">🏁</div>
-        <div>
-          <div class="route-label">Dropoff</div>
-          <div class="route-text" id="inc-dropoff">—</div>
-        </div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-accept" onclick="acceptRide()">Accept Ride</button>
-      <button class="btn btn-decline" onclick="declineRide()">Decline</button>
-    </div>
-  </div>
-
-  <!-- Active Ride -->
-  <div class="active-ride" id="active-card">
-    <div class="card-label">Current Ride</div>
-    <div class="route">
-      <div class="route-point">
-        <div class="route-icon pickup">📍</div>
-        <div>
-          <div class="route-label" style="color:#555">Pickup</div>
-          <div class="route-text" id="act-pickup">—</div>
-        </div>
-      </div>
-      <div class="route-point">
-        <div class="route-icon dropoff">🏁</div>
-        <div>
-          <div class="route-label" style="color:#555">Dropoff</div>
-          <div class="route-text" id="act-dropoff">—</div>
-        </div>
-      </div>
-    </div>
-    <div class="status-row">
-      <button class="status-btn" onclick="updateStatus('in_progress')">▶ Start Ride</button>
-      <button class="status-btn" onclick="updateStatus('completed')">✓ Complete</button>
-    </div>
-    <div class="fare-box" id="fare-box">
-      <div class="fare-amount" id="fare-amount">P0.00</div>
-      <div class="fare-label">Ride Fare Earned</div>
-    </div>
-  </div>
-
-  <!-- All Rides -->
-  <div class="card">
-    <div class="card-label">All Rides</div>
-    <div id="rides-list"><div class="empty">No rides yet</div></div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-  const BASE = "https://spiti-spiti-production.up.railway.app";
-  const DRIVER_ID = 1;
-  let pendingRide = null;
-  let activeRide = null;
-  let trackingInterval = null;
-  let driverMap = null;
-  let driverMarker = null;
-
-  window.addEventListener("load", () => {
-    driverMap = L.map("driver-map").setView([-24.6541, 25.9087], 13);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap"
-    }).addTo(driverMap);
-  });
-
-  const socket = io(BASE);
-
-  socket.on("connect", () => {
-    document.getElementById("dot").classList.add("live");
-    document.getElementById("conn-label").textContent = "Live";
-    socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
-    loadRides();
-  });
-
-  socket.on("disconnect", () => {
-    document.getElementById("dot").classList.remove("live");
-    document.getElementById("conn-label").textContent = "Offline";
-  });
-
-  socket.on("new-ride", (ride) => {
-    pendingRide = ride;
-    document.getElementById("inc-pickup").textContent = ride.pickup;
-    document.getElementById("inc-dropoff").textContent = ride.dropoff;
-    document.getElementById("incoming-card").classList.add("visible");
-    showToast("New ride request! 🔔", "warn");
-    loadRides();
-  });
-
-  socket.on("new-delivery", (delivery) => {
-    showToast("New delivery request! 📦", "warn");
-  });
-
-  socket.on("ride-updated", (ride) => {
-    if (activeRide && ride.id === activeRide.id) {
-      activeRide = ride;
-      if (ride.status === "completed") {
-        const fare = ride.fare ? "P" + parseFloat(ride.fare).toFixed(2) : "P0.00";
-        document.getElementById("fare-box").style.display = "block";
-        document.getElementById("fare-amount").textContent = fare;
-        showToast("Ride completed! Earned " + fare + " 🎉");
-        setTimeout(() => {
-          document.getElementById("active-card").classList.remove("visible");
-          document.getElementById("fare-box").style.display = "none";
-          activeRide = null;
-          loadRides();
-        }, 4000);
-      }
-    }
-    loadRides();
-  });
-
-  function startTracking() {
-    if (!navigator.geolocation) return showToast("Geolocation not supported", "error");
-    document.getElementById("location-dot").classList.add("tracking");
-    document.getElementById("location-text").textContent = "Sharing location...";
-    document.getElementById("stop-tracking-btn").style.display = "block";
-    document.getElementById("start-tracking-btn").style.display = "none";
-    sendLocation();
-    trackingInterval = setInterval(sendLocation, 5000);
-    showToast("Location sharing started");
-  }
-
-  function stopTracking() {
-    clearInterval(trackingInterval);
-    trackingInterval = null;
-    document.getElementById("location-dot").classList.remove("tracking");
-    document.getElementById("location-text").textContent = "Location not sharing";
-    document.getElementById("stop-tracking-btn").style.display = "none";
-    document.getElementById("start-tracking-btn").style.display = "block";
-    showToast("Location sharing stopped");
-  }
-
-  function sendLocation() {
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      if (driverMap) {
-        if (driverMarker) {
-          driverMarker.setLatLng([lat, lng]);
-        } else {
-          driverMarker = L.marker([lat, lng], {
-            icon: L.divIcon({
-              className: "",
-              html: '<div style="background:#22c55e;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(34,197,94,0.8)"></div>',
-              iconSize: [16, 16], iconAnchor: [8, 8]
-            })
-          }).addTo(driverMap);
-        }
-        driverMap.setView([lat, lng], 15);
-      }
-      document.getElementById("location-text").textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
-      try {
-        await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lat, lng })
-        });
-      } catch(e) {}
-    }, () => showToast("Could not get location", "error"));
-  }
-
-  async function acceptRide() {
-    if (!pendingRide) return;
-    try {
-      const res = await fetch(`${BASE}/rides/accept`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rideId: pendingRide.id, driverId: DRIVER_ID })
-      });
-      const ride = await res.json();
-      activeRide = ride;
-      document.getElementById("incoming-card").classList.remove("visible");
-      document.getElementById("active-card").classList.add("visible");
-      document.getElementById("act-pickup").textContent = ride.pickup;
-      document.getElementById("act-dropoff").textContent = ride.dropoff;
-      pendingRide = null;
-      showToast("Ride accepted! 🚗");
-      loadRides();
-    } catch(e) { showToast("Failed to accept", "error"); }
-  }
-
-  function declineRide() {
-    pendingRide = null;
-    document.getElementById("incoming-card").classList.remove("visible");
-    showToast("Ride declined");
-  }
-
-  async function updateStatus(status) {
-    if (!activeRide) return;
-    try {
-      const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
-      });
-      const ride = await res.json();
-      activeRide = ride;
-      if (status === "completed") {
-        const fare = ride.fare ? "P" + parseFloat(ride.fare).toFixed(2) : "P0.00";
-        document.getElementById("fare-box").style.display = "block";
-        document.getElementById("fare-amount").textContent = fare;
-        showToast("Ride completed! Earned " + fare + " 🎉");
-        setTimeout(() => {
-          document.getElementById("active-card").classList.remove("visible");
-          document.getElementById("fare-box").style.display = "none";
-          activeRide = null;
-          loadRides();
-        }, 4000);
-      } else {
-        showToast("Status: " + status.replace(/_/g, " "));
-      }
-      loadRides();
-    } catch(e) { showToast("Failed", "error"); }
-  }
-
-  async function toggleAvailability() {
-    const on = document.getElementById("avail-toggle").checked;
-    document.getElementById("avail-sub").textContent = on ? "You are online" : "You are offline";
-    try {
-      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ available: on })
-      });
-      showToast(on ? "You are now online 🟢" : "You are now offline");
-    } catch(e) { showToast("Failed to update availability", "error"); }
-  }
-
-  async function loadRides() {
-    try {
-      const res = await fetch(`${BASE}/rides`);
-      const rides = await res.json();
-      const el = document.getElementById("rides-list");
-      el.innerHTML = rides.length ? rides.map(r => `
-        <div class="ride-item">
-          <div>
-            <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
-            <div class="ride-meta">Ride #${r.id} ${r.fare ? "· P" + parseFloat(r.fare).toFixed(2) : ""}</div>
-          </div>
-          <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
-        </div>
-      `).join("") : '<div class="empty">No rides yet</div>';
-      document.getElementById("total-rides").textContent = rides.length;
-      document.getElementById("completed-rides").textContent = rides.filter(r => r.status === "completed").length;
-      const earnings = rides.filter(r => r.status === "completed" && r.driver_id == DRIVER_ID)
-        .reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
-      document.getElementById("total-earnings").textContent = "P" + earnings.toFixed(2);
-    } catch(e) {}
-  }
-
-  function showToast(msg, type = "") {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.className = "toast show" + (type ? " " + type : "");
-    setTimeout(() => t.className = "toast", 3500);
-  }
-</script>
-</body>
-</html>
+      <div class
