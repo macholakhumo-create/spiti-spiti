@@ -50,84 +50,78 @@ app.get("/rides/:id", async (req, res) => {
   }
 });
 
-// CREATE ride
+// CREATE ride with rider's offered price
 app.post("/rides", async (req, res) => {
-  const { pickup, dropoff, riderId } = req.body;
+  const { pickup, dropoff, riderId, offered_fare } = req.body;
+  const fare = Math.max(15, parseFloat(offered_fare) || 15);
   try {
     const result = await pool.query(
-      "INSERT INTO rides (pickup, dropoff, status) VALUES ($1, $2, 'requested') RETURNING *",
-      [pickup, dropoff]
+      "INSERT INTO rides (pickup, dropoff, status, rider_id, offered_fare) VALUES ($1, $2, 'requested', $3, $4) RETURNING *",
+      [pickup, dropoff, riderId || 1, fare]
     );
     const ride = result.rows[0];
     io.to("drivers").emit("new-ride", ride);
     if (riderId) io.to(`rider:${riderId}`).emit("ride-created", ride);
+    // Auto expire after 10 minutes if no driver accepts
+    setTimeout(async () => {
+      try {
+        const check = await pool.query("SELECT status FROM rides WHERE id=$1", [ride.id]);
+        if (check.rows[0] && check.rows[0].status === "requested") {
+          await pool.query("UPDATE rides SET status='cancelled' WHERE id=$1", [ride.id]);
+          if (riderId) io.to(`rider:${riderId}`).emit("ride-updated", { ...ride, status: "cancelled" });
+        }
+      } catch(e) {}
+    }, 600000);
     res.json(ride);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// OFFER fare (driver proposes fare)
+// DRIVER makes offer (accept or counter)
 app.post("/rides/:id/offer", async (req, res) => {
-  const { fare_offer, driverId } = req.body;
+  const { fare_offer, driverId, driver_name } = req.body;
+  const fare = Math.max(15, parseFloat(fare_offer) || 15);
+  try {
+    const result = await pool.query("SELECT * FROM rides WHERE id=$1", [req.params.id]);
+    const ride = result.rows[0];
+    if (!ride) return res.status(404).json({ error: "Ride not found" });
+    const offer = { rideId: ride.id, driverId, driver_name, fare_offer: fare, pickup: ride.pickup, dropoff: ride.dropoff };
+    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("driver-offer", offer);
+    io.to("drivers").emit("offer-sent", { rideId: ride.id, driverId });
+    res.json({ success: true, offer });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// RIDER accepts a driver's offer
+app.post("/rides/:id/accept-offer", async (req, res) => {
+  const { driverId, fare } = req.body;
   try {
     const result = await pool.query(
-      "UPDATE rides SET fare_offer=$1, status='offered', driver_id=$2 WHERE id=$3 RETURNING *",
-      [fare_offer, driverId, req.params.id]
+      "UPDATE rides SET status='accepted', driver_id=$1, fare=$2, fare_accepted=true WHERE id=$3 RETURNING *",
+      [driverId, fare, req.params.id]
     );
     const ride = result.rows[0];
-   io.emit("fare-offered", ride);
     io.to("drivers").emit("ride-updated", ride);
+    io.to(`driver:${driverId}`).emit("offer-accepted", ride);
+    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("ride-updated", ride);
     res.json(ride);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ACCEPT fare (rider accepts)
-app.post("/rides/:id/accept-fare", async (req, res) => {
+// RIDER declines a driver's offer
+app.post("/rides/:id/decline-offer", async (req, res) => {
+  const { driverId } = req.body;
   try {
-    const result = await pool.query(
-      "UPDATE rides SET fare_accepted=true, status='accepted', fare=fare_offer WHERE id=$1 RETURNING *",
-      [req.params.id]
-    );
+    const result = await pool.query("SELECT * FROM rides WHERE id=$1", [req.params.id]);
     const ride = result.rows[0];
-    io.to("drivers").emit("ride-updated", ride);
-    io.to("rider").emit("ride-updated", ride);
-    res.json(ride);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DECLINE fare (rider declines)
-app.post("/rides/:id/decline-fare", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "UPDATE rides SET fare_offer=NULL, status='requested', driver_id=NULL WHERE id=$1 RETURNING *",
-      [req.params.id]
-    );
-    const ride = result.rows[0];
-    io.to("drivers").emit("new-ride", ride);
-    io.to("rider").emit("fare-declined", ride);
-    res.json(ride);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ACCEPT ride (legacy)
-app.post("/rides/accept", async (req, res) => {
-  const { rideId, driverId } = req.body;
-  try {
-    const result = await pool.query(
-      "UPDATE rides SET status='accepted', driver_id=$1 WHERE id=$2 RETURNING *",
-      [driverId, rideId]
-    );
-    const ride = result.rows[0];
-    io.to("drivers").emit("ride-updated", ride);
-    io.to("rider").emit("ride-updated", ride);
-    res.json(ride);
+    io.to(`driver:${driverId}`).emit("offer-declined", { rideId: ride.id });
+    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("offer-cleared", { rideId: ride.id });
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -145,7 +139,7 @@ app.patch("/rides/:id/status", async (req, res) => {
     );
     const ride = result.rows[0];
     io.to("drivers").emit("ride-updated", ride);
-    io.to("rider").emit("ride-updated", ride);
+    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("ride-updated", ride);
     res.json(ride);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -166,7 +160,7 @@ app.patch("/rides/:id/assign", async (req, res) => {
   }
 });
 
-// GET messages for a ride
+// GET messages
 app.get("/rides/:id/messages", async (req, res) => {
   try {
     const result = await pool.query(
@@ -219,7 +213,7 @@ app.post("/drivers", async (req, res) => {
   }
 });
 
-// TOGGLE driver availability
+// TOGGLE availability
 app.patch("/drivers/:id/availability", async (req, res) => {
   const { available } = req.body;
   try {
@@ -259,14 +253,26 @@ app.patch("/drivers/:id/location", async (req, res) => {
   }
 });
 
+// GET driver location
+app.get("/drivers/:id/location", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, name, lat, lng FROM drivers WHERE id=$1",
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: "Driver not found" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET all vehicles
 app.get("/vehicles", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT v.*, d.name as driver_name
-      FROM vehicles v
-      LEFT JOIN drivers d ON v.driver_id = d.id
-      ORDER BY v.id DESC
+      SELECT v.*, d.name as driver_name FROM vehicles v
+      LEFT JOIN drivers d ON v.driver_id = d.id ORDER BY v.id DESC
     `);
     res.json(result.rows);
   } catch (err) {
@@ -333,10 +339,8 @@ app.delete("/vehicles/:id", async (req, res) => {
 app.get("/deliveries", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT d.*, dr.name as driver_name
-      FROM deliveries d
-      LEFT JOIN drivers dr ON d.driver_id = dr.id
-      ORDER BY d.id DESC
+      SELECT d.*, dr.name as driver_name FROM deliveries d
+      LEFT JOIN drivers dr ON d.driver_id = dr.id ORDER BY d.id DESC
     `);
     res.json(result.rows);
   } catch (err) {
@@ -369,9 +373,7 @@ app.post("/deliveries/accept", async (req, res) => {
       "UPDATE deliveries SET status='picked_up', driver_id=$1 WHERE id=$2 RETURNING *",
       [driverId, deliveryId]
     );
-    const delivery = result.rows[0];
-    io.to("drivers").emit("delivery-updated", delivery);
-    res.json(delivery);
+    res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -387,9 +389,7 @@ app.patch("/deliveries/:id/status", async (req, res) => {
       "UPDATE deliveries SET status=$1 WHERE id=$2 RETURNING *",
       [status, req.params.id]
     );
-    const delivery = result.rows[0];
-    io.to("drivers").emit("delivery-updated", delivery);
-    res.json(delivery);
+    res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
