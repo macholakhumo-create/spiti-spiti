@@ -1,6 +1,0 @@
-{
-  "name": "TransitCore Polished",
-  "description": "Professional e-hailing and fleet management system with polished Slate/Blue aesthetic and real-time telemetry.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["Real-time Tracking", "Role-based Dashboards", "Booking Management"]
-}
