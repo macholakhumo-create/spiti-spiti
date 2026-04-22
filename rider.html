@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
@@ -27,27 +28,31 @@
     .card-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6c63ff; margin-bottom: 14px; }
     .field { margin-bottom: 12px; }
     label { display: block; font-size: 0.73rem; color: #666; margin-bottom: 4px; }
-    input { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 11px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; }
+    input[type=text], input[type=number] { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 11px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; }
     input:focus { border-color: #6c63ff; }
-    .fare-hint { font-size: 0.7rem; color: #444; margin-top: 4px; }
-    .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .fare-hint { font-size: 0.68rem; color: #444; margin-top: 4px; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+    .btn:last-child { margin-bottom: 0; }
     .btn-primary { background: #6c63ff; color: #fff; }
     .btn-danger { background: #ef4444; color: #fff; }
-    .btn-success { background: #22c55e; color: #fff; }
     .btn-ghost { background: #1e1e28; color: #888; border: 1px solid #2a2a3a; }
-    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-    .status-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 20px; margin-bottom: 16px; display: none; }
-    .status-card.visible { display: block; }
-    .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .status-title { font-size: 0.92rem; font-weight: 600; }
-    .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-    .badge-requested { background: #1e293b; color: #94a3b8; }
-    .badge-accepted { background: #14532d; color: #22c55e; }
-    .badge-in_progress { background: #451a03; color: #f59e0b; }
-    .badge-completed { background: #1e1b4b; color: #818cf8; }
-    .badge-cancelled { background: #2d1515; color: #ef4444; }
-    .badge-offered { background: #1e1b4b; color: #a855f7; }
+    .btn:hover { opacity: 0.88; }
+
+    /* STATUS PROGRESS */
+    .progress-track { display: flex; align-items: center; margin-bottom: 20px; }
+    .progress-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .progress-dot { width: 28px; height: 28px; border-radius: 50%; background: #1e1e28; border: 2px solid #2a2a3a; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #444; transition: all 0.3s; z-index: 1; }
+    .progress-dot.active { background: #6c63ff; border-color: #6c63ff; color: #fff; }
+    .progress-dot.done { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .progress-line { flex: 1; height: 2px; background: #2a2a3a; transition: background 0.3s; }
+    .progress-line.done { background: #22c55e; }
+    .progress-label { font-size: 0.58rem; color: #444; margin-top: 4px; text-align: center; }
+    .progress-label.active { color: #6c63ff; }
+    .progress-label.done { color: #22c55e; }
+
+    .panel { display: none; }
+    .panel.visible { display: block; }
+
     .route { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
     .route-point { display: flex; align-items: center; gap: 10px; }
     .route-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
@@ -56,75 +61,70 @@
     .route-label { font-size: 0.65rem; color: #555; margin-bottom: 2px; }
     .route-text { font-size: 0.85rem; color: #ccc; }
 
-    /* OFFER CARDS */
-    .offers-section { margin-bottom: 16px; }
-    .offers-title { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #a855f7; margin-bottom: 10px; }
+    .fare-display { background: #0f0f13; border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 14px; }
+    .fare-amount { font-size: 2rem; font-weight: 700; color: #6c63ff; letter-spacing: -0.04em; }
+    .fare-sub { font-size: 0.68rem; color: #555; margin-top: 3px; }
+    .fare-display.agreed .fare-amount { color: #22c55e; }
+
+    /* OFFERS */
     .offer-card { background: #1a1625; border: 1px solid #a855f733; border-radius: 12px; padding: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    .offer-driver { font-size: 0.83rem; font-weight: 600; }
-    .offer-fare { font-size: 1.2rem; font-weight: 700; color: #a855f7; }
-    .offer-type { font-size: 0.65rem; color: #666; margin-top: 2px; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .offer-info .offer-driver { font-size: 0.83rem; font-weight: 600; }
+    .offer-info .offer-price { font-size: 1.3rem; font-weight: 700; color: #a855f7; }
+    .offer-info .offer-tag { font-size: 0.62rem; color: #666; margin-top: 2px; }
     .offer-btns { display: flex; gap: 6px; }
-    .offer-btn { padding: 7px 14px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
-    .offer-btn.accept { background: #22c55e; color: #fff; }
-    .offer-btn.decline { background: #1e1e28; color: #888; border: 1px solid #2a2a3a; }
-    .offer-btn:hover { opacity: 0.85; }
+    .obtn { padding: 7px 13px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: none; }
+    .obtn.acc { background: #22c55e; color: #fff; }
+    .obtn.dec { background: #1e1e28; color: #888; border: 1px solid #2a2a3a; }
 
-    /* TIMER */
-    .timer-bar { background: #1e1e28; border-radius: 8px; height: 6px; margin-bottom: 14px; overflow: hidden; }
-    .timer-fill { height: 100%; background: linear-gradient(90deg, #6c63ff, #a855f7); border-radius: 8px; transition: width 1s linear; }
-    .timer-text { font-size: 0.72rem; color: #555; text-align: center; margin-bottom: 10px; }
-
-    /* FARE BOX */
-    .fare-box { background: #0f0f13; border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 14px; display: none; }
-    .fare-amount { font-size: 2rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
-    .fare-label { font-size: 0.7rem; color: #555; margin-top: 3px; }
-
-    /* DRIVER INFO */
-    .driver-info { background: #0f0f13; border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .driver-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #6c63ff, #22c55e); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.88rem; color: #fff; flex-shrink: 0; }
-    .driver-name { font-size: 0.85rem; font-weight: 600; }
-    .driver-label { font-size: 0.7rem; color: #555; margin-top: 2px; }
+    /* DRIVER CARD */
+    .driver-card { background: #0f0f13; border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .driver-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#22c55e); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; color: #fff; flex-shrink: 0; }
+    .driver-name { font-size: 0.88rem; font-weight: 600; }
+    .driver-sub { font-size: 0.7rem; color: #555; margin-top: 2px; }
 
     /* MAP */
-    #rider-map { height: 220px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2a2a3a; display: none; }
-    .map-status { font-size: 0.72rem; color: #555; display: none; align-items: center; gap: 6px; margin-bottom: 14px; }
-    .map-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
-    .map-dot.active { background: #22c55e; animation: blink 1.5s infinite; }
+    #rider-map { height: 220px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2a2a3a; }
+    .map-pill { display: inline-flex; align-items: center; gap: 5px; background: #0f0f13; border-radius: 20px; padding: 5px 12px; font-size: 0.7rem; color: #555; margin-bottom: 14px; }
+    .map-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; }
+    .map-dot.live { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
     /* CHAT */
-    .chat-section { display: none; }
-    .chat-section.visible { display: block; }
-    .chat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .chat-robot { width: 36px; height: 36px; flex-shrink: 0; }
-    .chat-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6c63ff; }
-    .chat-messages { background: #0f0f13; border-radius: 12px; padding: 12px; height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-    .chat-messages::-webkit-scrollbar { width: 3px; }
-    .chat-messages::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
-    .msg { max-width: 78%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.4; }
-    .msg.mine { background: #6c63ff; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .msg.theirs { background: #1e1e28; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .msg-time { font-size: 0.6rem; opacity: 0.6; margin-top: 3px; }
-    .chat-input-row { display: flex; gap: 8px; }
-    .chat-input { flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.83rem; outline: none; }
-    .chat-input:focus { border-color: #6c63ff; }
-    .chat-send { background: #6c63ff; border: none; border-radius: 10px; padding: 10px 14px; color: #fff; cursor: pointer; font-size: 1rem; transition: opacity 0.2s; }
-    .chat-send:hover { opacity: 0.85; }
+    .chat-wrap { background: #0f0f13; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+    .chat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .chat-head svg { flex-shrink: 0; }
+    .chat-head-text { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #6c63ff; }
+    .chat-msgs { height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px; padding-right: 4px; }
+    .chat-msgs::-webkit-scrollbar { width: 3px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+    .msg { max-width: 80%; padding: 8px 12px; border-radius: 14px; font-size: 0.8rem; line-height: 1.45; word-break: break-word; }
+    .msg.me { background: #6c63ff; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.them { background: #1e1e28; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-meta { font-size: 0.58rem; opacity: 0.55; margin-top: 3px; }
+    .chat-row { display: flex; gap: 8px; }
+    .chat-in { flex: 1; background: #16161d; border: 1px solid #2a2a3a; border-radius: 10px; padding: 10px 13px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.83rem; outline: none; }
+    .chat-in:focus { border-color: #6c63ff; }
+    .chat-btn { background: #6c63ff; border: none; border-radius: 10px; padding: 10px 14px; color: #fff; cursor: pointer; font-size: 1rem; }
 
     /* HISTORY */
-    .history-item { background: #0f0f13; border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .history-item { background: #0f0f13; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .history-route { font-size: 0.82rem; color: #ccc; }
     .history-meta { font-size: 0.68rem; color: #444; margin-top: 3px; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.63rem; font-weight: 600; text-transform: uppercase; }
+    .badge-requested { background: #1e293b; color: #94a3b8; }
+    .badge-accepted { background: #14532d; color: #22c55e; }
+    .badge-in_progress { background: #451a03; color: #f59e0b; }
+    .badge-completed { background: #1e1b4b; color: #818cf8; }
+    .badge-cancelled { background: #2d1515; color: #ef4444; }
     .empty { text-align: center; color: #444; font-size: 0.82rem; padding: 20px; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; max-width: 90vw; text-align: center; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
     .toast.warn { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
-
 <nav>
   <div class="brand">Spiti-Spiti<span>.</span></div>
   <div class="conn-badge">
@@ -137,120 +137,137 @@
   <div class="page-title">Hey Rider 👋</div>
   <div class="page-sub">Where are you headed today?</div>
 
-  <!-- Request Form -->
-  <div class="card" id="request-card">
-    <div class="card-label">Request a Ride</div>
-    <div class="field">
-      <label>Pickup Location</label>
-      <input id="pickup" placeholder="Where are you?" />
+  <!-- REQUEST FORM -->
+  <div id="panel-request" class="panel visible">
+    <div class="card">
+      <div class="card-label">Request a Ride</div>
+      <div class="field">
+        <label>Pickup Location</label>
+        <input type="text" id="pickup" placeholder="Where are you?" />
+      </div>
+      <div class="field">
+        <label>Dropoff Location</label>
+        <input type="text" id="dropoff" placeholder="Where to?" />
+      </div>
+      <div class="field">
+        <label>Your Offered Fare (BWP)</label>
+        <input type="number" id="offered-fare" min="15" placeholder="e.g. 30" />
+        <div class="fare-hint">⚡ Minimum P15.00 · Drivers can accept or counter offer</div>
+      </div>
+      <button class="btn btn-primary" onclick="createRide()">Request Ride →</button>
     </div>
-    <div class="field">
-      <label>Dropoff Location</label>
-      <input id="dropoff" placeholder="Where to?" />
-    </div>
-    <div class="field">
-      <label>Your Offered Fare (BWP)</label>
-      <input id="offered-fare" type="number" min="15" placeholder="e.g. 25" />
-      <div class="fare-hint">Minimum P15.00 — drivers can accept or counter offer</div>
-    </div>
-    <button class="btn btn-primary" onclick="createRide()">Request Ride →</button>
   </div>
 
-  <!-- Waiting for offers -->
-  <div class="status-card" id="waiting-card">
-    <div class="status-header">
-      <div class="status-title">Looking for drivers...</div>
-      <span class="badge badge-requested" id="status-badge">Requested</span>
-    </div>
-    <div class="route">
-      <div class="route-point">
-        <div class="route-icon pickup">📍</div>
-        <div><div class="route-label">Pickup</div><div class="route-text" id="w-pickup">—</div></div>
+  <!-- WAITING FOR OFFERS -->
+  <div id="panel-waiting" class="panel">
+    <div class="card">
+      <div class="card-label">Waiting for Drivers</div>
+      <div class="route">
+        <div class="route-point">
+          <div class="route-icon pickup">📍</div>
+          <div><div class="route-label">Pickup</div><div class="route-text" id="w-pickup">—</div></div>
+        </div>
+        <div class="route-point">
+          <div class="route-icon dropoff">🏁</div>
+          <div><div class="route-label">Dropoff</div><div class="route-text" id="w-dropoff">—</div></div>
+        </div>
       </div>
-      <div class="route-point">
-        <div class="route-icon dropoff">🏁</div>
-        <div><div class="route-label">Dropoff</div><div class="route-text" id="w-dropoff">—</div></div>
+      <div class="fare-display">
+        <div class="fare-amount" id="w-fare">P0.00</div>
+        <div class="fare-sub">Your offered fare</div>
       </div>
+      <div id="offers-wrap" style="display:none">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#a855f7;margin-bottom:10px">🚗 Driver Offers</div>
+        <div id="offers-list"></div>
+      </div>
+      <button class="btn btn-ghost" onclick="cancelRequest()">Cancel Request</button>
     </div>
-    <div style="background:#0f0f13;border-radius:10px;padding:12px;text-align:center;margin-bottom:14px">
-      <div style="font-size:0.72rem;color:#555;margin-bottom:4px">Your offered fare</div>
-      <div style="font-size:1.5rem;font-weight:700;color:#6c63ff" id="w-fare">P0.00</div>
-    </div>
-
-    <!-- Driver Offers -->
-    <div class="offers-section" id="offers-section" style="display:none">
-      <div class="offers-title">🚗 Driver Offers</div>
-      <div id="offers-list"></div>
-    </div>
-
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="cancelRequest()">Cancel Request</button>
   </div>
 
-  <!-- Active Ride -->
-  <div class="status-card" id="active-card">
-    <div class="status-header">
-      <div class="status-title">Active Ride</div>
-      <span class="badge badge-accepted" id="active-badge">Accepted</span>
-    </div>
-    <div class="route">
-      <div class="route-point">
-        <div class="route-icon pickup">📍</div>
-        <div><div class="route-label">Pickup</div><div class="route-text" id="a-pickup">—</div></div>
-      </div>
-      <div class="route-point">
-        <div class="route-icon dropoff">🏁</div>
-        <div><div class="route-label">Dropoff</div><div class="route-text" id="a-dropoff">—</div></div>
-      </div>
-    </div>
+  <!-- ACTIVE RIDE -->
+  <div id="panel-active" class="panel">
+    <div class="card">
+      <div class="card-label">Active Ride</div>
 
-    <div class="fare-box" id="fare-box">
-      <div class="fare-amount" id="fare-amount">P0.00</div>
-      <div class="fare-label">Agreed Fare</div>
-    </div>
-
-    <div class="driver-info" id="driver-info">
-      <div class="driver-avatar" id="driver-avatar">D</div>
-      <div>
-        <div class="driver-name" id="driver-name">Your Driver</div>
-        <div class="driver-label">On the way to you 🚗</div>
+      <!-- Progress tracker -->
+      <div class="progress-track" id="progress-track">
+        <div class="progress-step">
+          <div class="progress-dot done" id="step-accepted">✓</div>
+          <div class="progress-label done">Accepted</div>
+        </div>
+        <div class="progress-line" id="line-1"></div>
+        <div class="progress-step">
+          <div class="progress-dot" id="step-started">2</div>
+          <div class="progress-label" id="label-started">Started</div>
+        </div>
+        <div class="progress-line" id="line-2"></div>
+        <div class="progress-step">
+          <div class="progress-dot" id="step-completed">3</div>
+          <div class="progress-label" id="label-completed">Done</div>
+        </div>
       </div>
-    </div>
 
-    <div id="rider-map"></div>
-    <div class="map-status" id="map-status">
-      <div class="map-dot" id="map-dot"></div>
-      <span id="map-text">Waiting for driver location...</span>
-    </div>
+      <div class="route">
+        <div class="route-point">
+          <div class="route-icon pickup">📍</div>
+          <div><div class="route-label">Pickup</div><div class="route-text" id="a-pickup">—</div></div>
+        </div>
+        <div class="route-point">
+          <div class="route-icon dropoff">🏁</div>
+          <div><div class="route-label">Dropoff</div><div class="route-text" id="a-dropoff">—</div></div>
+        </div>
+      </div>
 
-    <!-- Chat -->
-    <div class="chat-section" id="chat-section">
-      <div class="chat-header">
-        <svg class="chat-robot" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="36" height="36" rx="10" fill="#1e1e28"/>
-          <rect x="9" y="13" width="18" height="13" rx="3" fill="#6c63ff"/>
-          <rect x="13" y="17" width="3" height="3" rx="1.5" fill="#fff"/>
-          <rect x="20" y="17" width="3" height="3" rx="1.5" fill="#fff"/>
-          <rect x="15" y="22" width="6" height="1.5" rx="0.75" fill="#fff"/>
-          <rect x="16" y="9" width="4" height="4" rx="1" fill="#6c63ff"/>
-          <rect x="17.5" y="8" width="1" height="2" rx="0.5" fill="#a855f7"/>
-          <rect x="6" y="16" width="3" height="6" rx="1.5" fill="#6c63ff"/>
-          <rect x="27" y="16" width="3" height="6" rx="1.5" fill="#6c63ff"/>
-        </svg>
-        <div class="chat-title">Chat with Driver</div>
+      <div class="fare-display agreed">
+        <div class="fare-amount" id="a-fare">P0.00</div>
+        <div class="fare-sub">Agreed Fare</div>
       </div>
-      <div class="chat-messages" id="chat-messages">
-        <div class="empty" style="padding:10px">Say hi to your driver! 👋</div>
-      </div>
-      <div class="chat-input-row">
-        <input class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" />
-        <button class="chat-send" onclick="sendMessage()">➤</button>
-      </div>
-    </div>
 
-    <button class="btn btn-danger" style="margin-top:14px" onclick="cancelRide()">Cancel Ride</button>
+      <div class="driver-card">
+        <div class="driver-avatar" id="driver-avatar">D</div>
+        <div>
+          <div class="driver-name" id="driver-name">Your Driver</div>
+          <div class="driver-sub" id="driver-sub">On the way to you 🚗</div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div id="rider-map"></div>
+      <div class="map-pill">
+        <div class="map-dot" id="map-dot"></div>
+        <span id="map-text">Waiting for driver location...</span>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat-wrap">
+        <div class="chat-head">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="34" height="34" rx="10" fill="#1e1e28"/>
+            <rect x="8" y="12" width="18" height="13" rx="3" fill="#6c63ff"/>
+            <circle cx="12.5" cy="18.5" r="1.5" fill="white"/>
+            <circle cx="21.5" cy="18.5" r="1.5" fill="white"/>
+            <rect x="14" y="22" width="6" height="1.5" rx="0.75" fill="white"/>
+            <rect x="15.5" y="7" width="3" height="5" rx="1.5" fill="#6c63ff"/>
+            <circle cx="17" cy="7" r="1.5" fill="#a855f7"/>
+            <rect x="5" y="15" width="3" height="5" rx="1.5" fill="#6c63ff"/>
+            <rect x="26" y="15" width="3" height="5" rx="1.5" fill="#6c63ff"/>
+          </svg>
+          <div class="chat-head-text">Chat with Driver</div>
+        </div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="empty" style="padding:8px;font-size:0.78rem">Say hi to your driver! 👋</div>
+        </div>
+        <div class="chat-row">
+          <input class="chat-in" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()" />
+          <button class="chat-btn" onclick="sendMsg()">➤</button>
+        </div>
+      </div>
+
+      <button class="btn btn-danger" onclick="cancelRide()">Cancel Ride</button>
+    </div>
   </div>
 
-  <!-- Ride History -->
+  <!-- HISTORY -->
   <div class="card">
     <div class="card-label">Recent Rides</div>
     <div id="history"><div class="empty">No rides yet</div></div>
@@ -265,16 +282,16 @@
   let activeRide = null;
   let riderMap = null;
   let driverMarker = null;
-  let mapInitialized = false;
-  let pendingOffers = {};
-  let offerTimers = {};
+  let mapReady = false;
+  let offers = {};
 
-  const socket = io(BASE);
+  const socket = io(BASE, { transports: ["websocket", "polling"] });
 
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
     document.getElementById("conn-label").textContent = "Live";
-    socket.emit("join-role", { role: `rider${RIDER_ID}`, userId: RIDER_ID });
+    socket.emit("join-role", { role: "rider", userId: RIDER_ID });
+    console.log("Socket connected, joined rider:" + RIDER_ID);
     loadHistory();
   });
 
@@ -284,37 +301,46 @@
   });
 
   socket.on("ride-created", (ride) => {
+    console.log("ride-created", ride);
     activeRide = ride;
-    showWaiting(ride);
+    showPanel("waiting");
+    document.getElementById("w-pickup").textContent = ride.pickup;
+    document.getElementById("w-dropoff").textContent = ride.dropoff;
+    document.getElementById("w-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
     showToast("Ride posted! Waiting for offers...", "warn");
   });
 
   socket.on("driver-offer", (offer) => {
-    pendingOffers[offer.driverId] = offer;
+    console.log("driver-offer received", offer);
+    offers[offer.driverId] = offer;
     renderOffers();
-    showToast(`Driver offer: P${parseFloat(offer.fare_offer).toFixed(2)} 🚗`, "warn");
-  });
-
-  socket.on("offer-cleared", () => {
-    // offer was declined by rider already
+    showToast("New offer: P" + parseFloat(offer.fare_offer).toFixed(2) + " 🚗", "warn");
   });
 
   socket.on("ride-updated", (ride) => {
+    console.log("ride-updated", ride.status);
     if (!activeRide || ride.id !== activeRide.id) return;
     activeRide = ride;
-    const badge = document.getElementById("active-badge");
-    if (badge) {
-      badge.className = `badge badge-${ride.status}`;
-      badge.textContent = ride.status.replace(/_/g, " ");
-    }
+    updateProgress(ride.status);
     if (ride.status === "accepted") {
-      showActiveRide(ride);
+      showPanel("active");
+      document.getElementById("a-pickup").textContent = ride.pickup;
+      document.getElementById("a-dropoff").textContent = ride.dropoff;
+      document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+      document.getElementById("driver-avatar").textContent = "D" + ride.driver_id;
+      document.getElementById("driver-name").textContent = "Driver #" + ride.driver_id;
+      socket.emit("join-ride", { rideId: ride.id });
+      loadMsgs(ride.id);
+      initMap();
       showToast("Driver is on the way! 🚗");
     }
-    if (ride.status === "in_progress") showToast("Your ride has started! 🚀");
+    if (ride.status === "in_progress") {
+      document.getElementById("driver-sub").textContent = "Ride in progress 🚀";
+      showToast("Ride started! 🚀");
+    }
     if (ride.status === "completed") {
-      const fare = ride.fare ? "P" + parseFloat(ride.fare).toFixed(2) : "";
-      showToast("Ride completed! " + fare + " Thanks 🎉");
+      document.getElementById("driver-sub").textContent = "Ride completed ✅";
+      showToast("Ride completed! P" + parseFloat(ride.fare || 0).toFixed(2) + " 🎉");
       setTimeout(() => { resetAll(); loadHistory(); }, 4000);
     }
     if (ride.status === "cancelled") {
@@ -323,49 +349,94 @@
     }
   });
 
-  socket.on("driver-location", (data) => {
+  socket.on("driver-location", ({ driverId, lat, lng }) => {
     if (!activeRide) return;
-    updateDriverOnMap(data.lat, data.lng);
+    updateMap(lat, lng);
   });
 
   socket.on("new-message", (msg) => {
     if (!activeRide) return;
-    appendMessage(msg);
+    appendMsg(msg);
   });
 
+  function showPanel(name) {
+    ["request","waiting","active"].forEach(p => {
+      document.getElementById("panel-" + p).classList.toggle("visible", p === name);
+    });
+  }
+
+  function updateProgress(status) {
+    const s1 = document.getElementById("step-accepted");
+    const s2 = document.getElementById("step-started");
+    const s3 = document.getElementById("step-completed");
+    const l1 = document.getElementById("line-1");
+    const l2 = document.getElementById("line-2");
+    const lb2 = document.getElementById("label-started");
+    const lb3 = document.getElementById("label-completed");
+
+    if (status === "accepted") {
+      s1.className = "progress-dot done"; s1.textContent = "✓";
+      s2.className = "progress-dot active"; s2.textContent = "2";
+      lb2.className = "progress-label active";
+    }
+    if (status === "in_progress") {
+      s1.className = "progress-dot done"; s1.textContent = "✓";
+      s2.className = "progress-dot done"; s2.textContent = "✓";
+      l1.className = "progress-line done";
+      lb2.className = "progress-label done";
+      s3.className = "progress-dot active"; s3.textContent = "3";
+      lb3.className = "progress-label active";
+    }
+    if (status === "completed") {
+      [s1,s2,s3].forEach(s => { s.className = "progress-dot done"; s.textContent = "✓"; });
+      [l1,l2].forEach(l => l.className = "progress-line done");
+      [lb2,lb3].forEach(l => l.className = "progress-label done");
+    }
+  }
+
   function renderOffers() {
-    const list = document.getElementById("offers-list");
-    const section = document.getElementById("offers-section");
-    const offers = Object.values(pendingOffers);
-    if (!offers.length) { section.style.display = "none"; return; }
-    section.style.display = "block";
-    list.innerHTML = offers.map(o => {
-      const isMatch = parseFloat(o.fare_offer) <= parseFloat(document.getElementById("w-fare").textContent.replace("P",""));
+    const list = Object.values(offers);
+    const wrap = document.getElementById("offers-wrap");
+    const el = document.getElementById("offers-list");
+    if (!list.length) { wrap.style.display = "none"; return; }
+    wrap.style.display = "block";
+    const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 15;
+    el.innerHTML = list.map(o => {
+      const match = parseFloat(o.fare_offer) <= myFare;
       return `
         <div class="offer-card">
-          <div>
+          <div class="offer-info">
             <div class="offer-driver">🚗 ${o.driver_name || "Driver #" + o.driverId}</div>
-            <div class="offer-fare">P${parseFloat(o.fare_offer).toFixed(2)}</div>
-            <div class="offer-type">${isMatch ? "✅ Matches your price" : "💬 Counter offer"}</div>
+            <div class="offer-price">P${parseFloat(o.fare_offer).toFixed(2)}</div>
+            <div class="offer-tag">${match ? "✅ Matches your price" : "💬 Counter offer"}</div>
           </div>
           <div class="offer-btns">
-            <button class="offer-btn accept" onclick="acceptOffer(${o.driverId}, ${o.fare_offer})">Accept</button>
-            <button class="offer-btn decline" onclick="declineOffer(${o.driverId})">✕</button>
+            <button class="obtn acc" onclick="acceptOffer(${o.driverId},${o.fare_offer})">Accept</button>
+            <button class="obtn dec" onclick="declineOffer(${o.driverId})">✕</button>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join("");
   }
 
   async function acceptOffer(driverId, fare) {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId, fare })
       });
-      pendingOffers = {};
+      const ride = await res.json();
+      activeRide = ride;
+      offers = {};
+      showPanel("active");
+      document.getElementById("a-pickup").textContent = ride.pickup;
+      document.getElementById("a-dropoff").textContent = ride.dropoff;
+      document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+      document.getElementById("driver-avatar").textContent = "D" + ride.driver_id;
+      document.getElementById("driver-name").textContent = "Driver #" + ride.driver_id;
+      socket.emit("join-ride", { rideId: ride.id });
+      loadMsgs(ride.id);
+      initMap();
       showToast("Offer accepted! Driver is coming 🚗");
     } catch(e) { showToast("Failed", "error"); }
   }
@@ -374,110 +445,68 @@
     if (!activeRide) return;
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId })
       });
-      delete pendingOffers[driverId];
+      delete offers[driverId];
       renderOffers();
       showToast("Offer declined");
     } catch(e) {}
   }
 
-  function showWaiting(ride) {
-    document.getElementById("request-card").style.display = "none";
-    document.getElementById("waiting-card").classList.add("visible");
-    document.getElementById("active-card").classList.remove("visible");
-    document.getElementById("w-pickup").textContent = ride.pickup;
-    document.getElementById("w-dropoff").textContent = ride.dropoff;
-    document.getElementById("w-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
-  }
-
-  function showActiveRide(ride) {
-    document.getElementById("waiting-card").classList.remove("visible");
-    document.getElementById("active-card").classList.add("visible");
-    document.getElementById("a-pickup").textContent = ride.pickup;
-    document.getElementById("a-dropoff").textContent = ride.dropoff;
-    if (ride.fare) {
-      document.getElementById("fare-box").style.display = "block";
-      document.getElementById("fare-amount").textContent = "P" + parseFloat(ride.fare).toFixed(2);
-    }
-    if (ride.driver_id) {
-      document.getElementById("driver-avatar").textContent = "D" + ride.driver_id;
-      document.getElementById("driver-name").textContent = "Driver #" + ride.driver_id;
-    }
-    document.getElementById("chat-section").classList.add("visible");
-    socket.emit("join-ride", { rideId: ride.id });
-    loadMessages(ride.id);
-    initMap();
-  }
-
   function initMap() {
-    if (mapInitialized) return;
-    mapInitialized = true;
-    document.getElementById("rider-map").style.display = "block";
-    document.getElementById("map-status").style.display = "flex";
+    if (mapReady) return;
+    mapReady = true;
     riderMap = L.map("rider-map").setView([-24.6541, 25.9087], 13);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap"
-    }).addTo(riderMap);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(riderMap);
+    setTimeout(() => riderMap.invalidateSize(), 300);
   }
 
-  function updateDriverOnMap(lat, lng) {
-    initMap();
-    document.getElementById("map-dot").classList.add("active");
-    document.getElementById("map-text").textContent = "Driver location updating live";
+  function updateMap(lat, lng) {
+    if (!mapReady) initMap();
+    document.getElementById("map-dot").classList.add("live");
+    document.getElementById("map-text").textContent = "Driver location live";
     if (driverMarker) {
       driverMarker.setLatLng([lat, lng]);
     } else {
       driverMarker = L.marker([lat, lng], {
         icon: L.divIcon({
           className: "",
-          html: '<div style="background:#6c63ff;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 8px rgba(108,99,255,0.8)"></div>',
-          iconSize: [16, 16], iconAnchor: [8, 8]
+          html: '<div style="background:#6c63ff;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 10px #6c63ff88"></div>',
+          iconSize: [16,16], iconAnchor: [8,8]
         })
-      }).addTo(riderMap).bindPopup("Your Driver");
+      }).addTo(riderMap).bindPopup("Your Driver 🚗");
     }
     riderMap.setView([lat, lng], 15);
   }
 
-  async function loadMessages(rideId) {
+  async function loadMsgs(rideId) {
     try {
       const res = await fetch(`${BASE}/rides/${rideId}/messages`);
       const msgs = await res.json();
-      const el = document.getElementById("chat-messages");
-      if (msgs.length) {
-        el.innerHTML = "";
-        msgs.forEach(m => appendMessage(m));
-      }
+      const el = document.getElementById("chat-msgs");
+      if (msgs.length) { el.innerHTML = ""; msgs.forEach(appendMsg); }
     } catch(e) {}
   }
 
-  function appendMessage(msg) {
-    const el = document.getElementById("chat-messages");
-    const isEmpty = el.querySelector(".empty");
-    if (isEmpty) el.innerHTML = "";
+  function appendMsg(msg) {
+    const el = document.getElementById("chat-msgs");
+    if (el.querySelector(".empty")) el.innerHTML = "";
     const mine = msg.sender_role === "rider";
-    const time = new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    el.innerHTML += `
-      <div class="msg ${mine ? "mine" : "theirs"}">
-        ${msg.message}
-        <div class="msg-time">${time}</div>
-      </div>
-    `;
+    const time = new Date(msg.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    el.innerHTML += `<div class="msg ${mine?"me":"them"}">${msg.message}<div class="msg-meta">${time}</div></div>`;
     el.scrollTop = el.scrollHeight;
   }
 
-  async function sendMessage() {
+  async function sendMsg() {
     if (!activeRide) return;
-    const input = document.getElementById("chat-input");
+    const input = document.getElementById("chat-in");
     const message = input.value.trim();
     if (!message) return;
     input.value = "";
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sender_role: "rider", message })
       });
     } catch(e) { showToast("Message failed", "error"); }
@@ -491,52 +520,45 @@
     if (offered_fare < 15) return showToast("Minimum fare is P15.00", "error");
     try {
       const res = await fetch(`${BASE}/rides`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pickup, dropoff, riderId: RIDER_ID, offered_fare })
       });
       const ride = await res.json();
       activeRide = ride;
-      showWaiting(ride);
+      showPanel("waiting");
+      document.getElementById("w-pickup").textContent = ride.pickup;
+      document.getElementById("w-dropoff").textContent = ride.dropoff;
+      document.getElementById("w-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
       showToast("Ride posted!");
       loadHistory();
     } catch(e) { showToast("Failed to create ride", "error"); }
   }
 
   async function cancelRequest() {
-    if (!activeRide) return;
-    try {
-      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "cancelled" })
-      });
-    } catch(e) {}
+    if (activeRide) {
+      try {
+        await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+          method: "PATCH", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "cancelled" })
+        });
+      } catch(e) {}
+    }
     resetAll();
     showToast("Request cancelled");
     loadHistory();
   }
 
-  function cancelRide() {
-    resetAll();
-    loadHistory();
-  }
+  function cancelRide() { resetAll(); loadHistory(); }
 
   function resetAll() {
-    activeRide = null;
-    pendingOffers = {};
-    mapInitialized = false;
-    driverMarker = null;
-    riderMap = null;
-    document.getElementById("request-card").style.display = "block";
-    document.getElementById("waiting-card").classList.remove("visible");
-    document.getElementById("active-card").classList.remove("visible");
-    document.getElementById("rider-map").style.display = "none";
-    document.getElementById("map-status").style.display = "none";
-    document.getElementById("fare-box").style.display = "none";
-    document.getElementById("chat-section").classList.remove("visible");
+    activeRide = null; offers = {}; mapReady = false; driverMarker = null; riderMap = null;
+    showPanel("request");
     document.getElementById("offers-list").innerHTML = "";
-    document.getElementById("offers-section").style.display = "none";
+    document.getElementById("offers-wrap").style.display = "none";
+    document.getElementById("chat-msgs").innerHTML = '<div class="empty" style="padding:8px;font-size:0.78rem">Say hi to your driver! 👋</div>';
+    document.getElementById("rider-map").innerHTML = "";
+    document.getElementById("map-dot").classList.remove("live");
+    document.getElementById("map-text").textContent = "Waiting for driver location...";
   }
 
   async function loadHistory() {
@@ -544,22 +566,21 @@
       const res = await fetch(`${BASE}/rides`);
       const rides = await res.json();
       const el = document.getElementById("history");
-      el.innerHTML = rides.length ? rides.slice(0, 5).map(r => `
+      el.innerHTML = rides.length ? rides.slice(0,5).map(r => `
         <div class="history-item">
           <div>
             <div class="history-route">${r.pickup} → ${r.dropoff}</div>
-            <div class="history-meta">Ride #${r.id} ${r.fare ? "· P" + parseFloat(r.fare).toFixed(2) : ""}</div>
+            <div class="history-meta">Ride #${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : ""}</div>
           </div>
           <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
-        </div>
-      `).join("") : '<div class="empty">No rides yet</div>';
+        </div>`).join("") : '<div class="empty">No rides yet</div>';
     } catch(e) {}
   }
 
-  function showToast(msg, type = "") {
+  function showToast(msg, type="") {
     const t = document.getElementById("toast");
     t.textContent = msg;
-    t.className = "toast show" + (type ? " " + type : "");
+    t.className = "toast show" + (type ? " "+type : "");
     setTimeout(() => t.className = "toast", 3500);
   }
 </script>
