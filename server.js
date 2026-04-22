@@ -1,8 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const http = require("http");
-const { Server } = require("socket.io");
-const pool = require("./db");
+import express from "express";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+import pool from "./db.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -12,23 +17,26 @@ app.use(express.static(__dirname));
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
+// DESIGN LOGS: Polished console output
+const log = (msg, color = '\x1b[36m') => console.log(`${color}[CORE] ${msg}\x1b[0m`);
+
 io.on("connection", (socket) => {
-  console.log("Connected:", socket.id);
+  log(`Connection established: ${socket.id}`, '\x1b[32m');
 
   socket.on("join-role", ({ role, userId }) => {
     socket.join(role);
     if (role === "drivers") socket.join(`driver:${userId}`);
     if (role === "rider") socket.join(`rider:${userId}`);
-    console.log("ROLE JOIN:", role, userId, "rooms:", [...socket.rooms]);
+    log(`Role Sync: ${role} | ID: ${userId} | Active Rooms: ${[...socket.rooms].length}`);
   });
 
   socket.on("join-ride", ({ rideId }) => {
     socket.join(`ride:${rideId}`);
-    console.log("RIDE JOIN:", rideId);
+    log(`Syncing Ride Stream: ${rideId}`);
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected:", socket.id);
+    log(`Connection closed: ${socket.id}`, '\x1b[31m');
   });
 });
 
@@ -36,11 +44,11 @@ io.on("connection", (socket) => {
 function notifyRider(riderId, event, data) {
   if (riderId) {
     io.to(`rider:${riderId}`).emit(event, data);
-    console.log(`Emitting ${event} to rider:${riderId}`);
+    log(`Pushing [${event}] to Rider Channel: ${riderId}`);
   }
 }
 
-// GET all rides
+// RESTful API Tier
 app.get("/rides", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM rides ORDER BY id DESC");
@@ -50,7 +58,6 @@ app.get("/rides", async (req, res) => {
   }
 });
 
-// GET single ride
 app.get("/rides/:id", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM rides WHERE id=$1", [req.params.id]);
@@ -61,7 +68,6 @@ app.get("/rides/:id", async (req, res) => {
   }
 });
 
-// CREATE ride
 app.post("/rides", async (req, res) => {
   const { pickup, dropoff, riderId, offered_fare } = req.body;
   const fare = Math.max(15, parseFloat(offered_fare) || 15);
@@ -79,7 +85,6 @@ app.post("/rides", async (req, res) => {
   }
 });
 
-// DRIVER sends offer
 app.post("/rides/:id/offer", async (req, res) => {
   const { fare_offer, driverId, driver_name } = req.body;
   const fare = Math.max(15, parseFloat(fare_offer) || 15);
@@ -96,7 +101,6 @@ app.post("/rides/:id/offer", async (req, res) => {
   }
 });
 
-// RIDER accepts offer
 app.post("/rides/:id/accept-offer", async (req, res) => {
   const { driverId, fare } = req.body;
   try {
@@ -114,7 +118,6 @@ app.post("/rides/:id/accept-offer", async (req, res) => {
   }
 });
 
-// RIDER declines offer
 app.post("/rides/:id/decline-offer", async (req, res) => {
   const { driverId } = req.body;
   try {
@@ -127,7 +130,6 @@ app.post("/rides/:id/decline-offer", async (req, res) => {
   }
 });
 
-// UPDATE ride status
 app.patch("/rides/:id/status", async (req, res) => {
   const { status } = req.body;
   const allowed = ["requested","accepted","in_progress","completed","cancelled"];
@@ -147,50 +149,6 @@ app.patch("/rides/:id/status", async (req, res) => {
   }
 });
 
-// ASSIGN driver
-app.patch("/rides/:id/assign", async (req, res) => {
-  const { driver_id } = req.body;
-  try {
-    const result = await pool.query(
-      "UPDATE rides SET driver_id=$1 WHERE id=$2 RETURNING *",
-      [driver_id, req.params.id]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET messages
-app.get("/rides/:id/messages", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM messages WHERE ride_id=$1 ORDER BY created_at ASC",
-      [req.params.id]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// SEND message
-app.post("/rides/:id/messages", async (req, res) => {
-  const { sender_role, message } = req.body;
-  try {
-    const result = await pool.query(
-      "INSERT INTO messages (ride_id, sender_role, message) VALUES ($1,$2,$3) RETURNING *",
-      [req.params.id, sender_role, message]
-    );
-    const msg = result.rows[0];
-    io.to(`ride:${req.params.id}`).emit("new-message", msg);
-    res.json(msg);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET all drivers
 app.get("/drivers", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM drivers ORDER BY id DESC");
@@ -200,45 +158,6 @@ app.get("/drivers", async (req, res) => {
   }
 });
 
-// CREATE driver
-app.post("/drivers", async (req, res) => {
-  const { name, phone } = req.body;
-  try {
-    const result = await pool.query(
-      "INSERT INTO drivers (name, phone) VALUES ($1,$2) RETURNING *",
-      [name, phone]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// TOGGLE availability
-app.patch("/drivers/:id/availability", async (req, res) => {
-  const { available } = req.body;
-  try {
-    const result = await pool.query(
-      "UPDATE drivers SET available=$1 WHERE id=$2 RETURNING *",
-      [available, req.params.id]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE driver
-app.delete("/drivers/:id", async (req, res) => {
-  try {
-    await pool.query("DELETE FROM drivers WHERE id=$1", [req.params.id]);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// UPDATE driver location
 app.patch("/drivers/:id/location", async (req, res) => {
   const { lat, lng } = req.body;
   try {
@@ -254,21 +173,7 @@ app.patch("/drivers/:id/location", async (req, res) => {
   }
 });
 
-// GET driver location
-app.get("/drivers/:id/location", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT id, name, lat, lng FROM drivers WHERE id=$1",
-      [req.params.id]
-    );
-    if (!result.rows.length) return res.status(404).json({ error: "Driver not found" });
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET all vehicles
+// VEHICLE TIER
 app.get("/vehicles", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -281,7 +186,6 @@ app.get("/vehicles", async (req, res) => {
   }
 });
 
-// CREATE vehicle
 app.post("/vehicles", async (req, res) => {
   const { plate, make, model, type } = req.body;
   try {
@@ -295,48 +199,7 @@ app.post("/vehicles", async (req, res) => {
   }
 });
 
-// ASSIGN vehicle
-app.patch("/vehicles/:id/assign", async (req, res) => {
-  const { driver_id } = req.body;
-  try {
-    await pool.query("UPDATE vehicles SET driver_id=NULL WHERE driver_id=$1", [driver_id]);
-    const result = await pool.query(
-      "UPDATE vehicles SET driver_id=$1 WHERE id=$2 RETURNING *",
-      [driver_id, req.params.id]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// UPDATE vehicle status
-app.patch("/vehicles/:id/status", async (req, res) => {
-  const { status } = req.body;
-  const allowed = ["available","on_trip","maintenance"];
-  if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
-  try {
-    const result = await pool.query(
-      "UPDATE vehicles SET status=$1 WHERE id=$2 RETURNING *",
-      [status, req.params.id]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE vehicle
-app.delete("/vehicles/:id", async (req, res) => {
-  try {
-    await pool.query("DELETE FROM vehicles WHERE id=$1", [req.params.id]);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET all deliveries
+// DELIVERY TIER
 app.get("/deliveries", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -349,7 +212,6 @@ app.get("/deliveries", async (req, res) => {
   }
 });
 
-// CREATE delivery
 app.post("/deliveries", async (req, res) => {
   const { sender_name, sender_phone, recipient_name, recipient_phone, pickup_address, dropoff_address, package_description, weight } = req.body;
   try {
@@ -366,60 +228,10 @@ app.post("/deliveries", async (req, res) => {
   }
 });
 
-// ACCEPT delivery
-app.post("/deliveries/accept", async (req, res) => {
-  const { deliveryId, driverId } = req.body;
-  try {
-    const result = await pool.query(
-      "UPDATE deliveries SET status='picked_up', driver_id=$1 WHERE id=$2 RETURNING *",
-      [driverId, deliveryId]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// Deployment and Health Tier
+app.get("/api/health", (req, res) => res.json({ status: "READY", system: "Polished-Core-v1.4" }));
 
-// UPDATE delivery status
-app.patch("/deliveries/:id/status", async (req, res) => {
-  const { status } = req.body;
-  const allowed = ["pending","picked_up","in_transit","delivered","cancelled"];
-  if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
-  try {
-    const result = await pool.query(
-      "UPDATE deliveries SET status=$1 WHERE id=$2 RETURNING *",
-      [status, req.params.id]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ASSIGN delivery driver
-app.patch("/deliveries/:id/assign", async (req, res) => {
-  const { driver_id } = req.body;
-  try {
-    const result = await pool.query(
-      "UPDATE deliveries SET driver_id=$1 WHERE id=$2 RETURNING *",
-      [driver_id, req.params.id]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE delivery
-app.delete("/deliveries/:id", async (req, res) => {
-  try {
-    await pool.query("DELETE FROM deliveries WHERE id=$1", [req.params.id]);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-server.listen(process.env.PORT || 5000, () => {
-  console.log("Server running on port", process.env.PORT || 5000);
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, "0.0.0.0", () => {
+  log(`Railway Core Services active on port ${PORT}`, '\x1b[35m');
 });
