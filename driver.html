@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Driver</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,120 +17,127 @@
     nav { background: #16161d; border-bottom: 1px solid #2a2a3a; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em; }
     .brand span { color: #22c55e; }
-    .nav-right { display: flex; align-items: center; gap: 12px; }
     .conn-badge { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #666; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; }
     .dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
-    .emergency-btn { display: flex; align-items: center; gap: 6px; background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; animation: emergencyPulse 2s infinite; text-decoration: none; }
-    @keyframes emergencyPulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)} 50%{box-shadow:0 0 0 8px rgba(239,68,68,0)} }
-    .container { max-width: 520px; margin: 0 auto; padding: 32px 20px; }
-    .page-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 6px; }
-    .page-sub { font-size: 0.85rem; color: #555; margin-bottom: 32px; }
-    .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-    .card-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #22c55e; margin-bottom: 16px; }
-    .availability-toggle { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .container { max-width: 520px; margin: 0 auto; padding: 24px 20px 100px; }
+    .page-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 4px; }
+    .page-sub { font-size: 0.83rem; color: #555; margin-bottom: 24px; }
+    .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .card-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #22c55e; margin-bottom: 14px; }
+    .availability-toggle { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .toggle-label { font-size: 0.88rem; font-weight: 500; }
-    .toggle-sub { font-size: 0.72rem; color: #555; margin-top: 3px; }
+    .toggle-sub { font-size: 0.7rem; color: #555; margin-top: 3px; }
     .switch { position: relative; width: 52px; height: 28px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; inset: 0; background: #2a2a3a; border-radius: 28px; cursor: pointer; transition: 0.3s; }
     .slider:before { content: ""; position: absolute; width: 20px; height: 20px; left: 4px; bottom: 4px; background: #fff; border-radius: 50%; transition: 0.3s; }
     input:checked + .slider { background: #22c55e; }
     input:checked + .slider:before { transform: translateX(24px); }
-    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .stat-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 12px; padding: 18px; }
-    .stat-num { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; color: #22c55e; }
-    .stat-label { font-size: 0.72rem; color: #555; margin-top: 4px; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 12px; padding: 16px; }
+    .stat-num { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.04em; color: #22c55e; }
+    .stat-label { font-size: 0.68rem; color: #555; margin-top: 3px; }
 
-    /* INCOMING */
-    .incoming { background: linear-gradient(135deg, #14532d, #166534); border: 1px solid #22c55e44; border-radius: 16px; padding: 24px; margin-bottom: 20px; display: none; animation: pulse 2s infinite; }
+    /* INCOMING RIDE */
+    .incoming { background: linear-gradient(135deg, #0d2318, #0f2d1a); border: 1px solid #22c55e44; border-radius: 16px; padding: 20px; margin-bottom: 16px; display: none; animation: pulse 2s infinite; }
     .incoming.visible { display: block; }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.2)} 50%{box-shadow:0 0 0 12px rgba(34,197,94,0)} }
-    .incoming-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-    .incoming-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(34,197,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
-    .incoming-title { font-size: 0.95rem; font-weight: 600; }
-    .incoming-sub { font-size: 0.72rem; color: #86efac; margin-top: 2px; }
-    .route { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .incoming-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .incoming-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .incoming-title { font-size: 0.92rem; font-weight: 600; }
+    .incoming-sub { font-size: 0.7rem; color: #86efac; margin-top: 2px; }
+    .route { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
     .route-point { display: flex; align-items: center; gap: 10px; }
-    .route-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
-    .route-icon.pickup { background: rgba(255,255,255,0.1); }
-    .route-icon.dropoff { background: rgba(34,197,94,0.2); }
-    .route-label { font-size: 0.68rem; color: #86efac; margin-bottom: 2px; }
-    .route-text { font-size: 0.85rem; }
+    .route-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; flex-shrink: 0; }
+    .route-icon.pickup { background: rgba(255,255,255,0.08); }
+    .route-icon.dropoff { background: rgba(34,197,94,0.15); }
+    .route-label { font-size: 0.65rem; color: #86efac; margin-bottom: 1px; }
+    .route-text { font-size: 0.83rem; }
+    .rider-fare { background: rgba(34,197,94,0.1); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .rider-fare-label { font-size: 0.7rem; color: #86efac; }
+    .rider-fare-amount { font-size: 1.3rem; font-weight: 700; color: #22c55e; }
 
-    /* FARE INPUT */
-    .fare-input-section { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 14px; margin-bottom: 16px; }
-    .fare-input-label { font-size: 0.72rem; color: #86efac; margin-bottom: 8px; }
-    .fare-input-row { display: flex; gap: 8px; align-items: center; }
-    .fare-prefix { font-size: 1.1rem; font-weight: 700; color: #22c55e; }
-    .fare-input { flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; outline: none; }
-    .fare-input:focus { border-color: #22c55e; }
-
-    .btn-row { display: flex; gap: 10px; }
-    .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+    /* OFFER INPUT */
+    .offer-section { margin-bottom: 14px; }
+    .offer-label { font-size: 0.7rem; color: #86efac; margin-bottom: 6px; }
+    .offer-input-row { display: flex; gap: 8px; }
+    .offer-input { flex: 1; background: #0f0f13; border: 1px solid #22c55e44; border-radius: 10px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; outline: none; }
+    .offer-input:focus { border-color: #22c55e; }
+    .btn-row { display: flex; gap: 8px; }
+    .btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-accept  { background: #22c55e; color: #fff; }
+    .btn-accept { background: #22c55e; color: #fff; }
+    .btn-offer { background: #a855f7; color: #fff; }
     .btn-decline { background: #1e1e28; color: #888; border: 1px solid #2a2a3a; }
-    .btn-full { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; margin-bottom: 8px; }
+    .btn-full { width: 100%; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; margin-bottom: 8px; }
+    .btn-full:last-child { margin-bottom: 0; }
     .btn-full:hover { opacity: 0.88; }
-    .btn-start    { background: #f59e0b; color: #000; }
+    .btn-start { background: #f59e0b; color: #000; }
     .btn-complete { background: #22c55e; color: #fff; }
+    .btn-stop { background: #ef4444; color: #fff; }
 
     /* ACTIVE RIDE */
-    .active-ride { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 24px; margin-bottom: 20px; display: none; }
+    .active-ride { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 20px; margin-bottom: 16px; display: none; }
     .active-ride.visible { display: block; }
-    .fare-display { background: #0f0f13; border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .fare-display-label { font-size: 0.72rem; color: #555; }
-    .fare-display-amount { font-size: 1.2rem; font-weight: 700; color: #22c55e; }
-    .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-    .status-btn { padding: 8px 14px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #666; transition: all 0.2s; }
-    .status-btn:hover { border-color: #22c55e; color: #22c55e; }
+    .fare-box { background: #0f0f13; border-radius: 10px; padding: 12px; text-align: center; margin: 12px 0; }
+    .fare-amount { font-size: 1.8rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
+    .fare-label { font-size: 0.68rem; color: #555; margin-top: 3px; }
+    .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .status-btn { flex: 1; padding: 10px; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #666; transition: all 0.2s; }
+    .status-btn.start:hover { border-color: #f59e0b; color: #f59e0b; }
+    .status-btn.complete:hover { border-color: #22c55e; color: #22c55e; }
 
     /* MAP */
-    #driver-map { height: 200px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2a2a3a; }
-    .location-status { font-size: 0.75rem; color: #555; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+    #driver-map { height: 180px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2a2a3a; }
+    .location-status { font-size: 0.72rem; color: #555; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
     .location-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
     .location-dot.tracking { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
     /* CHAT */
-    .chat-section { margin-top: 16px; }
-    .chat-box { background: #0f0f13; border-radius: 12px; padding: 14px; height: 200px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .chat-msg { max-width: 75%; padding: 8px 12px; border-radius: 12px; font-size: 0.82rem; line-height: 1.4; }
-    .chat-msg.driver { background: #22c55e; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .chat-msg.rider  { background: #1e1e2e; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .chat-msg-time { font-size: 0.6rem; opacity: 0.6; margin-top: 3px; }
+    .chat-section { display: none; margin-top: 14px; }
+    .chat-section.visible { display: block; }
+    .chat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .chat-robot { width: 34px; height: 34px; flex-shrink: 0; }
+    .chat-title { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #22c55e; }
+    .chat-messages { background: #0f0f13; border-radius: 12px; padding: 10px; height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .chat-messages::-webkit-scrollbar { width: 3px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+    .msg { max-width: 78%; padding: 8px 11px; border-radius: 12px; font-size: 0.78rem; line-height: 1.4; }
+    .msg.mine { background: #22c55e; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.theirs { background: #1e1e28; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-time { font-size: 0.58rem; opacity: 0.6; margin-top: 2px; }
     .chat-input-row { display: flex; gap: 8px; }
-    .chat-input { flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 10px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.83rem; outline: none; }
+    .chat-input { flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 9px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.82rem; outline: none; }
     .chat-input:focus { border-color: #22c55e; }
-    .chat-send { background: #22c55e; border: none; border-radius: 10px; padding: 10px 16px; color: #fff; font-size: 0.9rem; cursor: pointer; transition: opacity 0.2s; }
+    .chat-send { background: #22c55e; border: none; border-radius: 10px; padding: 9px 13px; color: #fff; cursor: pointer; font-size: 0.95rem; transition: opacity 0.2s; }
     .chat-send:hover { opacity: 0.85; }
-    .chat-empty { text-align: center; color: #333; font-size: 0.78rem; padding: 20px; }
 
-    .ride-item { background: #0f0f13; border-radius: 10px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .ride-route { font-size: 0.83rem; }
-    .ride-id { font-size: 0.7rem; color: #444; margin-top: 3px; }
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-    .badge-requested  { background: #1e293b; color: #94a3b8; }
-    .badge-offered    { background: #1e1b4b; color: #818cf8; }
-    .badge-accepted   { background: #14532d; color: #22c55e; }
-    .badge-in_progress{ background: #451a03; color: #f59e0b; }
-    .badge-completed  { background: #1e1b4b; color: #818cf8; }
-    .empty { text-align: center; color: #444; font-size: 0.83rem; padding: 20px; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.83rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
+    /* RIDES LIST */
+    .ride-item { background: #0f0f13; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .ride-route { font-size: 0.82rem; }
+    .ride-meta { font-size: 0.68rem; color: #444; margin-top: 3px; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.63rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-requested { background: #1e293b; color: #94a3b8; }
+    .badge-accepted { background: #14532d; color: #22c55e; }
+    .badge-in_progress { background: #451a03; color: #f59e0b; }
+    .badge-completed { background: #1e1b4b; color: #818cf8; }
+    .badge-cancelled { background: #2d1515; color: #ef4444; }
+    .empty { text-align: center; color: #444; font-size: 0.82rem; padding: 20px; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 999; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
+    .toast.warn { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
+
 <nav>
   <div class="brand">Spiti-Spiti<span>.</span> Driver</div>
-  <div class="nav-right">
-    <a href="tel:999" class="emergency-btn">🚨 999</a>
-    <div class="conn-badge">
-      <div class="dot" id="dot"></div>
-      <span id="conn-label">Connecting...</span>
-    </div>
+  <div class="conn-badge">
+    <div class="dot" id="dot"></div>
+    <span id="conn-label">Connecting...</span>
   </div>
 </nav>
 
@@ -163,7 +173,7 @@
     </div>
   </div>
 
-  <!-- Live Location -->
+  <!-- Location -->
   <div class="card">
     <div class="card-label">Your Location</div>
     <div id="driver-map"></div>
@@ -171,8 +181,8 @@
       <div class="location-dot" id="location-dot"></div>
       <span id="location-text">Location not sharing</span>
     </div>
-    <button class="btn-full btn-start" id="start-tracking-btn" onclick="startTracking()">📍 Start Sharing Location</button>
-    <button class="btn-full btn-complete" id="stop-tracking-btn" style="display:none" onclick="stopTracking()">⏹ Stop Sharing</button>
+    <button class="btn-full btn-start" id="start-btn" onclick="startTracking()">📍 Start Sharing Location</button>
+    <button class="btn-full btn-stop" id="stop-btn" style="display:none" onclick="stopTracking()">⏹ Stop Sharing</button>
   </div>
 
   <!-- Incoming Ride -->
@@ -181,7 +191,7 @@
       <div class="incoming-icon">🔔</div>
       <div>
         <div class="incoming-title">New Ride Request</div>
-        <div class="incoming-sub">Set your fare and offer to the rider</div>
+        <div class="incoming-sub" id="incoming-sub">Rider is looking for a driver</div>
       </div>
     </div>
     <div class="route">
@@ -194,34 +204,36 @@
         <div><div class="route-label">Dropoff</div><div class="route-text" id="inc-dropoff">—</div></div>
       </div>
     </div>
-    <div class="fare-input-section">
-      <div class="fare-input-label">Your fare offer to the rider</div>
-      <div class="fare-input-row">
-        <span class="fare-prefix">P</span>
-        <input class="fare-input" id="fare-offer-input" type="number" placeholder="0.00" min="0" step="0.50" />
+    <div class="rider-fare">
+      <div>
+        <div class="rider-fare-label">Rider's offered price</div>
+        <div class="rider-fare-amount" id="inc-fare">P0.00</div>
+      </div>
+      <div style="font-size:0.72rem;color:#86efac">Min P15.00</div>
+    </div>
+    <div class="offer-section">
+      <div class="offer-label">Your counter offer (leave same to accept as-is):</div>
+      <div class="offer-input-row">
+        <input class="offer-input" id="counter-fare" type="number" min="15" placeholder="P amount" />
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-accept" onclick="offerFare()">Send Offer →</button>
-      <button class="btn btn-decline" onclick="declineRide()">Decline</button>
+      <button class="btn btn-accept" onclick="sendOffer(false)">✓ Accept Price</button>
+      <button class="btn btn-offer" onclick="sendOffer(true)">💬 Counter Offer</button>
+      <button class="btn btn-decline" onclick="declineRide()">✕</button>
     </div>
   </div>
 
-  <!-- Waiting for fare acceptance -->
-  <div class="card" id="waiting-card" style="display:none">
-    <div class="card-label">Fare Sent</div>
-    <div style="text-align:center;padding:20px 0">
-      <div style="font-size:2rem;margin-bottom:12px">⏳</div>
-      <div style="font-size:0.88rem;color:#888">Waiting for rider to accept your fare offer of</div>
-      <div style="font-size:1.8rem;font-weight:700;color:#22c55e;margin:8px 0" id="sent-fare-amount">P0</div>
-      <button class="btn-full btn-decline" style="margin-top:12px;background:#1e1e28;color:#888;border:1px solid #2a2a3a" onclick="withdrawOffer()">Withdraw Offer</button>
-    </div>
+  <!-- Offer Accepted notification -->
+  <div id="offer-accepted-banner" style="display:none;background:linear-gradient(135deg,#14532d,#166534);border:1px solid #22c55e44;border-radius:16px;padding:16px 20px;margin-bottom:16px;text-align:center">
+    <div style="font-size:1.2rem;margin-bottom:4px">🎉 Offer Accepted!</div>
+    <div style="font-size:0.83rem;color:#86efac">Rider accepted your price. Head to pickup!</div>
   </div>
 
   <!-- Active Ride -->
   <div class="active-ride" id="active-card">
     <div class="card-label">Current Ride</div>
-    <div class="route" style="margin-bottom:16px">
+    <div class="route">
       <div class="route-point">
         <div class="route-icon pickup">📍</div>
         <div><div class="route-label" style="color:#555">Pickup</div><div class="route-text" id="act-pickup">—</div></div>
@@ -231,26 +243,38 @@
         <div><div class="route-label" style="color:#555">Dropoff</div><div class="route-text" id="act-dropoff">—</div></div>
       </div>
     </div>
-    <div class="fare-display">
-      <div class="fare-display-label">Agreed Fare</div>
-      <div class="fare-display-amount" id="act-fare">P0</div>
+    <div class="fare-box">
+      <div class="fare-amount" id="act-fare">P0.00</div>
+      <div class="fare-label">Agreed Fare</div>
+    </div>
+    <div class="status-row">
+      <button class="status-btn start" onclick="updateStatus('in_progress')">▶ Start Ride</button>
+      <button class="status-btn complete" onclick="updateStatus('completed')">✓ Complete</button>
     </div>
 
-    <!-- CHAT -->
-    <div class="chat-section">
-      <div class="card-label" style="margin-bottom:10px">💬 Chat with Rider</div>
-      <div class="chat-box" id="chat-box">
-        <div class="chat-empty">No messages yet</div>
+    <!-- Chat -->
+    <div class="chat-section" id="chat-section">
+      <div class="chat-header">
+        <svg class="chat-robot" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="10" fill="#1e1e28"/>
+          <rect x="9" y="13" width="18" height="13" rx="3" fill="#22c55e"/>
+          <rect x="13" y="17" width="3" height="3" rx="1.5" fill="#fff"/>
+          <rect x="20" y="17" width="3" height="3" rx="1.5" fill="#fff"/>
+          <rect x="15" y="22" width="6" height="1.5" rx="0.75" fill="#fff"/>
+          <rect x="16" y="9" width="4" height="4" rx="1" fill="#22c55e"/>
+          <rect x="17.5" y="8" width="1" height="2" rx="0.5" fill="#86efac"/>
+          <rect x="6" y="16" width="3" height="6" rx="1.5" fill="#22c55e"/>
+          <rect x="27" y="16" width="3" height="6" rx="1.5" fill="#22c55e"/>
+        </svg>
+        <div class="chat-title">Chat with Rider</div>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="empty" style="padding:10px">No messages yet</div>
       </div>
       <div class="chat-input-row">
-        <input class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <input class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" />
         <button class="chat-send" onclick="sendMessage()">➤</button>
       </div>
-    </div>
-
-    <div class="status-row">
-      <button class="status-btn" onclick="updateStatus('in_progress')">▶ Start Ride</button>
-      <button class="status-btn" onclick="updateStatus('completed')">✓ Complete</button>
     </div>
   </div>
 
@@ -266,8 +290,9 @@
 <script>
   const BASE = "https://spiti-spiti-production.up.railway.app";
   const DRIVER_ID = 1;
+  const DRIVER_NAME = "Driver " + DRIVER_ID;
   let pendingRide = null;
-  let activeRide  = null;
+  let activeRide = null;
   let trackingInterval = null;
   let driverMap = null;
   let driverMarker = null;
@@ -280,75 +305,79 @@
   });
 
   const socket = io(BASE);
+
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
     document.getElementById("conn-label").textContent = "Live";
     socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
+    loadRides();
   });
+
   socket.on("disconnect", () => {
     document.getElementById("dot").classList.remove("live");
     document.getElementById("conn-label").textContent = "Offline";
   });
+
   socket.on("new-ride", (ride) => {
+    if (activeRide) return; // busy with another ride
     pendingRide = ride;
-    document.getElementById("inc-pickup").textContent  = ride.pickup;
+    document.getElementById("inc-pickup").textContent = ride.pickup;
     document.getElementById("inc-dropoff").textContent = ride.dropoff;
+    document.getElementById("inc-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
+    document.getElementById("counter-fare").value = ride.offered_fare || 15;
     document.getElementById("incoming-card").classList.add("visible");
-    document.getElementById("waiting-card").style.display = "none";
-    showToast("New ride request!");
+    showToast("New ride request! 🔔", "warn");
+  });
+
+  socket.on("offer-accepted", (ride) => {
+    activeRide = ride;
+    document.getElementById("incoming-card").classList.remove("visible");
+    document.getElementById("offer-accepted-banner").style.display = "block";
+    document.getElementById("active-card").classList.add("visible");
+    document.getElementById("act-pickup").textContent = ride.pickup;
+    document.getElementById("act-dropoff").textContent = ride.dropoff;
+    document.getElementById("act-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+    document.getElementById("chat-section").classList.add("visible");
+    socket.emit("join-ride", { rideId: ride.id });
+    loadMessages(ride.id);
+    setTimeout(() => { document.getElementById("offer-accepted-banner").style.display = "none"; }, 4000);
+    showToast("Rider accepted! Head to pickup 🚗");
     loadRides();
   });
+
+  socket.on("offer-declined", () => {
+    showToast("Rider declined your offer", "error");
+  });
+
   socket.on("ride-updated", (ride) => {
-    if (ride.status === "accepted" && ride.driver_id == DRIVER_ID) {
+    if (activeRide && ride.id === activeRide.id) {
       activeRide = ride;
-      document.getElementById("waiting-card").style.display = "none";
-      document.getElementById("active-card").classList.add("visible");
-      document.getElementById("act-pickup").textContent  = ride.pickup;
-      document.getElementById("act-dropoff").textContent = ride.dropoff;
-      document.getElementById("act-fare").textContent    = "P" + parseFloat(ride.fare || 0).toFixed(2);
-      socket.emit("join-ride", { rideId: ride.id });
-      loadMessages();
-      showToast("Rider accepted your fare! 🎉");
-    }
-    if (activeRide && ride.id === activeRide.id && ride.status === "completed") {
-      document.getElementById("active-card").classList.remove("visible");
-      activeRide = null;
-      showToast("Ride completed!");
       loadRides();
     }
-    loadRides();
   });
+
   socket.on("new-message", (msg) => {
-    if (!activeRide || msg.ride_id !== activeRide.id) return;
+    if (!activeRide) return;
     appendMessage(msg);
   });
 
-  async function offerFare() {
+  socket.on("new-delivery", () => {
+    showToast("New delivery request! 📦", "warn");
+  });
+
+  async function sendOffer(isCounter) {
     if (!pendingRide) return;
-    const fareInput = document.getElementById("fare-offer-input").value;
-    if (!fareInput || parseFloat(fareInput) <= 0) return showToast("Enter a fare amount", true);
+    const fareInput = document.getElementById("counter-fare").value;
+    const fare = Math.max(15, parseFloat(fareInput) || 15);
     try {
       await fetch(`${BASE}/rides/${pendingRide.id}/offer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fare_offer: parseFloat(fareInput), driverId: DRIVER_ID })
+        body: JSON.stringify({ fare_offer: fare, driverId: DRIVER_ID, driver_name: DRIVER_NAME })
       });
       document.getElementById("incoming-card").classList.remove("visible");
-      document.getElementById("waiting-card").style.display = "block";
-      document.getElementById("sent-fare-amount").textContent = "P" + parseFloat(fareInput).toFixed(2);
-      document.getElementById("fare-offer-input").value = "";
-      showToast("Fare offer sent to rider!");
-    } catch(e) { showToast("Failed to send offer", true); }
-  }
-
-  async function withdrawOffer() {
-    if (!pendingRide) return;
-    try {
-      await fetch(`${BASE}/rides/${pendingRide.id}/decline-fare`, { method: "POST" });
-      document.getElementById("waiting-card").style.display = "none";
-      pendingRide = null;
-      showToast("Offer withdrawn");
-    } catch(e) { showToast("Failed", true); }
+      showToast(isCounter ? `Counter offer P${fare.toFixed(2)} sent! ✉️` : "Offer sent! Waiting for rider...");
+    } catch(e) { showToast("Failed to send offer", "error"); }
   }
 
   function declineRide() {
@@ -360,33 +389,34 @@
   async function updateStatus(status) {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
+      const ride = await res.json();
+      activeRide = ride;
       if (status === "completed") {
-        document.getElementById("active-card").classList.remove("visible");
-        activeRide = null;
-        loadRides();
+        showToast("Ride completed! 🎉");
+        setTimeout(() => {
+          document.getElementById("active-card").classList.remove("visible");
+          document.getElementById("chat-section").classList.remove("visible");
+          activeRide = null;
+          loadRides();
+        }, 3000);
+      } else {
+        showToast("Status: " + status.replace(/_/g, " "));
       }
-      showToast("Status: " + status.replace("_", " "));
-    } catch(e) { showToast("Failed", true); }
+      loadRides();
+    } catch(e) { showToast("Failed", "error"); }
   }
 
-  function toggleAvailability() {
-    const on = document.getElementById("avail-toggle").checked;
-    document.getElementById("avail-sub").textContent = on ? "You are online" : "You are offline";
-    showToast(on ? "You are now online 🟢" : "You are now offline");
-  }
-
-  // LOCATION
   function startTracking() {
-    if (!navigator.geolocation) return showToast("Geolocation not supported", true);
+    if (!navigator.geolocation) return showToast("Geolocation not supported", "error");
     document.getElementById("location-dot").classList.add("tracking");
     document.getElementById("location-text").textContent = "Sharing location...";
-    document.getElementById("stop-tracking-btn").style.display = "block";
-    document.getElementById("start-tracking-btn").style.display = "none";
+    document.getElementById("stop-btn").style.display = "block";
+    document.getElementById("start-btn").style.display = "none";
     sendLocation();
     trackingInterval = setInterval(sendLocation, 5000);
     showToast("Location sharing started");
@@ -397,8 +427,8 @@
     trackingInterval = null;
     document.getElementById("location-dot").classList.remove("tracking");
     document.getElementById("location-text").textContent = "Location not sharing";
-    document.getElementById("stop-tracking-btn").style.display = "none";
-    document.getElementById("start-tracking-btn").style.display = "block";
+    document.getElementById("stop-btn").style.display = "none";
+    document.getElementById("start-btn").style.display = "block";
     showToast("Location sharing stopped");
   }
 
@@ -419,7 +449,7 @@
         }
         driverMap.setView([lat, lng], 15);
       }
-      document.getElementById("location-text").textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+      document.getElementById("location-text").textContent = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
       try {
         await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
           method: "PATCH",
@@ -427,35 +457,47 @@
           body: JSON.stringify({ lat, lng })
         });
       } catch(e) {}
-    }, () => showToast("Could not get location", true));
+    }, () => showToast("Could not get location", "error"));
   }
 
-  // CHAT
-  async function loadMessages() {
-    if (!activeRide) return;
+  async function toggleAvailability() {
+    const on = document.getElementById("avail-toggle").checked;
+    document.getElementById("avail-sub").textContent = on ? "You are online" : "You are offline";
     try {
-      const res = await fetch(`${BASE}/rides/${activeRide.id}/messages`);
+      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ available: on })
+      });
+      showToast(on ? "You are now online 🟢" : "You are now offline");
+    } catch(e) {}
+  }
+
+  async function loadMessages(rideId) {
+    try {
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
       const msgs = await res.json();
-      const box = document.getElementById("chat-box");
-      box.innerHTML = "";
-      if (!msgs.length) {
-        box.innerHTML = '<div class="chat-empty">No messages yet</div>';
-        return;
+      const el = document.getElementById("chat-messages");
+      if (msgs.length) {
+        el.innerHTML = "";
+        msgs.forEach(m => appendMessage(m));
       }
-      msgs.forEach(m => appendMessage(m));
     } catch(e) {}
   }
 
   function appendMessage(msg) {
-    const box = document.getElementById("chat-box");
-    const empty = box.querySelector(".chat-empty");
-    if (empty) empty.remove();
-    const div = document.createElement("div");
-    div.className = `chat-msg ${msg.sender_role === "driver" ? "driver" : "rider"}`;
+    const el = document.getElementById("chat-messages");
+    const isEmpty = el.querySelector(".empty");
+    if (isEmpty) el.innerHTML = "";
+    const mine = msg.sender_role === "driver";
     const time = new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    div.innerHTML = `${msg.message}<div class="chat-msg-time">${time}</div>`;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+    el.innerHTML += `
+      <div class="msg ${mine ? "mine" : "theirs"}">
+        ${msg.message}
+        <div class="msg-time">${time}</div>
+      </div>
+    `;
+    el.scrollTop = el.scrollHeight;
   }
 
   async function sendMessage() {
@@ -470,7 +512,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sender_role: "driver", message })
       });
-    } catch(e) { showToast("Failed to send", true); }
+    } catch(e) { showToast("Message failed", "error"); }
   }
 
   async function loadRides() {
@@ -482,27 +524,26 @@
         <div class="ride-item">
           <div>
             <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
-            <div class="ride-id">Ride #${r.id} · ${r.fare ? "P" + parseFloat(r.fare).toFixed(2) : "No fare"}</div>
+            <div class="ride-meta">Ride #${r.id} ${r.fare ? "· P" + parseFloat(r.fare).toFixed(2) : r.offered_fare ? "· Offered P" + parseFloat(r.offered_fare).toFixed(2) : ""}</div>
           </div>
-          <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
+          <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
         </div>
       `).join("") : '<div class="empty">No rides yet</div>';
       document.getElementById("total-rides").textContent = rides.length;
       document.getElementById("completed-rides").textContent = rides.filter(r => r.status === "completed").length;
-      const earnings = rides.filter(r => r.status === "completed" && r.driver_id == DRIVER_ID)
-                           .reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
+      const earnings = rides
+        .filter(r => r.status === "completed" && r.driver_id == DRIVER_ID)
+        .reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
       document.getElementById("total-earnings").textContent = "P" + earnings.toFixed(2);
     } catch(e) {}
   }
 
-  function showToast(msg, error = false) {
+  function showToast(msg, type = "") {
     const t = document.getElementById("toast");
     t.textContent = msg;
-    t.className = "toast show" + (error ? " error" : "");
-    setTimeout(() => t.className = "toast", 3000);
+    t.className = "toast show" + (type ? " " + type : "");
+    setTimeout(() => t.className = "toast", 3500);
   }
-
-  loadRides();
 </script>
 </body>
 </html>
