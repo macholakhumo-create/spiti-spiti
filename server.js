@@ -14,20 +14,31 @@ const io = new Server(server, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
   console.log("Connected:", socket.id);
+
   socket.on("join-role", ({ role, userId }) => {
     socket.join(role);
     if (role === "drivers") socket.join(`driver:${userId}`);
-    if (role.startsWith("rider")) socket.join(`rider:${userId}`);
-    console.log("ROLE JOIN:", role, userId);
+    if (role === "rider") socket.join(`rider:${userId}`);
+    console.log("ROLE JOIN:", role, userId, "rooms:", [...socket.rooms]);
   });
+
   socket.on("join-ride", ({ rideId }) => {
     socket.join(`ride:${rideId}`);
     console.log("RIDE JOIN:", rideId);
   });
+
   socket.on("disconnect", () => {
     console.log("Disconnected:", socket.id);
   });
 });
+
+// Helper to notify rider
+function notifyRider(riderId, event, data) {
+  if (riderId) {
+    io.to(`rider:${riderId}`).emit(event, data);
+    console.log(`Emitting ${event} to rider:${riderId}`);
+  }
+}
 
 // GET all rides
 app.get("/rides", async (req, res) => {
@@ -50,35 +61,25 @@ app.get("/rides/:id", async (req, res) => {
   }
 });
 
-// CREATE ride with rider's offered price
+// CREATE ride
 app.post("/rides", async (req, res) => {
   const { pickup, dropoff, riderId, offered_fare } = req.body;
   const fare = Math.max(15, parseFloat(offered_fare) || 15);
   try {
     const result = await pool.query(
-      "INSERT INTO rides (pickup, dropoff, status, rider_id, offered_fare) VALUES ($1, $2, 'requested', $3, $4) RETURNING *",
+      "INSERT INTO rides (pickup, dropoff, status, rider_id, offered_fare) VALUES ($1,$2,'requested',$3,$4) RETURNING *",
       [pickup, dropoff, riderId || 1, fare]
     );
     const ride = result.rows[0];
     io.to("drivers").emit("new-ride", ride);
-    if (riderId) io.to(`rider:${riderId}`).emit("ride-created", ride);
-    // Auto expire after 10 minutes if no driver accepts
-    setTimeout(async () => {
-      try {
-        const check = await pool.query("SELECT status FROM rides WHERE id=$1", [ride.id]);
-        if (check.rows[0] && check.rows[0].status === "requested") {
-          await pool.query("UPDATE rides SET status='cancelled' WHERE id=$1", [ride.id]);
-          if (riderId) io.to(`rider:${riderId}`).emit("ride-updated", { ...ride, status: "cancelled" });
-        }
-      } catch(e) {}
-    }, 600000);
+    notifyRider(ride.rider_id, "ride-created", ride);
     res.json(ride);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// DRIVER makes offer (accept or counter)
+// DRIVER sends offer
 app.post("/rides/:id/offer", async (req, res) => {
   const { fare_offer, driverId, driver_name } = req.body;
   const fare = Math.max(15, parseFloat(fare_offer) || 15);
@@ -87,15 +88,15 @@ app.post("/rides/:id/offer", async (req, res) => {
     const ride = result.rows[0];
     if (!ride) return res.status(404).json({ error: "Ride not found" });
     const offer = { rideId: ride.id, driverId, driver_name, fare_offer: fare, pickup: ride.pickup, dropoff: ride.dropoff };
-    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("driver-offer", offer);
-    io.to("drivers").emit("offer-sent", { rideId: ride.id, driverId });
+    notifyRider(ride.rider_id, "driver-offer", offer);
+    io.to(`driver:${driverId}`).emit("offer-sent", { rideId: ride.id });
     res.json({ success: true, offer });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// RIDER accepts a driver's offer
+// RIDER accepts offer
 app.post("/rides/:id/accept-offer", async (req, res) => {
   const { driverId, fare } = req.body;
   try {
@@ -106,21 +107,20 @@ app.post("/rides/:id/accept-offer", async (req, res) => {
     const ride = result.rows[0];
     io.to("drivers").emit("ride-updated", ride);
     io.to(`driver:${driverId}`).emit("offer-accepted", ride);
-    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("ride-updated", ride);
+    notifyRider(ride.rider_id, "ride-updated", ride);
     res.json(ride);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// RIDER declines a driver's offer
+// RIDER declines offer
 app.post("/rides/:id/decline-offer", async (req, res) => {
   const { driverId } = req.body;
   try {
     const result = await pool.query("SELECT * FROM rides WHERE id=$1", [req.params.id]);
     const ride = result.rows[0];
     io.to(`driver:${driverId}`).emit("offer-declined", { rideId: ride.id });
-    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("offer-cleared", { rideId: ride.id });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -130,7 +130,7 @@ app.post("/rides/:id/decline-offer", async (req, res) => {
 // UPDATE ride status
 app.patch("/rides/:id/status", async (req, res) => {
   const { status } = req.body;
-  const allowed = ["requested", "offered", "accepted", "in_progress", "completed", "cancelled"];
+  const allowed = ["requested","accepted","in_progress","completed","cancelled"];
   if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
   try {
     const result = await pool.query(
@@ -139,7 +139,8 @@ app.patch("/rides/:id/status", async (req, res) => {
     );
     const ride = result.rows[0];
     io.to("drivers").emit("ride-updated", ride);
-    if (ride.rider_id) io.to(`rider:${ride.rider_id}`).emit("ride-updated", ride);
+    io.to(`ride:${ride.id}`).emit("ride-updated", ride);
+    notifyRider(ride.rider_id, "ride-updated", ride);
     res.json(ride);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -178,7 +179,7 @@ app.post("/rides/:id/messages", async (req, res) => {
   const { sender_role, message } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO messages (ride_id, sender_role, message) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO messages (ride_id, sender_role, message) VALUES ($1,$2,$3) RETURNING *",
       [req.params.id, sender_role, message]
     );
     const msg = result.rows[0];
@@ -204,7 +205,7 @@ app.post("/drivers", async (req, res) => {
   const { name, phone } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO drivers (name, phone) VALUES ($1, $2) RETURNING *",
+      "INSERT INTO drivers (name, phone) VALUES ($1,$2) RETURNING *",
       [name, phone]
     );
     res.json(result.rows[0]);
@@ -285,7 +286,7 @@ app.post("/vehicles", async (req, res) => {
   const { plate, make, model, type } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO vehicles (plate, make, model, type) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO vehicles (plate, make, model, type) VALUES ($1,$2,$3,$4) RETURNING *",
       [plate, make, model, type]
     );
     res.json(result.rows[0]);
@@ -312,7 +313,7 @@ app.patch("/vehicles/:id/assign", async (req, res) => {
 // UPDATE vehicle status
 app.patch("/vehicles/:id/status", async (req, res) => {
   const { status } = req.body;
-  const allowed = ["available", "on_trip", "maintenance"];
+  const allowed = ["available","on_trip","maintenance"];
   if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
   try {
     const result = await pool.query(
@@ -382,7 +383,7 @@ app.post("/deliveries/accept", async (req, res) => {
 // UPDATE delivery status
 app.patch("/deliveries/:id/status", async (req, res) => {
   const { status } = req.body;
-  const allowed = ["pending", "picked_up", "in_transit", "delivered", "cancelled"];
+  const allowed = ["pending","picked_up","in_transit","delivered","cancelled"];
   if (!allowed.includes(status)) return res.status(400).json({ error: "Invalid status" });
   try {
     const result = await pool.query(
