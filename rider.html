@@ -171,7 +171,7 @@
         <div class="step"><div class="step-dot" id="s3">3</div><span class="step-label">Final</span></div>
       </div>
 
-      <div id="map"></div>
+     <div id="map" style="height:280px; border-radius:16px; border:1px solid var(--border); margin-bottom:12px; overflow:hidden;"></div>
 
       <div class="fare-box agreed">
         <div class="fare-val" id="a-fare">P0.00</div>
@@ -230,13 +230,22 @@
     showToast("New negotiation offer received");
   });
 
-  socket.on("ride-updated", (ride) => {
-    if (!activeRide || ride.id !== activeRide.id) return;
+ socket.on("ride-updated", (ride) => {
+    if (!activeRide) activeRide = ride;
+    if (ride.id !== activeRide.id) return;
     activeRide = ride;
+    socket.emit("join-ride", { rideId: ride.id });
     if (ride.status === "accepted") {
       showPanel("active");
       document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare).toFixed(2);
-      initMap();
+      function initMap() {
+    if (map) return;
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19
+    }).addTo(map);
+    L.control.attribution({ prefix: false }).addTo(map);
+  }
       socket.emit("join-ride", { rideId: ride.id });
     }
     if (ride.status === "in_progress") {
@@ -253,10 +262,14 @@
   });
 
   socket.on("driver-location", ({ lat, lng }) => {
-    if (!map) initMap();
-    if (marker) marker.setLatLng([lat, lng]);
-    else marker = L.marker([lat, lng]).addTo(map);
-    map.setView([lat, lng]);
+    if (!map) function initMap() {
+    if (map) return;
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19
+    }).addTo(map);
+    L.control.attribution({ prefix: false }).addTo(map);
+  }
   });
 
   socket.on("new-message", (msg) => {
