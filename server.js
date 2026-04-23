@@ -1,6 +1,3 @@
-Here is the clean server.js — copy this exactly:
-
-```javascript
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
