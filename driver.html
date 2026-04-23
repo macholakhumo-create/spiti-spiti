@@ -134,7 +134,7 @@
 
   <div class="card">
     <span class="card-label">Telemetry Transmission</span>
-    <div id="map"></div>
+    <div id="map" style="height:280px; border-radius:16px; border:1px solid var(--border); margin-bottom:12px; overflow:hidden;"></div>
     <button class="btn btn-loc" id="loc-btn" onclick="toggleLoc()">Initialize GPS Stream</button>
   </div>
 
@@ -285,15 +285,27 @@ async function sendCounter() {
       locWatcher = navigator.geolocation.watchPosition(sendLoc);
       btn.textContent = "Streaming Live GPS";
       btn.classList.add("active");
-      initMap();
+      function initMap() {
+    if (map) return;
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 15);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19
+    }).addTo(map);
+  }
     }
   }
 
   async function sendLoc(p) {
     const { latitude: lat, longitude: lng } = p.coords;
+    if (!map) initMap();
+    const icon = L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px #22c55e88;"></div>',
+      iconSize: [14, 14], iconAnchor: [7, 7]
+    });
     if (marker) marker.setLatLng([lat, lng]);
-    else marker = L.marker([lat, lng]).addTo(map);
-    map.setView([lat, lng]);
+    else marker = L.marker([lat, lng], { icon }).addTo(map);
+    map.setView([lat, lng], 15);
     await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ lat, lng })
