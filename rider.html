@@ -7,197 +7,485 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
-  <title>Spiti-Spiti | Rider Portal</title>
+  <title>Spiti-Spiti | Rider</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
-      --bg: #f8fafc;
+      --bg: #f5f4f0;
       --surface: #ffffff;
-      --ink: #0f172a;
-      --accent: #2563eb;
-      --sub: #64748b;
-      --border: #e2e8f0;
-      --success: #16a34a;
-      --font: 'Inter', -apple-system, system-ui, sans-serif;
+      --ink: #111010;
+      --accent: #1a1a2e;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --sub: #71717a;
+      --border: #e4e4e7;
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-    
-    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-    .brand { font-size: 1.1rem; font-weight: 900; letter-spacing: -0.04em; color: var(--accent); text-transform: uppercase; }
-    .brand span { color: var(--ink); }
-    .conn-status { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; font-weight: 700; color: var(--sub); text-transform: uppercase; tracking: 0.05em; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; }
-    .dot.live { background: var(--success); box-shadow: 0 0 8px rgba(22,163,74,0.4); animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-    .container { max-width: 500px; margin: 0 auto; padding: 24px 20px 100px; }
-    .page-header { margin-bottom: 24px; }
-    .page-title { font-size: 1.75rem; font-weight: 900; letter-spacing: -0.05em; line-height: 1; margin-bottom: 4px; }
-    .page-sub { font-size: 0.85rem; color: var(--sub); font-weight: 500; }
-    
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .card-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: block; }
-    
-    .field { margin-bottom: 14px; }
-    label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--sub); margin-bottom: 6px; text-transform: uppercase; tracking: 0.02em; }
-    input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: var(--ink); font-family: var(--font); font-size: 0.95rem; font-weight: 500; outline: none; transition: all 0.2s; }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); background: #fff; }
-    .hint { font-size: 0.65rem; color: var(--sub); margin-top: 6px; font-weight: 500; }
-    
-    .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: var(--font); font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.2s; text-transform: uppercase; tracking: 0.05em; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-primary { background: var(--accent); color: #fff; shadow: 0 10px 15px -3px rgba(37,99,235,0.2); }
-    .btn-ghost { background: var(--bg); color: var(--sub); border: 1px solid var(--border); }
-    .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
-    .btn:active { scale: 0.98; }
+    header {
+      background: var(--ink);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .brand {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .brand span { color: #f59e0b; }
+    .conn-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .conn-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: 0.3s; }
+    .conn-pill .dot.live { background: #22c55e; box-shadow: 0 0 6px #22c55e; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-    .progress { display: flex; align-items: center; margin-bottom: 24px; padding: 0 8px; }
-    .step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
-    .step-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--bg); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: var(--sub); transition: all 0.4s; z-index: 2; }
-    .step-dot.active { background: var(--accent); border-color: var(--accent); color: #fff; shadow: 0 0 12px rgba(37,99,235,0.3); }
-    .step-dot.done { background: var(--success); border-color: var(--success); color: #fff; }
-    .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 -16px; transition: 0.4s; z-index: 1; }
-    .step-line.done { background: var(--success); }
-    .step-label { font-size: 0.6rem; font-weight: 800; color: var(--sub); margin-top: 6px; text-transform: uppercase; tracking: 0.05em; }
+    .container { max-width: 480px; margin: 0 auto; padding: 24px 16px 80px; }
 
-    .route { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-    .point { display: flex; align-items: center; gap: 12px; }
-    .icon { width: 34px; height: 34px; border-radius: 10px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; border: 1px solid var(--border); }
-    .loc-text { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
-    .loc-label { font-size: 0.65rem; color: var(--sub); font-weight: 700; text-transform: uppercase; }
+    .page-header { margin-bottom: 20px; }
+    .page-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+    .page-sub { font-size: 0.8rem; color: var(--sub); font-weight: 500; margin-top: 4px; }
 
-    .fare-box { background: var(--bg); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--border); margin-bottom: 16px; }
-    .fare-val { font-size: 2.25rem; font-weight: 900; color: var(--accent); tracking: -0.05em; }
-    .fare-box.agreed .fare-val { color: var(--success); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 14px;
+    }
+    .card-label {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sub);
+      margin-bottom: 16px;
+      display: block;
+    }
 
-    .offer-item { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; animation: slideUp 0.3s ease-out; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .offer-meta { font-size: 0.65rem; font-weight: 700; color: var(--sub); text-transform: uppercase; margin-top: 2px; }
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    input[type=text], input[type=number] {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type=text]:focus, input[type=number]:focus {
+      border-color: var(--accent);
+      background: #fff;
+    }
+    .hint { font-size: 0.65rem; color: var(--sub); margin-top: 5px; }
 
-    .railway-status { font-family: monospace; background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 12px; font-size: 11px; margin-top: 20px; border: 1px solid #1e293b; line-height: 1.5; }
-    
-    #map { height: 260px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 12px; }
-    
-    .chat { background: var(--bg); border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
-    .messages { height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; }
-    .msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.85rem; font-weight: 500; line-height: 1.4; }
-    .msg.me { background: var(--accent); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .msg.them { background: #fff; color: var(--ink); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-    
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-ghost { background: var(--bg); color: var(--sub); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { border-color: #999; color: var(--ink); }
+    .btn-danger { background: #fef2f2; color: #dc2626; border: 1.5px solid #fecaca; }
+    .btn-accept { background: var(--green); color: #fff; }
+    .btn-accept:hover { background: #15803d; }
+
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      z-index: 2;
+    }
+    .step-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--sub);
+      transition: all 0.4s;
+    }
+    .step-dot.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .step-dot.done { background: var(--green); border-color: var(--green); color: #fff; }
+    .step-label { font-size: 0.58rem; font-weight: 700; color: var(--sub); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 -8px; position: relative; top: -10px; z-index: 1; transition: 0.4s; }
+    .step-line.done { background: var(--green); }
+
+    .route-display { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .route-point { display: flex; align-items: center; gap: 12px; }
+    .route-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .route-label { font-size: 0.6rem; color: var(--sub); font-weight: 700; text-transform: uppercase; }
+    .route-val { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+
+    .fare-display {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .fare-amount { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.05em; color: var(--ink); }
+    .fare-display.agreed .fare-amount { color: var(--green); }
+    .fare-tag { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+    .offers-section { margin-bottom: 16px; display: none; }
+    .offers-title { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .offer-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .offer-driver { font-size: 0.85rem; font-weight: 700; color: var(--ink); }
+    .offer-meta { font-size: 0.65rem; color: var(--sub); font-weight: 600; margin-top: 2px; }
+    .offer-fare { font-size: 1.1rem; font-weight: 800; color: var(--green); margin-right: 12px; }
+    .offer-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-sm {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+      text-transform: uppercase;
+      transition: 0.2s;
+    }
+    .btn-sm:active { transform: scale(0.97); }
+    .btn-sm-accept { background: var(--ink); color: #fff; }
+    .btn-sm-decline { background: var(--bg); color: var(--sub); border: 1.5px solid var(--border); }
+
+    #map {
+      height: 260px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .chat-box {
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 14px;
+      border: 1.5px solid var(--border);
+    }
+    .chat-label { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .messages {
+      height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 10px;
+      scrollbar-width: none;
+    }
+    .messages::-webkit-scrollbar { display: none; }
+    .msg {
+      max-width: 80%;
+      padding: 9px 13px;
+      border-radius: 14px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .msg.me { background: var(--ink); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.them { background: #fff; color: var(--ink); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .chat-input-row { display: flex; gap: 8px; margin-top: 10px; }
+    .chat-input {
+      flex: 1;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--accent); }
+    .send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: 0.2s;
+    }
+    .send-btn:hover { background: #333; }
+
+    .status-block {
+      font-family: var(--mono);
+      background: var(--ink);
+      color: #22c55e;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 10px;
+      line-height: 1.8;
+      margin-top: 24px;
+      letter-spacing: 0.02em;
+    }
+
     .panel { display: none; }
     .panel.active { display: block; }
-    
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 99px; font-size: 0.82rem; font-weight: 700; z-index: 1000; opacity: 0; transition: 0.3s; pointer-events: none; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+    .waiting-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border-radius: 99px;
+      margin-bottom: 16px;
+    }
+    .waiting-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; animation: blink 1.2s infinite; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
   </style>
 </head>
 <body>
+
 <header>
   <div class="brand">Spiti<span>-Spiti</span></div>
-  <div class="conn-status">
+  <div class="conn-pill">
     <div class="dot" id="socket-dot"></div>
-    <span id="socket-label">Syncing...</span>
+    <span id="socket-label">Syncing</span>
   </div>
 </header>
 
 <div class="container">
   <div class="page-header">
-    <h1 class="page-title">Rider Portal</h1>
-    <p class="page-sub">Operational interface for transit requests</p>
+    <h1 class="page-title">Rider</h1>
+    <p class="page-sub">Request a ride, negotiate your fare</p>
   </div>
 
   <!-- PANEL: REQUEST -->
   <div id="panel-request" class="panel active">
     <div class="card">
-      <span class="card-label">Dispatch Request</span>
+      <span class="card-label">New Ride Request</span>
       <div class="field">
-        <label>Pick-up Point</label>
-        <input type="text" id="pickup" placeholder="Current Location">
+        <label>Pick-up Location</label>
+        <input type="text" id="pickup" placeholder="Where are you?">
       </div>
       <div class="field">
-        <label>Destination Access</label>
+        <label>Destination</label>
         <input type="text" id="dropoff" placeholder="Where to?">
       </div>
       <div class="field">
         <label>Offered Fare (BWP)</label>
         <input type="number" id="offered-fare" min="15" value="30">
-        <p class="hint">System minimum: P15.00 | Real-time negotiation active</p>
+        <p class="hint">Minimum P15.00 · Drivers can counter-offer</p>
       </div>
-      <button class="btn btn-primary" onclick="createRide()">Initialize Request →</button>
+      <button class="btn btn-primary" onclick="createRide()">Request Ride →</button>
+    </div>
+    <div class="status-block">
+      [READY] spiti-spiti: v1.0.0<br>
+      [SYNC] socket: active<br>
+      [STATUS] connected
     </div>
   </div>
 
-  <!-- PANEL: NEGOTIATION -->
+  <!-- PANEL: WAITING / NEGOTIATION -->
   <div id="panel-waiting" class="panel">
     <div class="card">
-      <span class="card-label">Negotiation Stream</span>
-      <div class="route">
-        <div class="point">
-          <div class="icon">📍</div>
-          <div><div class="loc-label">FROM</div><div class="loc-text" id="w-pickup">—</div></div>
+      <div class="waiting-label"><div class="waiting-dot"></div>Waiting for drivers</div>
+
+      <div class="route-display">
+        <div class="route-point">
+          <div class="route-icon">📍</div>
+          <div>
+            <div class="route-label">From</div>
+            <div class="route-val" id="w-pickup">—</div>
+          </div>
         </div>
-        <div class="point">
-          <div class="icon" style="background:#14532d22">🏁</div>
-          <div><div class="loc-label">TO</div><div class="loc-text" id="w-dropoff">—</div></div>
+        <div class="route-point">
+          <div class="route-icon" style="background:#f0fdf4;">🏁</div>
+          <div>
+            <div class="route-label">To</div>
+            <div class="route-val" id="w-dropoff">—</div>
+          </div>
         </div>
       </div>
-      <div class="fare-box">
-        <div class="fare-val" id="w-fare">P0.00</div>
-        <div class="loc-label" style="margin-top:4px">CURRENT BID</div>
+
+      <div class="fare-display">
+        <div class="fare-amount" id="w-fare">P0.00</div>
+        <div class="fare-tag">Your Offered Fare</div>
       </div>
-      
-      <div id="offers-wrap" style="display:none; margin-bottom:20px;">
-        <span class="card-label" style="font-size:0.55rem; color:#64748b;">Incoming Driver Counters</span>
+
+      <div class="offers-section" id="offers-wrap">
+        <div class="offers-title">Driver Offers</div>
         <div id="offers-list"></div>
       </div>
-      
-      <button class="btn btn-ghost" onclick="cancelRequest()">Abort Dispatch</button>
+
+      <button class="btn btn-ghost" onclick="cancelRequest()">Cancel Request</button>
+    </div>
+    <div class="status-block">
+      [READY] spiti-spiti: v1.0.0<br>
+      [SYNC] socket: active<br>
+      [STATUS] connected
     </div>
   </div>
 
-  <!-- PANEL: LIVE RIDE -->
+  <!-- PANEL: ACTIVE RIDE -->
   <div id="panel-active" class="panel">
     <div class="card">
-      <span class="card-label">Active Operational Stream</span>
-      
-      <div class="progress">
-        <div class="step"><div class="step-dot done">✓</div><span class="step-label">Synced</span></div>
+      <span class="card-label">Active Ride</span>
+
+      <div class="progress-bar">
+        <div class="step">
+          <div class="step-dot done" id="s1">✓</div>
+          <span class="step-label">Matched</span>
+        </div>
         <div class="step-line" id="l1"></div>
-        <div class="step"><div class="step-dot" id="s2">2</div><span class="step-label">transit</span></div>
+        <div class="step">
+          <div class="step-dot" id="s2">2</div>
+          <span class="step-label">Transit</span>
+        </div>
         <div class="step-line" id="l2"></div>
-        <div class="step"><div class="step-dot" id="s3">3</div><span class="step-label">Final</span></div>
-      </div>
-
-     <div id="map" style="height:280px; border-radius:16px; border:1px solid var(--border); margin-bottom:12px; overflow:hidden;"></div>
-
-      <div class="fare-box agreed">
-        <div class="fare-val" id="a-fare">P0.00</div>
-        <div class="loc-label">FIXED RATE</div>
-      </div>
-
-      <div class="chat">
-        <span class="card-label" style="font-size:0.55rem;">Telemetry Comms</span>
-        <div class="messages" id="msgs"></div>
-        <div style="display:flex; gap:8px;">
-          <input type="text" id="chat-in" placeholder="Secure message..." onkeydown="if(event.key==='Enter')sendMsg()">
-          <button class="btn btn-primary" style="width:50px; padding:0;" onclick="sendMsg()">➤</button>
+        <div class="step">
+          <div class="step-dot" id="s3">3</div>
+          <span class="step-label">Arrived</span>
         </div>
       </div>
+
+      <div id="map"></div>
+
+      <div class="fare-display agreed">
+        <div class="fare-amount" id="a-fare">P0.00</div>
+        <div class="fare-tag">Agreed Fare</div>
+      </div>
+
+      <div class="chat-box">
+        <div class="chat-label">Message Driver</div>
+        <div class="messages" id="msgs"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" type="text" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="send-btn" onclick="sendMsg()">➤</button>
+        </div>
+      </div>
+
       <br>
-      <button class="btn btn-danger" onclick="location.reload()">Terminate Service</button>
+      <button class="btn btn-danger" onclick="location.reload()">End Ride</button>
+    </div>
+    <div class="status-block">
+      [READY] spiti-spiti: v1.0.0<br>
+      [SYNC] socket: active<br>
+      [STATUS] connected
     </div>
   </div>
-
- <div class="railway-status">
-    [READY] spiti-spiti: v1.0.0<br>
-    [SYNC] socket: active<br>
-    [STATUS] connected
-  </div>
 </div>
-  
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -205,129 +493,210 @@
   const RIDER_ID = 1;
   let activeRide = null;
   let map = null;
-  let marker = null;
+  let driverMarker = null;
+  let pickupMarker = null;
+  let dropoffMarker = null;
   let offers = {};
 
   const socket = io(BASE);
+
   socket.on("connect", () => {
     document.getElementById("socket-dot").classList.add("live");
-    document.getElementById("socket-label").textContent = "CONNECTED";
+    document.getElementById("socket-label").textContent = "Live";
     socket.emit("join-role", { role: "rider", userId: RIDER_ID });
+  });
+
+  socket.on("disconnect", () => {
+    document.getElementById("socket-dot").classList.remove("live");
+    document.getElementById("socket-label").textContent = "Offline";
   });
 
   socket.on("ride-created", (ride) => {
     activeRide = ride;
+    socket.emit("join-ride", { rideId: ride.id });
     showPanel("waiting");
     document.getElementById("w-pickup").textContent = ride.pickup;
     document.getElementById("w-dropoff").textContent = ride.dropoff;
     document.getElementById("w-fare").textContent = "P" + parseFloat(ride.offered_fare).toFixed(2);
-    showToast("Dispatch initialized");
+    showToast("Ride requested! Waiting for drivers...");
   });
 
   socket.on("driver-offer", (offer) => {
     offers[offer.driverId] = offer;
     renderOffers();
-    showToast("New negotiation offer received");
+    showToast("New offer from a driver!");
   });
 
- socket.on("ride-updated", (ride) => {
+  socket.on("ride-updated", (ride) => {
     if (!activeRide) activeRide = ride;
     if (ride.id !== activeRide.id) return;
     activeRide = ride;
-    socket.emit("join-ride", { rideId: ride.id });
+
     if (ride.status === "accepted") {
       showPanel("active");
       document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare).toFixed(2);
-      function initMap() {
-    if (map) return;
-    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19
-    }).addTo(map);
-    L.control.attribution({ prefix: false }).addTo(map);
-  }
       socket.emit("join-ride", { rideId: ride.id });
+      initMap(ride);
+      showToast("Driver accepted! They're on the way.");
     }
     if (ride.status === "in_progress") {
+      document.getElementById("s2").classList.remove("active");
       document.getElementById("s2").classList.add("done");
+      document.getElementById("s2").textContent = "✓";
       document.getElementById("l1").classList.add("done");
-      showToast("Service line active");
+      document.getElementById("s3").classList.add("active");
+      showToast("Ride in progress!");
     }
     if (ride.status === "completed") {
+      document.getElementById("s3").classList.remove("active");
       document.getElementById("s3").classList.add("done");
+      document.getElementById("s3").textContent = "✓";
       document.getElementById("l2").classList.add("done");
-      showToast("Destination reached! Clearing stream...");
+      showToast("You've arrived! Ride complete.");
       setTimeout(() => location.reload(), 4000);
     }
   });
 
   socket.on("driver-location", ({ lat, lng }) => {
-    if (!map) function initMap() {
-    if (map) return;
-    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19
-    }).addTo(map);
-    L.control.attribution({ prefix: false }).addTo(map);
-  }
+    if (!map) return;
+    if (driverMarker) {
+      driverMarker.setLatLng([lat, lng]);
+    } else {
+      const icon = L.divIcon({
+        className: '',
+        html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(34,197,94,0.6);"></div>',
+        iconSize: [14, 14], iconAnchor: [7, 7]
+      });
+      driverMarker = L.marker([lat, lng], { icon }).addTo(map).bindPopup("Your Driver");
+    }
+    map.panTo([lat, lng]);
   });
 
   socket.on("new-message", (msg) => {
-    const el = document.getElementById("msgs");
-    const mine = msg.sender_role === "rider";
-    el.innerHTML += `<div class="msg ${mine?'me':'them'}">${msg.message}</div>`;
-    el.scrollTop = el.scrollHeight;
+    appendMessage(msg);
   });
 
   async function createRide() {
-    const pickup = document.getElementById("pickup").value || "Current Location";
-    const dropoff = document.getElementById("dropoff").value;
+    const pickup = document.getElementById("pickup").value.trim() || "Current Location";
+    const dropoff = document.getElementById("dropoff").value.trim();
     const fare = document.getElementById("offered-fare").value;
-    if (!dropoff) return showToast("Destination required");
-    await fetch(`${BASE}/rides`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pickup, dropoff, riderId: RIDER_ID, offered_fare: fare })
-    });
+    if (!dropoff) return showToast("Please enter a destination");
+    try {
+      await fetch(`${BASE}/rides`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pickup, dropoff, riderId: RIDER_ID, offered_fare: fare })
+      });
+    } catch(e) {
+      showToast("Failed to request ride");
+    }
   }
 
   function renderOffers() {
-    const el = document.getElementById("offers-list");
     const wrap = document.getElementById("offers-wrap");
-    const list = Object.values(offers);
-    if (!list.length) return wrap.style.display = "none";
+    const list = document.getElementById("offers-list");
+    const items = Object.values(offers);
+    if (!items.length) { wrap.style.display = "none"; return; }
     wrap.style.display = "block";
-    el.innerHTML = list.map(o => `
-      <div class="offer-item">
+    list.innerHTML = items.map(o => `
+      <div class="offer-card">
         <div>
-          <div style="font-weight:700;">Driver #${o.driverId}</div>
-          <div class="offer-meta">Wants P${parseFloat(o.fare_offer).toFixed(2)}</div>
+          <div class="offer-driver">${o.driver_name || "Driver #" + o.driverId}</div>
+          <div class="offer-meta">Counter offer</div>
         </div>
-        <button class="btn btn-primary" style="width:auto; padding:8px 16px; font-size:0.7rem;" onclick="acceptOffer(${o.driverId},${o.fare_offer})">Accept</button>
+        <div class="offer-actions">
+          <span class="offer-fare">P${parseFloat(o.fare_offer).toFixed(2)}</span>
+          <button class="btn-sm btn-sm-decline" onclick="declineOffer(${o.driverId})">Decline</button>
+          <button class="btn-sm btn-sm-accept" onclick="acceptOffer(${o.driverId}, ${o.fare_offer})">Accept</button>
+        </div>
       </div>
     `).join("");
   }
 
   async function acceptOffer(driverId, fare) {
-    await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ driverId, fare })
-    });
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId, fare })
+      });
+      offers = {};
+    } catch(e) {
+      showToast("Failed to accept offer");
+    }
   }
 
-  function initMap() {
+  async function declineOffer(driverId) {
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId })
+      });
+      delete offers[driverId];
+      renderOffers();
+      showToast("Offer declined");
+    } catch(e) {}
+  }
+
+  async function cancelRequest() {
+    if (!activeRide) { location.reload(); return; }
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" })
+      });
+    } catch(e) {}
+    location.reload();
+  }
+
+  function initMap(ride) {
     if (map) return;
-    map = L.map("map").setView([-24.6541, 25.9087], 14);
-    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+
+    const pickupIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:12px;height:12px;background:#f59e0b;border:2px solid #fff;border-radius:50%;"></div>',
+      iconSize: [12, 12], iconAnchor: [6, 6]
+    });
+    const dropoffIcon = L.divIcon({
+      className: '',
+      html: '<div style="width:12px;height:12px;background:#3b82f6;border:2px solid #fff;border-radius:50%;"></div>',
+      iconSize: [12, 12], iconAnchor: [6, 6]
+    });
+
+    if (ride) {
+      if (ride.pickup_lat && ride.pickup_lng)
+        pickupMarker = L.marker([ride.pickup_lat, ride.pickup_lng], { icon: pickupIcon }).addTo(map).bindPopup("Pickup: " + ride.pickup);
+      if (ride.dropoff_lat && ride.dropoff_lng)
+        dropoffMarker = L.marker([ride.dropoff_lat, ride.dropoff_lng], { icon: dropoffIcon }).addTo(map).bindPopup("Dropoff: " + ride.dropoff);
+    }
   }
 
   async function sendMsg() {
     const input = document.getElementById("chat-in");
-    if (!input.value) return;
-    await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender_role: "rider", message: input.value })
-    });
+    const msg = input.value.trim();
+    if (!msg || !activeRide) return;
     input.value = "";
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender_role: "rider", message: msg })
+      });
+    } catch(e) {}
+  }
+
+  function appendMessage(msg) {
+    const el = document.getElementById("msgs");
+    const mine = msg.sender_role === "rider";
+    const div = document.createElement("div");
+    div.className = "msg " + (mine ? "me" : "them");
+    div.textContent = msg.message;
+    el.appendChild(div);
+    el.scrollTop = el.scrollHeight;
   }
 
   function showPanel(id) {
@@ -337,7 +706,8 @@
 
   function showToast(m) {
     const t = document.getElementById("toast");
-    t.textContent = m; t.classList.add("show");
+    t.textContent = m;
+    t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 3000);
   }
 </script>
