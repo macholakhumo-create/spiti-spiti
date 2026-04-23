@@ -430,6 +430,3 @@ app.delete("/deliveries/:id", async (req, res) => {
 server.listen(process.env.PORT || 5000, () => {
   console.log("Server running on port", process.env.PORT || 5000);
 });
-```
-
-Upload this to GitHub → Railway will redeploy → tell me when it says **Server running** in logs and which map style you prefer, then I'll send the final rider.html and driver.html! 🚀
