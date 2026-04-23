@@ -170,9 +170,12 @@
     <p class="stat-lbl" style="text-align:center;">Agreed Rate</p>
     <div class="stat-val" id="act-fare" style="text-align:center; font-size:2rem; margin-bottom:20px;">P0.00</div>
     
+    <p class="node-lbl" style="text-align:center; margin-bottom:8px;">Your Counter Offer (BWP)</p>
+    <input class="offer-input" type="number" id="counter-fare" min="15" placeholder="Enter amount"/>
     <div style="display:flex; gap:12px;">
-      <button class="btn btn-acc" id="start-btn" onclick="updateStatus('in_progress')">Resume Trip</button>
-      <button class="btn btn-acc" style="background:var(--accent);" onclick="updateStatus('completed')">Complete Trip</button>
+      <button class="btn btn-acc" onclick="acceptOffer()">Accept as is</button>
+      <button class="btn btn-acc" style="background:var(--accent);" onclick="sendCounter()">Counter</button>
+      <button class="btn btn-dec" onclick="closeInc()">Decline</button>
     </div>
 
     <div class="comms">
@@ -186,8 +189,8 @@
 
   <div class="railway-status">
     [READY] spiti-spiti: v1.0.0<br>
-[SYNC] socket: active<br>
-[STATUS] connected
+    [SYNC] socket: active<br>
+    [STATUS] connected
   </div>
 </div>
 
@@ -243,7 +246,16 @@
       body: JSON.stringify({ available: on })
     });
   }
-
+async function sendCounter() {
+    const fare = document.getElementById("counter-fare").value;
+    if (!fare || fare < 15) return showToast("Minimum fare is P15");
+    await fetch(`${BASE}/rides/${pendingRide.id}/offer`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ driverId: DRIVER_ID, driver_name: "Driver", fare_offer: fare })
+    });
+    showToast("Counter offer sent!");
+    closeInc();
+  }
   async function acceptOffer() {
     await fetch(`${BASE}/rides/${pendingRide.id}/accept-offer`, {
       method: "POST", headers: { "Content-Type": "application/json" },
