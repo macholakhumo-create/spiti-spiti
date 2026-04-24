@@ -6,192 +6,217 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <title>Spiti-Spiti | Operator Console</title>
+  <title>Spiti-Spiti | Driver</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --ink: #f8fafc;
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --ink: #f0f0f5;
       --accent: #22c55e;
-      --sub: #94a3b8;
-      --border: #334155;
-      --font: 'Inter', sans-serif;
+      --sub: #52525b;
+      --border: #1e1e2a;
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: var(--font); background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
-    
-    header { background: #020617; border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; sticky: top; z-index: 100; }
-    .brand { font-size: 1rem; font-weight: 900; letter-spacing: -0.04em; color: var(--accent); }
-    .brand span { color: #fff; }
-    
-    .status-badge { display: flex; align-items: center; gap: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; tracking: 0.1em; padding: 6px 12px; background: #1e293b; border-radius: 20px; border: 1px solid var(--border); }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: #475569; }
-    .dot.on { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    .container { max-width: 500px; margin: 0 auto; padding: 20px 16px 100px; }
-    
-    .operator-info { margin-bottom: 24px; padding: 0 4px; }
-    .op-title { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.05em; }
-    .op-sub { font-size: 0.8rem; color: var(--sub); font-weight: 600; text-transform: uppercase; tracking: 0.05em; }
+    header { background: #060608; border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 200; }
+    .brand { font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; text-transform: uppercase; }
+    .brand span { color: #f59e0b; }
+    .conn-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 5px 12px; border-radius: 99px; font-size: 0.65rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.08em; }
+    .conn-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #333; transition: 0.3s; }
+    .conn-pill .dot.live { background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
-    .card-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; display: block; }
-    
-    /* Toggle switch polished */
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .switch { position: relative; width: 50px; height: 26px; }
+    .container { max-width: 480px; margin: 0 auto; padding: 24px 16px 80px; }
+    .page-header { margin-bottom: 20px; }
+    .page-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+    .page-sub { font-size: 0.8rem; color: var(--sub); font-weight: 500; margin-top: 4px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; margin-bottom: 14px; }
+    .card-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: block; }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .switch { position: relative; width: 52px; height: 28px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: var(--accent); }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: #2a2a3a; transition: .3s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background: var(--accent); }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
-    .stat-val { font-size: 1.25rem; font-weight: 900; color: #fff; }
-    .stat-lbl { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+    .stat-val { font-size: 1.3rem; font-weight: 800; color: #fff; }
+    .stat-lbl { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
 
-    .incoming { background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); border: 1px solid #10b981; display: none; }
-    .incoming.active { display: block; animation: alert 2s infinite; }
-    @keyframes alert { 0% { box-shadow: 0 0 0 0px rgba(16,185,129,0.4); } 70% { box-shadow: 0 0 0 15px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0px rgba(16,185,129,0); } }
+    #map { height: 200px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--border); }
 
-    .route { border-left: 2px dashed var(--border); margin: 0 0 20px 10px; padding-left: 20px; position: relative; }
-    .route::before, .route::after { content: ''; position: absolute; left: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
-    .route::before { top: 0; background: #fff; }
-    .route::after { bottom: 0; background: var(--accent); }
-    .node { margin-bottom: 24px; }
-    .node:last-child { margin-bottom: 0; }
-    .node-loc { font-size: 0.95rem; font-weight: 700; color: #fff; }
-    .node-lbl { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; }
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: var(--font); font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #fff; color: #000; }
+    .btn-accent { background: var(--accent); color: #000; }
+    .btn-ghost { background: transparent; color: var(--sub); border: 1px solid var(--border); }
+    .btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
+    .btn-loc { background: var(--surface); color: var(--sub); border: 1px solid var(--border); }
+    .btn-loc.streaming { background: var(--accent); color: #000; border-color: var(--accent); }
 
-    .offer-input { width: 100%; background: #0f172a; border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
-    
-    .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: var(--font); font-size: 0.82rem; font-weight: 800; cursor: pointer; text-transform: uppercase; tracking: 0.1em; transition: 0.2s; }
-    .btn-acc { background: #fff; color: #000; }
-    .btn-dec { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-    .btn-loc { background: var(--accent); color: #000; transition: 0.3s; }
-    .btn-loc.active { background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+    /* INCOMING */
+    .incoming-card { background: linear-gradient(135deg, #052e16 0%, #064e3b 100%); border: 1.5px solid #16a34a; border-radius: 20px; padding: 22px; margin-bottom: 14px; display: none; animation: pulse-border 2s infinite; }
+    .incoming-card.active { display: block; }
+    @keyframes pulse-border { 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.3)} 70%{box-shadow:0 0 0 12px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+    .incoming-label { font-size: 0.6rem; font-weight: 800; color: #86efac; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 16px; display: block; }
 
-    #map { height: 180px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 16px; }
+    .route-block { margin-bottom: 18px; }
+    .route-point { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .route-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .route-label { font-size: 0.6rem; color: #86efac; font-weight: 700; text-transform: uppercase; }
+    .route-val { font-size: 0.9rem; font-weight: 600; color: #fff; }
 
-    .active-ride { border-left: 4px solid var(--accent); display: none; }
-    .active-ride.show { display: block; }
-    
-    .comms { background: #0f172a; border-radius: 16px; padding: 16px; border: 1px solid var(--border); margin-top: 16px; }
-    .msgs { height: 150px; overflow-y: auto; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; }
-    .msg.me { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
-    .msg.them { background: #1e293b; color: #fff; align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 2px; }
-    
-    .railway-status { font-family: 'JetBrains Mono', monospace; background: #020617; color: #22c55e; padding: 14px; border-radius: 12px; font-size: 10px; margin-top: 24px; border: 1px solid #1e293b; }
-    
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 24px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; text-transform: uppercase; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+    .rider-fare-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; text-align: center; margin-bottom: 16px; }
+    .rider-fare-label { font-size: 0.6rem; font-weight: 700; color: #86efac; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .rider-fare-val { font-size: 1.8rem; font-weight: 800; color: #fff; }
+
+    .counter-section { margin-bottom: 16px; }
+    .counter-label { font-size: 0.6rem; font-weight: 700; color: #86efac; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .counter-input { width: 100%; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 14px; color: #fff; font-family: var(--mono); font-size: 1.4rem; font-weight: 700; text-align: center; outline: none; transition: border-color 0.2s; margin-bottom: 10px; }
+    .counter-input:focus { border-color: var(--accent); }
+    .counter-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .action-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ACTIVE */
+    .active-card { display: none; }
+    .active-card.show { display: block; }
+
+    .fare-big { text-align: center; margin-bottom: 20px; }
+    .fare-big-val { font-size: 2.2rem; font-weight: 800; color: var(--accent); letter-spacing: -0.04em; }
+    .fare-big-lbl { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    .comms { background: var(--bg); border-radius: 14px; padding: 14px; border: 1px solid var(--border); margin-top: 16px; }
+    .comms-label { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .msgs { height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; scrollbar-width: none; }
+    .msgs::-webkit-scrollbar { display: none; }
+    .msg { max-width: 80%; padding: 9px 13px; border-radius: 12px; font-size: 0.82rem; font-weight: 500; line-height: 1.4; }
+    .msg.me { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 3px; }
+    .msg.them { background: var(--surface); color: #fff; border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 3px; }
+    .comms-input-row { display: flex; gap: 8px; margin-top: 10px; }
+    .comms-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font); font-size: 0.85rem; outline: none; }
+    .comms-input:focus { border-color: var(--accent); }
+    .send-btn { width: 42px; height: 42px; border-radius: 10px; background: var(--accent); color: #000; border: none; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .status-block { font-family: var(--mono); background: #060608; color: var(--accent); padding: 14px 16px; border-radius: 14px; font-size: 10px; line-height: 1.8; margin-top: 24px; border: 1px solid var(--border); letter-spacing: 0.02em; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 11px 22px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; z-index: 1000; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
   </style>
 </head>
 <body>
+
 <header>
-  <div class="brand">Spiti<span>-Spiti</span>. Operator</div>
-  <div class="status-badge">
+  <div class="brand">Spiti<span>-Spiti</span> <span style="color:var(--sub);font-weight:500;font-size:0.8rem;">· Driver</span></div>
+  <div class="conn-pill">
     <div class="dot" id="socket-dot"></div>
     <span id="socket-label">Offline</span>
   </div>
 </header>
 
 <div class="container">
-  <div class="operator-info">
-    <p class="op-sub">Service ID #OPS-2841</p>
-    <h1 class="op-title">Command Center</h1>
+  <div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-sub">Driver ID #<span id="driver-id-display">1</span></p>
   </div>
 
+  <!-- STATUS CARD -->
   <div class="card">
     <div class="toggle-row">
-      <div style="flex:1;">
-        <span class="card-label" style="margin-bottom:4px;">Operational Duty</span>
-        <p style="font-size:0.75rem; color:var(--sub); font-weight:600;" id="avail-txt">OFFLINE</p>
+      <div>
+        <span class="card-label" style="margin-bottom:4px;">Duty Status</span>
+        <p style="font-size:0.78rem;color:var(--sub);font-weight:600;" id="avail-txt">OFFLINE</p>
       </div>
       <label class="switch">
         <input type="checkbox" id="avail-toggle" onchange="toggleAvail()">
         <span class="slider"></span>
       </label>
     </div>
-    
     <div class="stats">
-      <div class="stat-box">
-        <p class="stat-lbl">Active Shifts</p>
-        <p class="stat-val" id="s-done">0</p>
-      </div>
-      <div class="stat-box">
-        <p class="stat-lbl">Session BWP</p>
-        <p class="stat-val" id="s-earn">P0.00</p>
-      </div>
+      <div class="stat-box"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Rides Today</div></div>
+      <div class="stat-box"><div class="stat-val" id="s-earn">P0</div><div class="stat-lbl">Earned</div></div>
     </div>
   </div>
 
+  <!-- MAP CARD -->
   <div class="card">
-    <span class="card-label">Telemetry Transmission</span>
-    <div id="map" style="height:280px; border-radius:16px; border:1px solid var(--border); margin-bottom:12px; overflow:hidden;"></div>
-    <button class="btn btn-loc" id="loc-btn" onclick="toggleLoc()">Initialize GPS Stream</button>
+    <span class="card-label">Live Location</span>
+    <div id="map"></div>
+    <button class="btn btn-loc" id="loc-btn" onclick="toggleLoc()">Start GPS Tracking</button>
   </div>
 
-  <!-- PANEL: INCOMING -->
-  <div class="card incoming" id="inc-card">
-    <span class="card-label" style="color:#fff;">Operational Alert: New Request</span>
-    <div class="route">
-      <div class="node">
-        <p class="node-lbl">Pick-up Node</p>
-        <p class="node-loc" id="inc-pick">—</p>
+  <!-- INCOMING RIDE -->
+  <div class="incoming-card" id="inc-card">
+    <span class="incoming-label">⚡ New Ride Request</span>
+    <div class="route-block">
+      <div class="route-point">
+        <div class="route-icon">📍</div>
+        <div><div class="route-label">Pickup</div><div class="route-val" id="inc-pick">—</div></div>
       </div>
-      <div class="node">
-        <p class="node-lbl">Terminal Access</p>
-        <p class="node-loc" id="inc-drop">—</p>
+      <div class="route-point">
+        <div class="route-icon">🏁</div>
+        <div><div class="route-label">Dropoff</div><div class="route-val" id="inc-drop">—</div></div>
       </div>
     </div>
-    <p class="node-lbl" style="text-align:center; margin-bottom:8px;">Rider Requested Rate</p>
-    <div class="offer-input" id="inc-rate" style="background:rgba(0,0,0,0.2); border:none; color:#10b981;">P0.00</div>
-    
-    <div style="display:flex; gap:12px;">
-      <button class="btn btn-acc" onclick="acceptOffer()">Accept</button>
-      <button class="btn btn-dec" onclick="closeInc()">Decline</button>
+    <div class="rider-fare-box">
+      <div class="rider-fare-label">Rider's Offered Fare</div>
+      <div class="rider-fare-val" id="inc-rate">P0.00</div>
+    </div>
+    <div class="counter-section">
+      <div class="counter-label">Your Counter Offer (BWP) — leave blank to accept as-is</div>
+      <input class="counter-input" type="number" id="counter-fare" min="15" placeholder="e.g. 45">
+    </div>
+    <div class="action-row-3">
+      <button class="btn btn-primary" onclick="acceptAsIs()">Accept</button>
+      <button class="btn btn-accent" onclick="sendCounter()">Counter</button>
+      <button class="btn btn-danger" onclick="closeInc()">Decline</button>
     </div>
   </div>
 
-  <!-- PANEL: ACTIVE -->
-  <div class="card active-ride" id="act-card">
-    <span class="card-label">Service Execution in Progress</span>
-    <div class="route" style="margin-bottom:12px;">
-      <div class="node"><p class="node-lbl">From</p><p class="node-loc" id="act-src">—</p></div>
-      <div class="node"><p class="node-lbl">To</p><p class="node-loc" id="act-dst">—</p></div>
+  <!-- ACTIVE RIDE -->
+  <div class="card active-card" id="act-card">
+    <span class="card-label">Active Ride</span>
+    <div class="route-block">
+      <div class="route-point">
+        <div class="route-icon" style="background:rgba(255,255,255,0.05);">📍</div>
+        <div><div class="route-label" style="color:var(--sub);">From</div><div class="route-val" id="act-src">—</div></div>
+      </div>
+      <div class="route-point">
+        <div class="route-icon" style="background:rgba(255,255,255,0.05);">🏁</div>
+        <div><div class="route-label" style="color:var(--sub);">To</div><div class="route-val" id="act-dst">—</div></div>
+      </div>
     </div>
-    <p class="stat-lbl" style="text-align:center;">Agreed Rate</p>
-    <div class="stat-val" id="act-fare" style="text-align:center; font-size:2rem; margin-bottom:20px;">P0.00</div>
-    
-    <p class="node-lbl" style="text-align:center; margin-bottom:8px;">Your Counter Offer (BWP)</p>
-    <input class="offer-input" type="number" id="counter-fare" min="15" placeholder="Enter amount"/>
-    <div style="display:flex; gap:12px;">
-      <button class="btn btn-acc" onclick="acceptOffer()">Accept as is</button>
-      <button class="btn btn-acc" style="background:var(--accent);" onclick="sendCounter()">Counter</button>
-      <button class="btn btn-dec" onclick="closeInc()">Decline</button>
+    <div class="fare-big">
+      <div class="fare-big-val" id="act-fare">P0.00</div>
+      <div class="fare-big-lbl">Agreed Fare</div>
     </div>
-
+    <div class="action-row" style="margin-bottom:10px;">
+      <button class="btn btn-primary" id="start-btn" onclick="updateStatus('in_progress')">Start Trip</button>
+      <button class="btn btn-accent" onclick="updateStatus('completed')">Complete</button>
+    </div>
     <div class="comms">
+      <div class="comms-label">Message Rider</div>
       <div class="msgs" id="msgs"></div>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="chat-in" placeholder="Secure comms..." style="background:#020617; border:1px solid #334155; padding:10px; color:#fff; flex:1; border-radius:10px;" onkeydown="if(event.key==='Enter')sendMsg()">
-        <button class="btn btn-acc" style="width:50px; padding:0;" onclick="sendMsg()">➤</button>
+      <div class="comms-input-row">
+        <input class="comms-input" type="text" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
       </div>
     </div>
   </div>
 
-  <div class="railway-status">
-    [READY] spiti-spiti: v1.0.0<br>
-    [SYNC] socket: active<br>
-    [STATUS] connected
-  </div>
+  <div class="status-block">[READY] spiti-spiti: v1.0.0<br>[SYNC] socket: active<br>[STATUS] connected</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -201,13 +226,24 @@
   const DRIVER_ID = 1;
   let activeRide = null;
   let pendingRide = null;
-  let map, marker, locWatcher;
+  let map, driverMarker, locWatcher;
+  let ridesCompleted = 0;
+  let totalEarned = 0;
+
+  document.getElementById("driver-id-display").textContent = DRIVER_ID;
 
   const socket = io(BASE);
+
   socket.on("connect", () => {
-    document.getElementById("socket-dot").classList.add("on");
-    document.getElementById("socket-label").textContent = "CONNECTED";
+    document.getElementById("socket-dot").classList.add("live");
+    document.getElementById("socket-label").textContent = "Live";
     socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
+    if (activeRide) socket.emit("join-ride", { rideId: activeRide.id });
+  });
+
+  socket.on("disconnect", () => {
+    document.getElementById("socket-dot").classList.remove("live");
+    document.getElementById("socket-label").textContent = "Offline";
   });
 
   socket.on("new-ride", (ride) => {
@@ -216,62 +252,106 @@
     document.getElementById("inc-pick").textContent = ride.pickup;
     document.getElementById("inc-drop").textContent = ride.dropoff;
     document.getElementById("inc-rate").textContent = "P" + parseFloat(ride.offered_fare).toFixed(2);
+    document.getElementById("counter-fare").value = "";
     document.getElementById("inc-card").classList.add("active");
-    showToast("Urgent Operational Alert");
+    showToast("New ride request!");
   });
 
   socket.on("offer-accepted", (ride) => {
     activeRide = ride;
+    pendingRide = null;
     document.getElementById("inc-card").classList.remove("active");
     document.getElementById("act-card").classList.add("show");
     document.getElementById("act-src").textContent = ride.pickup;
     document.getElementById("act-dst").textContent = ride.dropoff;
     document.getElementById("act-fare").textContent = "P" + parseFloat(ride.fare).toFixed(2);
     socket.emit("join-ride", { rideId: ride.id });
-    showToast("Contract Secured. Proceed to Pickup.");
+    loadMessages(ride.id);
+    showToast("Offer accepted! Head to pickup.");
+  });
+
+  socket.on("offer-declined", () => {
+    showToast("Rider declined your offer");
+  });
+
+  socket.on("ride-updated", (ride) => {
+    if (!activeRide || ride.id !== activeRide.id) return;
+    activeRide = ride;
+    if (ride.status === "completed") {
+      ridesCompleted++;
+      totalEarned += parseFloat(ride.fare || 0);
+      document.getElementById("s-done").textContent = ridesCompleted;
+      document.getElementById("s-earn").textContent = "P" + totalEarned.toFixed(0);
+      document.getElementById("act-card").classList.remove("show");
+      activeRide = null;
+      showToast("Ride complete!");
+    }
   });
 
   socket.on("new-message", (msg) => {
     const el = document.getElementById("msgs");
     const mine = msg.sender_role === "driver";
-    el.innerHTML += `<div class="msg ${mine?'me':'them'}">${msg.message}</div>`;
+    const div = document.createElement("div");
+    div.className = "msg " + (mine ? "me" : "them");
+    div.textContent = msg.message;
+    el.appendChild(div);
     el.scrollTop = el.scrollHeight;
   });
 
   async function toggleAvail() {
     const on = document.getElementById("avail-toggle").checked;
-    document.getElementById("avail-txt").textContent = on ? "ACTIVE / SEARCHING" : "OFFLINE";
-    await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ available: on })
-    });
-  }
-async function sendCounter() {
-    const fare = document.getElementById("counter-fare").value;
-    if (!fare || fare < 15) return showToast("Minimum fare is P15");
-    await fetch(`${BASE}/rides/${pendingRide.id}/offer`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ driverId: DRIVER_ID, driver_name: "Driver", fare_offer: fare })
-    });
-    showToast("Counter offer sent!");
-    closeInc();
-  }
-  async function acceptOffer() {
-    await fetch(`${BASE}/rides/${pendingRide.id}/accept-offer`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ driverId: DRIVER_ID, fare: pendingRide.offered_fare })
-    });
+    document.getElementById("avail-txt").textContent = on ? "ONLINE — ACCEPTING RIDES" : "OFFLINE";
+    try {
+      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ available: on })
+      });
+    } catch(e) {}
   }
 
-  async function updateStatus(s) {
-    const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: s })
-    });
-    if (s === 'completed') {
-      showToast("Shift Terminal Complete");
-      setTimeout(() => location.reload(), 3000);
-    }
+  async function acceptAsIs() {
+    if (!pendingRide) return;
+    try {
+      await fetch(`${BASE}/rides/${pendingRide.id}/accept-offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId: DRIVER_ID, fare: pendingRide.offered_fare })
+      });
+      closeInc();
+    } catch(e) { showToast("Failed to accept"); }
+  }
+
+  async function sendCounter() {
+    const fareVal = document.getElementById("counter-fare").value;
+    const fare = parseFloat(fareVal);
+    if (!fareVal || isNaN(fare) || fare < 15) return showToast("Enter a valid amount (min P15)");
+    if (!pendingRide) return showToast("No pending ride");
+    try {
+      await fetch(`${BASE}/rides/${pendingRide.id}/offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId: DRIVER_ID, driver_name: "Driver #" + DRIVER_ID, fare_offer: fare })
+      });
+      showToast("Counter offer sent — P" + fare.toFixed(2));
+      closeInc();
+    } catch(e) { showToast("Failed to send counter"); }
+  }
+
+  async function updateStatus(status) {
+    if (!activeRide) return;
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      if (status === "in_progress") {
+        document.getElementById("start-btn").disabled = true;
+        document.getElementById("start-btn").textContent = "Trip In Progress";
+        showToast("Trip started!");
+      }
+      if (status === "completed") {
+        showToast("Ride complete!");
+        setTimeout(() => location.reload(), 3000);
+      }
+    } catch(e) { showToast("Failed to update status"); }
   }
 
   function toggleLoc() {
@@ -279,19 +359,14 @@ async function sendCounter() {
     if (locWatcher) {
       navigator.geolocation.clearWatch(locWatcher);
       locWatcher = null;
-      btn.textContent = "Initialize GPS Stream";
-      btn.classList.remove("active");
+      btn.textContent = "Start GPS Tracking";
+      btn.classList.remove("streaming");
     } else {
-      locWatcher = navigator.geolocation.watchPosition(sendLoc);
-      btn.textContent = "Streaming Live GPS";
-      btn.classList.add("active");
-      function initMap() {
-    if (map) return;
-    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19
-    }).addTo(map);
-  }
+      if (!navigator.geolocation) return showToast("GPS not available");
+      locWatcher = navigator.geolocation.watchPosition(sendLoc, () => showToast("GPS error"), { enableHighAccuracy: true });
+      btn.textContent = "GPS Streaming Live";
+      btn.classList.add("streaming");
+      initMap();
     }
   }
 
@@ -300,35 +375,56 @@ async function sendCounter() {
     if (!map) initMap();
     const icon = L.divIcon({
       className: '',
-      html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px #22c55e88;"></div>',
+      html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(34,197,94,0.7);"></div>',
       iconSize: [14, 14], iconAnchor: [7, 7]
     });
-    if (marker) marker.setLatLng([lat, lng]);
-    else marker = L.marker([lat, lng], { icon }).addTo(map);
+    if (driverMarker) driverMarker.setLatLng([lat, lng]);
+    else driverMarker = L.marker([lat, lng], { icon }).addTo(map).bindPopup("You");
     map.setView([lat, lng], 15);
-    await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lat, lng })
-    });
+    try {
+      await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng })
+      });
+    } catch(e) {}
   }
 
   function initMap() {
     if (map) return;
-    map = L.map("map").setView([-24.6541, 25.9087], 15);
-    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 15);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+  }
+
+  async function loadMessages(rideId) {
+    try {
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const msgs = await res.json();
+      msgs.forEach(m => {
+        const el = document.getElementById("msgs");
+        const mine = m.sender_role === "driver";
+        const div = document.createElement("div");
+        div.className = "msg " + (mine ? "me" : "them");
+        div.textContent = m.message;
+        el.appendChild(div);
+      });
+    } catch(e) {}
   }
 
   async function sendMsg() {
     const input = document.getElementById("chat-in");
-    if (!input.value) return;
-    await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender_role: "driver", message: input.value })
-    });
+    const msg = input.value.trim();
+    if (!msg || !activeRide) return;
     input.value = "";
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender_role: "driver", message: msg })
+      });
+    } catch(e) {}
   }
 
   function closeInc() { document.getElementById("inc-card").classList.remove("active"); }
+
   function showToast(m) {
     const t = document.getElementById("toast");
     t.textContent = m; t.classList.add("show");
