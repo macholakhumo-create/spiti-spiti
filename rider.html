@@ -19,7 +19,6 @@
       --ink: #111010;
       --accent: #1a1a2e;
       --green: #16a34a;
-      --green-bg: #dcfce7;
       --sub: #71717a;
       --border: #e4e4e7;
       --font: 'DM Sans', sans-serif;
@@ -28,147 +27,37 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    header {
-      background: var(--ink);
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 200;
-    }
-    .brand {
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: #fff;
-      text-transform: uppercase;
-    }
+    header { background: var(--ink); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 200; }
+    .brand { font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; text-transform: uppercase; }
     .brand span { color: #f59e0b; }
-    .conn-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      padding: 5px 12px;
-      border-radius: 99px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.5);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
+    .conn-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); padding: 5px 12px; border-radius: 99px; font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
     .conn-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: 0.3s; }
     .conn-pill .dot.live { background: #22c55e; box-shadow: 0 0 6px #22c55e; animation: blink 2s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
     .container { max-width: 480px; margin: 0 auto; padding: 24px 16px 80px; }
-
     .page-header { margin-bottom: 20px; }
     .page-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
     .page-sub { font-size: 0.8rem; color: var(--sub); font-weight: 500; margin-top: 4px; }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 22px;
-      margin-bottom: 14px;
-    }
-    .card-label {
-      font-size: 0.6rem;
-      font-weight: 800;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--sub);
-      margin-bottom: 16px;
-      display: block;
-    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; margin-bottom: 14px; }
+    .card-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sub); margin-bottom: 16px; display: block; }
 
     .field { margin-bottom: 12px; }
-    .field label {
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--sub);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    input[type=text], input[type=number] {
-      width: 100%;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      color: var(--ink);
-      font-family: var(--font);
-      font-size: 0.9rem;
-      font-weight: 500;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    input[type=text]:focus, input[type=number]:focus {
-      border-color: var(--accent);
-      background: #fff;
-    }
+    .field label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    input[type=text], input[type=number] { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--ink); font-family: var(--font); font-size: 0.9rem; font-weight: 500; outline: none; transition: border-color 0.2s; }
+    input[type=text]:focus, input[type=number]:focus { border-color: var(--accent); background: #fff; }
     .hint { font-size: 0.65rem; color: var(--sub); margin-top: 5px; }
 
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-family: var(--font);
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: var(--font); font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .btn:active { transform: scale(0.98); }
     .btn-primary { background: var(--ink); color: #fff; }
-    .btn-primary:hover { background: #333; }
     .btn-ghost { background: var(--bg); color: var(--sub); border: 1.5px solid var(--border); }
-    .btn-ghost:hover { border-color: #999; color: var(--ink); }
     .btn-danger { background: #fef2f2; color: #dc2626; border: 1.5px solid #fecaca; }
-    .btn-accept { background: var(--green); color: #fff; }
-    .btn-accept:hover { background: #15803d; }
 
-    .progress-bar {
-      display: flex;
-      align-items: center;
-      margin-bottom: 24px;
-      position: relative;
-    }
-    .step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-      z-index: 2;
-    }
-    .step-dot {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--bg);
-      border: 2px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: var(--sub);
-      transition: all 0.4s;
-    }
+    .progress-bar { display: flex; align-items: center; margin-bottom: 24px; }
+    .step { display: flex; flex-direction: column; align-items: center; flex: 1; z-index: 2; }
+    .step-dot { width: 36px; height: 36px; border-radius: 50%; background: var(--bg); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: var(--sub); transition: all 0.4s; }
     .step-dot.active { background: var(--ink); border-color: var(--ink); color: #fff; }
     .step-dot.done { background: var(--green); border-color: var(--green); color: #fff; }
     .step-label { font-size: 0.58rem; font-weight: 700; color: var(--sub); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -177,180 +66,52 @@
 
     .route-display { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
     .route-point { display: flex; align-items: center; gap: 12px; }
-    .route-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      flex-shrink: 0;
-    }
+    .route-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
     .route-label { font-size: 0.6rem; color: var(--sub); font-weight: 700; text-transform: uppercase; }
     .route-val { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
 
-    .fare-display {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
+    .fare-display { background: var(--bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px; text-align: center; margin-bottom: 16px; }
     .fare-amount { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.05em; color: var(--ink); }
     .fare-display.agreed .fare-amount { color: var(--green); }
     .fare-tag { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
 
+    .waiting-label { display: inline-flex; align-items: center; gap: 6px; background: #fef3c7; color: #92400e; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 99px; margin-bottom: 16px; }
+    .waiting-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; animation: blink 1.2s infinite; }
+
     .offers-section { margin-bottom: 16px; display: none; }
     .offers-title { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-    .offer-card {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      animation: slideUp 0.3s ease-out;
-    }
+    .offer-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; animation: slideUp 0.3s ease-out; }
     @keyframes slideUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .offer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .offer-driver { font-size: 0.85rem; font-weight: 700; color: var(--ink); }
-    .offer-meta { font-size: 0.65rem; color: var(--sub); font-weight: 600; margin-top: 2px; }
-    .offer-fare { font-size: 1.1rem; font-weight: 800; color: var(--green); margin-right: 12px; }
-    .offer-actions { display: flex; gap: 8px; align-items: center; }
-    .btn-sm {
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: 0.72rem;
-      font-weight: 800;
-      cursor: pointer;
-      border: none;
-      font-family: var(--font);
-      text-transform: uppercase;
-      transition: 0.2s;
-    }
+    .offer-fare { font-size: 1.3rem; font-weight: 800; color: var(--green); }
+    .offer-meta { font-size: 0.65rem; color: var(--sub); font-weight: 600; }
+    .offer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-sm { padding: 9px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; border: none; font-family: var(--font); text-transform: uppercase; transition: 0.2s; }
     .btn-sm:active { transform: scale(0.97); }
     .btn-sm-accept { background: var(--ink); color: #fff; }
     .btn-sm-decline { background: var(--bg); color: var(--sub); border: 1.5px solid var(--border); }
 
-    #map {
-      height: 260px;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 14px;
-      border: 1px solid var(--border);
-    }
+    #map { height: 260px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--border); }
 
-    .chat-box {
-      background: var(--bg);
-      border-radius: 14px;
-      padding: 14px;
-      border: 1.5px solid var(--border);
-    }
+    .chat-box { background: var(--bg); border-radius: 14px; padding: 14px; border: 1.5px solid var(--border); }
     .chat-label { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-    .messages {
-      height: 180px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-bottom: 10px;
-      scrollbar-width: none;
-    }
+    .messages { height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; scrollbar-width: none; }
     .messages::-webkit-scrollbar { display: none; }
-    .msg {
-      max-width: 80%;
-      padding: 9px 13px;
-      border-radius: 14px;
-      font-size: 0.83rem;
-      font-weight: 500;
-      line-height: 1.4;
-    }
+    .msg { max-width: 80%; padding: 9px 13px; border-radius: 14px; font-size: 0.83rem; font-weight: 500; line-height: 1.4; }
     .msg.me { background: var(--ink); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg.them { background: #fff; color: var(--ink); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
     .chat-input-row { display: flex; gap: 8px; margin-top: 10px; }
-    .chat-input {
-      flex: 1;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      color: var(--ink);
-      font-family: var(--font);
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+    .chat-input { flex: 1; background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--ink); font-family: var(--font); font-size: 0.85rem; outline: none; }
     .chat-input:focus { border-color: var(--accent); }
-    .send-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: var(--ink);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: 0.2s;
-    }
-    .send-btn:hover { background: #333; }
+    .send-btn { width: 42px; height: 42px; border-radius: 10px; background: var(--ink); color: #fff; border: none; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-    .status-block {
-      font-family: var(--mono);
-      background: var(--ink);
-      color: #22c55e;
-      padding: 14px 16px;
-      border-radius: 14px;
-      font-size: 10px;
-      line-height: 1.8;
-      margin-top: 24px;
-      letter-spacing: 0.02em;
-    }
+    .status-block { font-family: var(--mono); background: var(--ink); color: #22c55e; padding: 14px 16px; border-radius: 14px; font-size: 10px; line-height: 1.8; margin-top: 24px; letter-spacing: 0.02em; }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
-    .waiting-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #fef3c7;
-      color: #92400e;
-      font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 5px 12px;
-      border-radius: 99px;
-      margin-bottom: 16px;
-    }
-    .waiting-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; animation: blink 1.2s infinite; }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--ink);
-      color: #fff;
-      padding: 11px 22px;
-      border-radius: 99px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      z-index: 1000;
-      opacity: 0;
-      transition: all 0.3s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 11px 22px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; z-index: 1000; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
   </style>
 </head>
@@ -389,83 +150,52 @@
       </div>
       <button class="btn btn-primary" onclick="createRide()">Request Ride →</button>
     </div>
-    <div class="status-block">
-      [READY] spiti-spiti: v1.0.0<br>
-      [SYNC] socket: active<br>
-      [STATUS] connected
-    </div>
+    <div class="status-block">[READY] spiti-spiti: v1.0.0<br>[SYNC] socket: active<br>[STATUS] connected</div>
   </div>
 
-  <!-- PANEL: WAITING / NEGOTIATION -->
+  <!-- PANEL: WAITING -->
   <div id="panel-waiting" class="panel">
     <div class="card">
       <div class="waiting-label"><div class="waiting-dot"></div>Waiting for drivers</div>
-
       <div class="route-display">
         <div class="route-point">
           <div class="route-icon">📍</div>
-          <div>
-            <div class="route-label">From</div>
-            <div class="route-val" id="w-pickup">—</div>
-          </div>
+          <div><div class="route-label">From</div><div class="route-val" id="w-pickup">—</div></div>
         </div>
         <div class="route-point">
           <div class="route-icon" style="background:#f0fdf4;">🏁</div>
-          <div>
-            <div class="route-label">To</div>
-            <div class="route-val" id="w-dropoff">—</div>
-          </div>
+          <div><div class="route-label">To</div><div class="route-val" id="w-dropoff">—</div></div>
         </div>
       </div>
-
       <div class="fare-display">
         <div class="fare-amount" id="w-fare">P0.00</div>
         <div class="fare-tag">Your Offered Fare</div>
       </div>
-
       <div class="offers-section" id="offers-wrap">
-        <div class="offers-title">Driver Offers</div>
+        <div class="offers-title">Driver Counter Offers</div>
         <div id="offers-list"></div>
       </div>
-
       <button class="btn btn-ghost" onclick="cancelRequest()">Cancel Request</button>
     </div>
-    <div class="status-block">
-      [READY] spiti-spiti: v1.0.0<br>
-      [SYNC] socket: active<br>
-      [STATUS] connected
-    </div>
+    <div class="status-block">[READY] spiti-spiti: v1.0.0<br>[SYNC] socket: active<br>[STATUS] connected</div>
   </div>
 
   <!-- PANEL: ACTIVE RIDE -->
   <div id="panel-active" class="panel">
     <div class="card">
       <span class="card-label">Active Ride</span>
-
       <div class="progress-bar">
-        <div class="step">
-          <div class="step-dot done" id="s1">✓</div>
-          <span class="step-label">Matched</span>
-        </div>
+        <div class="step"><div class="step-dot done" id="s1">✓</div><span class="step-label">Matched</span></div>
         <div class="step-line" id="l1"></div>
-        <div class="step">
-          <div class="step-dot" id="s2">2</div>
-          <span class="step-label">Transit</span>
-        </div>
+        <div class="step"><div class="step-dot" id="s2">2</div><span class="step-label">Transit</span></div>
         <div class="step-line" id="l2"></div>
-        <div class="step">
-          <div class="step-dot" id="s3">3</div>
-          <span class="step-label">Arrived</span>
-        </div>
+        <div class="step"><div class="step-dot" id="s3">3</div><span class="step-label">Arrived</span></div>
       </div>
-
       <div id="map"></div>
-
       <div class="fare-display agreed">
         <div class="fare-amount" id="a-fare">P0.00</div>
         <div class="fare-tag">Agreed Fare</div>
       </div>
-
       <div class="chat-box">
         <div class="chat-label">Message Driver</div>
         <div class="messages" id="msgs"></div>
@@ -474,15 +204,10 @@
           <button class="send-btn" onclick="sendMsg()">➤</button>
         </div>
       </div>
-
       <br>
       <button class="btn btn-danger" onclick="location.reload()">End Ride</button>
     </div>
-    <div class="status-block">
-      [READY] spiti-spiti: v1.0.0<br>
-      [SYNC] socket: active<br>
-      [STATUS] connected
-    </div>
+    <div class="status-block">[READY] spiti-spiti: v1.0.0<br>[SYNC] socket: active<br>[STATUS] connected</div>
   </div>
 </div>
 
@@ -494,8 +219,6 @@
   let activeRide = null;
   let map = null;
   let driverMarker = null;
-  let pickupMarker = null;
-  let dropoffMarker = null;
   let offers = {};
 
   const socket = io(BASE);
@@ -504,6 +227,7 @@
     document.getElementById("socket-dot").classList.add("live");
     document.getElementById("socket-label").textContent = "Live";
     socket.emit("join-role", { role: "rider", userId: RIDER_ID });
+    if (activeRide) socket.emit("join-ride", { rideId: activeRide.id });
   });
 
   socket.on("disconnect", () => {
@@ -524,7 +248,7 @@
   socket.on("driver-offer", (offer) => {
     offers[offer.driverId] = offer;
     renderOffers();
-    showToast("New offer from a driver!");
+    showToast("Driver offer: P" + parseFloat(offer.fare_offer).toFixed(2));
   });
 
   socket.on("ride-updated", (ride) => {
@@ -536,19 +260,18 @@
       showPanel("active");
       document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare).toFixed(2);
       socket.emit("join-ride", { rideId: ride.id });
-      initMap(ride);
-      showToast("Driver accepted! They're on the way.");
+      initMap();
+      loadMessages(ride.id);
+      showToast("Driver confirmed! On the way.");
     }
     if (ride.status === "in_progress") {
-      document.getElementById("s2").classList.remove("active");
       document.getElementById("s2").classList.add("done");
       document.getElementById("s2").textContent = "✓";
       document.getElementById("l1").classList.add("done");
       document.getElementById("s3").classList.add("active");
-      showToast("Ride in progress!");
+      showToast("Your ride is in progress!");
     }
     if (ride.status === "completed") {
-      document.getElementById("s3").classList.remove("active");
       document.getElementById("s3").classList.add("done");
       document.getElementById("s3").textContent = "✓";
       document.getElementById("l2").classList.add("done");
@@ -559,22 +282,17 @@
 
   socket.on("driver-location", ({ lat, lng }) => {
     if (!map) return;
-    if (driverMarker) {
-      driverMarker.setLatLng([lat, lng]);
-    } else {
-      const icon = L.divIcon({
-        className: '',
-        html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(34,197,94,0.6);"></div>',
-        iconSize: [14, 14], iconAnchor: [7, 7]
-      });
-      driverMarker = L.marker([lat, lng], { icon }).addTo(map).bindPopup("Your Driver");
-    }
+    const icon = L.divIcon({
+      className: '',
+      html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(34,197,94,0.6);"></div>',
+      iconSize: [14, 14], iconAnchor: [7, 7]
+    });
+    if (driverMarker) driverMarker.setLatLng([lat, lng]);
+    else driverMarker = L.marker([lat, lng], { icon }).addTo(map).bindPopup("Your Driver");
     map.panTo([lat, lng]);
   });
 
-  socket.on("new-message", (msg) => {
-    appendMessage(msg);
-  });
+  socket.on("new-message", (msg) => { appendMessage(msg); });
 
   async function createRide() {
     const pickup = document.getElementById("pickup").value.trim() || "Current Location";
@@ -583,13 +301,10 @@
     if (!dropoff) return showToast("Please enter a destination");
     try {
       await fetch(`${BASE}/rides`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pickup, dropoff, riderId: RIDER_ID, offered_fare: fare })
       });
-    } catch(e) {
-      showToast("Failed to request ride");
-    }
+    } catch(e) { showToast("Failed to request ride"); }
   }
 
   function renderOffers() {
@@ -600,12 +315,14 @@
     wrap.style.display = "block";
     list.innerHTML = items.map(o => `
       <div class="offer-card">
-        <div>
-          <div class="offer-driver">${o.driver_name || "Driver #" + o.driverId}</div>
-          <div class="offer-meta">Counter offer</div>
+        <div class="offer-top">
+          <div>
+            <div class="offer-driver">${o.driver_name || "Driver #" + o.driverId}</div>
+            <div class="offer-meta">Counter offer</div>
+          </div>
+          <div class="offer-fare">P${parseFloat(o.fare_offer).toFixed(2)}</div>
         </div>
-        <div class="offer-actions">
-          <span class="offer-fare">P${parseFloat(o.fare_offer).toFixed(2)}</span>
+        <div class="offer-btns">
           <button class="btn-sm btn-sm-decline" onclick="declineOffer(${o.driverId})">Decline</button>
           <button class="btn-sm btn-sm-accept" onclick="acceptOffer(${o.driverId}, ${o.fare_offer})">Accept</button>
         </div>
@@ -616,21 +333,17 @@
   async function acceptOffer(driverId, fare) {
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId, fare })
       });
       offers = {};
-    } catch(e) {
-      showToast("Failed to accept offer");
-    }
+    } catch(e) { showToast("Failed to accept offer"); }
   }
 
   async function declineOffer(driverId) {
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId })
       });
       delete offers[driverId];
@@ -643,36 +356,25 @@
     if (!activeRide) { location.reload(); return; }
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "cancelled" })
       });
     } catch(e) {}
     location.reload();
   }
 
-  function initMap(ride) {
+  function initMap() {
     if (map) return;
     map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 14);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+  }
 
-    const pickupIcon = L.divIcon({
-      className: '',
-      html: '<div style="width:12px;height:12px;background:#f59e0b;border:2px solid #fff;border-radius:50%;"></div>',
-      iconSize: [12, 12], iconAnchor: [6, 6]
-    });
-    const dropoffIcon = L.divIcon({
-      className: '',
-      html: '<div style="width:12px;height:12px;background:#3b82f6;border:2px solid #fff;border-radius:50%;"></div>',
-      iconSize: [12, 12], iconAnchor: [6, 6]
-    });
-
-    if (ride) {
-      if (ride.pickup_lat && ride.pickup_lng)
-        pickupMarker = L.marker([ride.pickup_lat, ride.pickup_lng], { icon: pickupIcon }).addTo(map).bindPopup("Pickup: " + ride.pickup);
-      if (ride.dropoff_lat && ride.dropoff_lng)
-        dropoffMarker = L.marker([ride.dropoff_lat, ride.dropoff_lng], { icon: dropoffIcon }).addTo(map).bindPopup("Dropoff: " + ride.dropoff);
-    }
+  async function loadMessages(rideId) {
+    try {
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const msgs = await res.json();
+      msgs.forEach(m => appendMessage(m));
+    } catch(e) {}
   }
 
   async function sendMsg() {
@@ -682,8 +384,7 @@
     input.value = "";
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sender_role: "rider", message: msg })
       });
     } catch(e) {}
@@ -706,8 +407,7 @@
 
   function showToast(m) {
     const t = document.getElementById("toast");
-    t.textContent = m;
-    t.classList.add("show");
+    t.textContent = m; t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 3000);
   }
 </script>
