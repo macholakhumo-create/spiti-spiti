@@ -1,790 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Spiti-Spiti Rider</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --navy: #0f172a;
-    --navy-mid: #1e3a5f;
-    --blue: #2563eb;
-    --blue-light: #3b82f6;
-    --blue-pale: #eff6ff;
-    --white: #ffffff;
-    --grey-bg: #f1f5f9;
-    --grey-border: #e2e8f0;
-    --grey-text: #64748b;
-    --grey-input: #f8fafc;
-    --text-dark: #0f172a;
-    --green: #16a34a;
-    --green-pale: #f0fdf4;
-    --amber: #d97706;
-    --amber-pale: #fffbeb;
-    --red: #ef4444;
-    --red-pale: #fef2f2;
-    --nav-height: 64px;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
+  <title>Spiti-Spiti Rider</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e8e8f0; min-height: 100vh; }
+    nav { background: #16161d; border-bottom: 1px solid #2a2a3a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; }
+    .brand span { color: #6c63ff; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-user { font-size: 0.75rem; color: #555; }
+    .nav-user strong { color: #e8e8f0; }
+    .logout-btn { background: none; border: 1px solid #2a2a3a; color: #555; font-family: 'Inter', sans-serif; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+    .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
+    .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; flex-shrink: 0; }
+    .conn-dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .container { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
+    .greeting { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
+    .greeting-sub { font-size: 0.8rem; color: #555; margin-bottom: 20px; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #6c63ff; margin-bottom: 12px; }
+    .field { margin-bottom: 11px; }
+    label { display: block; font-size: 0.7rem; color: #555; margin-bottom: 4px; font-weight: 500; }
+    input[type=text], input[type=number] { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 11px 13px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #6c63ff; }
+    .fare-hint { font-size: 0.65rem; color: #333; margin-top: 3px; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+    .btn:last-child { margin-bottom: 0; }
+    .btn-primary { background: #6c63ff; color: #fff; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-ghost { background: #1e1e28; color: #666; border: 1px solid #2a2a3a; }
+    .btn:hover { opacity: 0.88; }
 
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: var(--grey-bg);
-    color: var(--text-dark);
-    min-height: 100vh;
-    max-width: 480px;
-    margin: 0 auto;
-    position: relative;
-    overflow-x: hidden;
-  }
+    /* PROGRESS */
+    .progress-bar { display: flex; align-items: flex-start; margin-bottom: 18px; padding: 0 4px; }
+    .prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #1e1e28; border: 2px solid #2a2a3a; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #333; transition: all 0.4s; position: relative; z-index: 1; }
+    .prog-dot.active { background: #6c63ff22; border-color: #6c63ff; color: #6c63ff; box-shadow: 0 0 12px #6c63ff44; }
+    .prog-dot.done { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .prog-line { flex: 1; height: 2px; background: #1e1e28; margin-top: 14px; transition: background 0.4s; }
+    .prog-line.done { background: #22c55e; }
+    .prog-label { font-size: 0.58rem; color: #333; margin-top: 5px; text-align: center; font-weight: 500; transition: color 0.3s; }
+    .prog-label.active { color: #6c63ff; }
+    .prog-label.done { color: #22c55e; }
 
-  /* ─── HEADER ─── */
-  .header {
-    background: var(--navy);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: 0.01em; }
-  .logo span { color: var(--blue-light); }
-  .header-right { display: flex; align-items: center; gap: 10px; }
-  .rider-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--blue); color: #fff;
-    font-size: 14px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
-  .status-pill {
-    display: flex; align-items: center; gap: 5px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 4px 10px;
-    font-size: 11px; font-weight: 600; color: #fff;
-  }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .panel { display: none; }
+    .panel.visible { display: block; }
 
-  /* ─── PAGES ─── */
-  .page { display: none; padding: 20px 16px calc(var(--nav-height) + 20px); min-height: calc(100vh - 60px); }
-  .page.active { display: block; }
+    .route-display { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .route-row { display: flex; align-items: center; gap: 10px; }
+    .route-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; flex-shrink: 0; }
+    .route-dot.from { background: #1e293b; }
+    .route-dot.to { background: #14532d; }
+    .route-lbl { font-size: 0.62rem; color: #444; margin-bottom: 1px; }
+    .route-val { font-size: 0.83rem; color: #ccc; }
 
-  /* ─── BOTTOM NAV ─── */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px;
-    background: var(--white);
-    border-top: 1px solid var(--grey-border);
-    display: flex;
-    height: var(--nav-height);
-    z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-  }
-  .nav-btn {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 4px; cursor: pointer; border: none;
-    background: transparent; padding: 8px 0;
-    font-family: 'Poppins', sans-serif;
-    transition: all 0.2s;
-  }
-  .nav-btn svg { width: 22px; height: 22px; stroke: #94a3b8; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
-  .nav-btn span { font-size: 10px; font-weight: 600; color: #94a3b8; transition: color 0.2s; }
-  .nav-btn.active svg { stroke: var(--blue); }
-  .nav-btn.active span { color: var(--blue); }
+    .fare-display { background: #0f0f13; border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 12px; }
+    .fare-num { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; }
+    .fare-num.purple { color: #6c63ff; }
+    .fare-num.green { color: #22c55e; }
+    .fare-lbl { font-size: 0.65rem; color: #444; margin-top: 2px; }
 
-  /* ─── CARDS ─── */
-  .card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    border: 1px solid var(--grey-border);
-  }
-  .card-title {
-    font-size: 11px; font-weight: 700;
-    color: var(--grey-text);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 16px;
-  }
+    /* OFFERS */
+    .offers-wrap { margin-bottom: 12px; }
+    .offers-head { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #a855f7; margin-bottom: 8px; }
+    .offer-card { background: #120f1a; border: 1px solid #a855f722; border-radius: 12px; padding: 12px 14px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+    .offer-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; }
+    .offer-price { font-size: 1.2rem; font-weight: 700; color: #a855f7; }
+    .offer-tag { font-size: 0.6rem; color: #555; margin-top: 2px; }
+    .offer-actions { display: flex; gap: 6px; }
+    .obtn { padding: 7px 12px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.73rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+    .obtn.acc { background: #22c55e; color: #fff; }
+    .obtn.dec { background: #1e1e28; color: #666; border: 1px solid #2a2a3a; }
+    .obtn:hover { opacity: 0.85; }
 
-  /* ─── FORM ELEMENTS ─── */
-  .field { margin-bottom: 14px; }
-  .field-label {
-    font-size: 11px; font-weight: 700;
-    color: var(--grey-text);
-    text-transform: uppercase; letter-spacing: 0.07em;
-    margin-bottom: 6px; display: block;
-  }
-  .field input, .field select {
-    width: 100%; padding: 13px 16px;
-    border-radius: 12px;
-    border: 1.5px solid var(--grey-border);
-    background: var(--grey-input);
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px; font-weight: 500;
-    color: var(--text-dark);
-    outline: none; transition: border 0.2s, background 0.2s;
-    appearance: none;
-  }
-  .field input:focus, .field select:focus {
-    border-color: var(--blue);
-    background: var(--white);
-  }
-  .field input::placeholder { color: #94a3b8; font-weight: 400; }
+    /* DRIVER CARD */
+    .driver-card { background: #0f0f13; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .driver-av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#22c55e); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0; }
+    .driver-name { font-size: 0.85rem; font-weight: 600; }
+    .driver-sub { font-size: 0.68rem; color: #555; margin-top: 2px; }
 
-  /* ─── BUTTONS ─── */
-  .btn-primary {
-    width: 100%; padding: 15px;
-    background: var(--blue); color: #fff;
-    border: none; border-radius: 14px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 15px; font-weight: 700;
-    cursor: pointer; transition: background 0.2s, transform 0.1s;
-    letter-spacing: 0.01em;
-  }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-primary:hover { background: var(--blue-light); }
-  .btn-secondary {
-    width: 100%; padding: 13px;
-    background: transparent; color: var(--red);
-    border: 1.5px solid var(--red);
-    border-radius: 14px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-    margin-top: 10px;
-  }
-  .btn-secondary:hover { background: var(--red-pale); }
-  .btn-outline {
-    width: 100%; padding: 13px;
-    background: transparent; color: var(--blue);
-    border: 1.5px solid var(--blue);
-    border-radius: 14px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-    margin-top: 10px;
-  }
+    /* MAP */
+    #rider-map { width: 100%; height: 200px; border-radius: 12px; margin-bottom: 10px; background: #0f0f13; border: 1px solid #2a2a3a; position: relative; overflow: hidden; }
+    .map-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .map-pulse { width: 48px; height: 48px; border-radius: 50%; background: #6c63ff22; border: 2px solid #6c63ff44; display: flex; align-items: center; justify-content: center; animation: mapPulse 2s infinite; }
+    @keyframes mapPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.7} }
+    .map-status-row { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #444; margin-bottom: 10px; }
+    .map-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
+    .map-live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .driver-pin { position: absolute; transition: all 0.5s ease; transform: translate(-50%, -50%); }
+    .driver-pin-dot { width: 18px; height: 18px; border-radius: 50%; background: #6c63ff; border: 3px solid #fff; box-shadow: 0 0 12px #6c63ff88; }
+    .driver-pin-ring { position: absolute; top: -6px; left: -6px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #6c63ff44; animation: ringPulse 2s infinite; }
+    @keyframes ringPulse { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
 
-  /* ─── STATUS BADGES ─── */
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 12px; border-radius: 20px;
-    font-size: 11px; font-weight: 700;
-  }
-  .badge-green { background: var(--green-pale); color: var(--green); }
-  .badge-blue { background: var(--blue-pale); color: var(--blue); }
-  .badge-amber { background: var(--amber-pale); color: var(--amber); }
-  .badge-red { background: var(--red-pale); color: var(--red); }
-  .badge-grey { background: var(--grey-bg); color: var(--grey-text); }
-
-  /* ─── PAGE: HOME ─── */
-  .page-subtitle { font-size: 22px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
-  .page-desc { font-size: 13px; color: var(--grey-text); font-weight: 400; margin-bottom: 20px; }
-
-  .ride-type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .ride-type-btn {
-    padding: 12px; border-radius: 12px;
-    border: 2px solid var(--grey-border);
-    background: var(--white); cursor: pointer;
-    text-align: center; transition: all 0.2s;
-    font-family: 'Poppins', sans-serif;
-  }
-  .ride-type-btn.selected { border-color: var(--blue); background: var(--blue-pale); }
-  .ride-type-btn svg { width: 24px; height: 24px; stroke: #94a3b8; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto 6px; }
-  .ride-type-btn.selected svg { stroke: var(--blue); }
-  .ride-type-btn .type-label { font-size: 12px; font-weight: 600; color: var(--grey-text); }
-  .ride-type-btn.selected .type-label { color: var(--blue); }
-
-  /* ─── ACTIVE RIDE ─── */
-  .active-ride-banner {
-    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-    border-radius: 16px; padding: 20px;
-    margin-bottom: 16px; color: #fff;
-  }
-  .active-ride-status { font-size: 12px; font-weight: 600; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .active-ride-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
-  .progress-steps { display: flex; align-items: center; gap: 0; margin-bottom: 16px; }
-  .step { display: flex; flex-direction: column; align-items: center; flex: 1; }
-  .step-circle {
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; margin-bottom: 4px;
-  }
-  .step-circle.done { background: #4ade80; color: #064e3b; }
-  .step-circle.active { background: var(--blue-light); color: #fff; }
-  .step-circle.pending { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
-  .step-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.6); text-align: center; }
-  .step-label.active { color: #fff; }
-  .step-line { flex: 1; height: 2px; background: rgba(255,255,255,0.15); margin-bottom: 18px; }
-  .step-line.done { background: #4ade80; }
-
-  .driver-card { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 12px; }
-  .driver-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
-  .driver-info { flex: 1; }
-  .driver-name { font-size: 14px; font-weight: 700; color: #fff; }
-  .driver-car { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
-  .driver-rating { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #fbbf24; margin-top: 3px; }
-
-  /* ─── RIDE HISTORY ─── */
-  .ride-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--grey-border); }
-  .ride-item:last-child { border-bottom: none; }
-  .ride-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--blue-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .ride-icon svg { width: 20px; height: 20px; stroke: var(--blue); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .ride-details { flex: 1; }
-  .ride-route { font-size: 13px; font-weight: 600; color: var(--text-dark); }
-  .ride-date { font-size: 11px; color: var(--grey-text); margin-top: 2px; }
-  .ride-fare { font-size: 14px; font-weight: 700; color: var(--text-dark); }
-
-  /* ─── NOTIFICATIONS ─── */
-  .notif-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--grey-border); }
-  .notif-item:last-child { border-bottom: none; }
-  .notif-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .notif-icon svg { width: 20px; height: 20px; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .notif-icon.blue { background: var(--blue-pale); }
-  .notif-icon.blue svg { stroke: var(--blue); }
-  .notif-icon.green { background: var(--green-pale); }
-  .notif-icon.green svg { stroke: var(--green); }
-  .notif-icon.amber { background: var(--amber-pale); }
-  .notif-icon.amber svg { stroke: var(--amber); }
-  .notif-title { font-size: 13px; font-weight: 600; color: var(--text-dark); }
-  .notif-desc { font-size: 12px; color: var(--grey-text); margin-top: 2px; }
-  .notif-time { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); margin-top: 4px; flex-shrink: 0; }
-
-  /* ─── PROFILE ─── */
-  .profile-header {
-    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-    border-radius: 16px; padding: 24px 20px;
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 16px;
-  }
-  .profile-avatar-lg {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: var(--blue); color: #fff;
-    font-size: 24px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; border: 3px solid rgba(255,255,255,0.2);
-  }
-  .profile-name { font-size: 18px; font-weight: 700; color: #fff; }
-  .profile-phone { font-size: 13px; color: #93c5fd; margin-top: 3px; }
-  .profile-since { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
-
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-  .stat-mini { background: var(--white); border-radius: 14px; padding: 14px 10px; text-align: center; border: 1px solid var(--grey-border); }
-  .stat-mini-value { font-size: 20px; font-weight: 700; color: var(--navy); }
-  .stat-mini-label { font-size: 10px; color: var(--grey-text); font-weight: 600; margin-top: 3px; }
-
-  .menu-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 15px 0; border-bottom: 1px solid var(--grey-border);
-    cursor: pointer;
-  }
-  .menu-item:last-child { border-bottom: none; }
-  .menu-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--blue-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .menu-icon svg { width: 18px; height: 18px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .menu-label { flex: 1; font-size: 14px; font-weight: 600; color: var(--text-dark); }
-  .menu-arrow svg { width: 16px; height: 16px; stroke: #94a3b8; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-  .menu-icon.red { background: var(--red-pale); }
-  .menu-icon.red svg { stroke: var(--red); }
-  .menu-label.red { color: var(--red); }
-
-  /* Edit profile form */
-  .edit-field { margin-bottom: 14px; }
-  .edit-field label { font-size: 11px; font-weight: 700; color: var(--grey-text); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; display: block; }
-  .edit-field input {
-    width: 100%; padding: 13px 16px;
-    border-radius: 12px; border: 1.5px solid var(--grey-border);
-    background: var(--grey-input);
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px; font-weight: 500; color: var(--text-dark);
-    outline: none; transition: border 0.2s;
-  }
-  .edit-field input:focus { border-color: var(--blue); background: #fff; }
-
-  .section-header { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-  .back-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--blue); padding: 0; margin-bottom: 16px; }
-  .back-btn svg { width: 18px; height: 18px; stroke: var(--blue); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-
-  .payment-option { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; border: 1.5px solid var(--grey-border); margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
-  .payment-option.selected { border-color: var(--blue); background: var(--blue-pale); }
-  .payment-option-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--grey-bg); display: flex; align-items: center; justify-content: center; }
-  .payment-option-icon svg { width: 18px; height: 18px; stroke: var(--grey-text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .payment-option.selected .payment-option-icon { background: var(--blue); }
-  .payment-option.selected .payment-option-icon svg { stroke: #fff; }
-  .payment-label { font-size: 14px; font-weight: 600; color: var(--text-dark); }
-  .payment-sub { font-size: 12px; color: var(--grey-text); }
-
-  .toast {
-    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-    background: var(--navy); color: #fff;
-    padding: 12px 20px; border-radius: 12px;
-    font-size: 13px; font-weight: 600;
-    z-index: 999; opacity: 0;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  }
-  .toast.show { opacity: 1; }
-
-  .sub-page { display: none; }
-  .sub-page.active { display: block; }
-</style>
-</head>
-<body>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="logo">SPITI-<span>SPITI</span></div>
-  <div class="header-right">
-    <div class="status-pill"><div class="status-dot"></div> Online</div>
-    <div class="rider-avatar" onclick="goToProfile()">R</div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- ═══ PAGE: HOME ═══ -->
-<div class="page active" id="page-home">
-  <div class="page-subtitle">Book a Ride</div>
-  <div class="page-desc">Request a ride, negotiate your fare</div>
-
-  <!-- Active ride banner (hidden by default) -->
-  <div class="active-ride-banner" id="active-ride" style="display:none;">
-    <div class="active-ride-status">Ride In Progress</div>
-    <div class="active-ride-title">Driver is on the way</div>
-    <div class="progress-steps">
-      <div class="step">
-        <div class="step-circle done">✓</div>
-        <div class="step-label">Requested</div>
-      </div>
-      <div class="step-line done"></div>
-      <div class="step">
-        <div class="step-circle active">2</div>
-        <div class="step-label active">Accepted</div>
-      </div>
-      <div class="step-line"></div>
-      <div class="step">
-        <div class="step-circle pending">3</div>
-        <div class="step-label">En Route</div>
-      </div>
-      <div class="step-line"></div>
-      <div class="step">
-        <div class="step-circle pending">4</div>
-        <div class="step-label">Arrived</div>
-      </div>
-    </div>
-    <div class="driver-card">
-      <div class="driver-avatar">JM</div>
-      <div class="driver-info">
-        <div class="driver-name">John Modise</div>
-        <div class="driver-car">Toyota Corolla · ABC 123 GP</div>
-        <div class="driver-rating">★ 4.8</div>
-      </div>
-      <div>
-        <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:8px 12px; text-align:center;">
-          <div style="font-size:16px; font-weight:700; color:#fff;">P45</div>
-          <div style="font-size:10px; color:rgba(255,255,255,0.6);">Fare</div>
-        </div>
-      </div>
-    </div>
-    <button class="btn-secondary" style="margin-top:14px; border-color:rgba(255,255,255,0.3); color:#fff;" onclick="cancelRide()">Cancel Ride</button>
-  </div>
-
-  <!-- Request form -->
-  <div class="card" id="ride-form">
-    <div class="card-title">New Ride Request</div>
-
-    <div class="ride-type-row">
-      <div class="ride-type-btn selected" onclick="selectType(this)">
-        <svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M10 17h4"/></svg>
-        <div class="type-label">Standard Ride</div>
-      </div>
-      <div class="ride-type-btn" onclick="selectType(this)">
-        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-        <div class="type-label">Delivery</div>
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="field-label">Pick-up Location</label>
-      <input type="text" placeholder="Where are you?" id="pickup" />
-    </div>
-    <div class="field">
-      <label class="field-label">Destination</label>
-      <input type="text" placeholder="Where to?" id="destination" />
-    </div>
-    <div class="field">
-      <label class="field-label">Offered Fare (BWP)</label>
-      <input type="number" placeholder="Enter amount" id="fare" value="30" min="1" />
-    </div>
-    <div class="field">
-      <label class="field-label">Notes (optional)</label>
-      <input type="text" placeholder="Any special instructions?" id="notes" />
-    </div>
-    <button class="btn-primary" onclick="requestRide()">Request Ride</button>
-  </div>
-</div>
-
-<!-- ═══ PAGE: MY RIDES ═══ -->
-<div class="page" id="page-rides">
-  <div class="page-subtitle">My Rides</div>
-  <div class="page-desc">Your ride history</div>
-
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <div class="card-title" style="margin-bottom:0;">Recent</div>
-      <div style="display:flex; gap:8px;">
-        <span class="badge badge-blue" style="cursor:pointer;" onclick="filterRides('all', this)">All</span>
-        <span class="badge badge-grey" style="cursor:pointer;" onclick="filterRides('completed', this)">Completed</span>
-        <span class="badge badge-grey" style="cursor:pointer;" onclick="filterRides('cancelled', this)">Cancelled</span>
-      </div>
-    </div>
-
-    <div id="rides-list">
-      <div class="ride-item" data-status="completed">
-        <div class="ride-icon"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="ride-details">
-          <div class="ride-route">CBD → Block 5</div>
-          <div class="ride-date">Today, 09:14 AM · <span class="badge badge-green" style="font-size:10px; padding:2px 8px;">Completed</span></div>
-        </div>
-        <div class="ride-fare">P45</div>
-      </div>
-      <div class="ride-item" data-status="completed">
-        <div class="ride-icon"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="ride-details">
-          <div class="ride-route">Riverwalk → Game City</div>
-          <div class="ride-date">Yesterday, 3:30 PM · <span class="badge badge-green" style="font-size:10px; padding:2px 8px;">Completed</span></div>
-        </div>
-        <div class="ride-fare">P30</div>
-      </div>
-      <div class="ride-item" data-status="cancelled">
-        <div class="ride-icon" style="background:var(--red-pale);"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="ride-details">
-          <div class="ride-route">Maun → Main Mall</div>
-          <div class="ride-date">12 May · <span class="badge badge-red" style="font-size:10px; padding:2px 8px;">Cancelled</span></div>
-        </div>
-        <div class="ride-fare">P60</div>
-      </div>
-      <div class="ride-item" data-status="completed">
-        <div class="ride-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-        <div class="ride-details">
-          <div class="ride-route">Delivery · Gaborone West</div>
-          <div class="ride-date">11 May · <span class="badge badge-green" style="font-size:10px; padding:2px 8px;">Completed</span></div>
-        </div>
-        <div class="ride-fare">P25</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ PAGE: NOTIFICATIONS ═══ -->
-<div class="page" id="page-notifications">
-  <div class="page-subtitle">Notifications</div>
-  <div class="page-desc">Stay up to date</div>
-
-  <div class="card">
-    <div class="card-title">Today</div>
-    <div class="notif-item">
-      <div class="notif-icon green">
-        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      </div>
-      <div style="flex:1;">
-        <div class="notif-title">Ride Completed</div>
-        <div class="notif-desc">Your ride from CBD to Block 5 is complete. Fare: P45</div>
-        <div class="notif-time">09:45 AM</div>
-      </div>
-      <div class="unread-dot"></div>
-    </div>
-    <div class="notif-item">
-      <div class="notif-icon blue">
-        <svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>
-      </div>
-      <div style="flex:1;">
-        <div class="notif-title">Driver Accepted</div>
-        <div class="notif-desc">John Modise accepted your ride request</div>
-        <div class="notif-time">09:15 AM</div>
-      </div>
-      <div class="unread-dot"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Yesterday</div>
-    <div class="notif-item">
-      <div class="notif-icon green">
-        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      </div>
-      <div style="flex:1;">
-        <div class="notif-title">Ride Completed</div>
-        <div class="notif-desc">Your ride from Riverwalk to Game City is complete. Fare: P30</div>
-        <div class="notif-time">3:58 PM</div>
-      </div>
-    </div>
-    <div class="notif-item">
-      <div class="notif-icon amber">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <div style="flex:1;">
-        <div class="notif-title">Driver Nearby</div>
-        <div class="notif-desc">Your driver is 2 minutes away. Please be ready.</div>
-        <div class="notif-time">3:28 PM</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ PAGE: PROFILE ═══ -->
-<div class="page" id="page-profile">
-
-  <!-- Main profile view -->
-  <div class="sub-page active" id="profile-main">
-    <div class="profile-header">
-      <div class="profile-avatar-lg">R</div>
-      <div>
-        <div class="profile-name">Rider User</div>
-        <div class="profile-phone">+267 71 234 567</div>
-        <div class="profile-since">Member since Jan 2025</div>
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-mini">
-        <div class="stat-mini-value">38</div>
-        <div class="stat-mini-label">Total Rides</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-value">P1,240</div>
-        <div class="stat-mini-label">Total Spent</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-value">4.9★</div>
-        <div class="stat-mini-label">My Rating</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Account</div>
-      <div class="menu-item" onclick="showSubPage('profile-edit')">
-        <div class="menu-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <div class="menu-label">Edit Profile</div>
-        <div class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="showSubPage('profile-payment')">
-        <div class="menu-icon"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-        <div class="menu-label">Payment Method</div>
-        <div class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="showSubPage('profile-history')">
-        <div class="menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <div class="menu-label">Ride History</div>
-        <div class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Support</div>
-      <div class="menu-item" onclick="showToast('Opening help centre...')">
-        <div class="menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-        <div class="menu-label">Help & Support</div>
-        <div class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="showToast('Opening terms...')">
-        <div class="menu-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-        <div class="menu-label">Terms & Privacy</div>
-        <div class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="showToast('Logging out...')">
-        <div class="menu-icon red"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
-        <div class="menu-label red">Log Out</div>
-        <div class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Profile -->
-  <div class="sub-page" id="profile-edit">
-    <button class="back-btn" onclick="showSubPage('profile-main')">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
-    </button>
-    <div class="page-subtitle" style="margin-bottom:4px;">Edit Profile</div>
-    <div class="page-desc" style="margin-bottom:20px;">Update your personal info</div>
-    <div class="card">
-      <div class="edit-field">
-        <label>Full Name</label>
-        <input type="text" value="Rider User" />
-      </div>
-      <div class="edit-field">
-        <label>Phone Number</label>
-        <input type="tel" value="+267 71 234 567" />
-      </div>
-      <div class="edit-field">
-        <label>Email Address</label>
-        <input type="email" value="rider@email.com" />
-      </div>
-      <div class="edit-field">
-        <label>Home Address</label>
-        <input type="text" placeholder="Enter your home address" />
-      </div>
-      <button class="btn-primary" onclick="showToast('Profile updated!')">Save Changes</button>
-    </div>
-  </div>
-
-  <!-- Payment Method -->
-  <div class="sub-page" id="profile-payment">
-    <button class="back-btn" onclick="showSubPage('profile-main')">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
-    </button>
-    <div class="page-subtitle" style="margin-bottom:4px;">Payment Method</div>
-    <div class="page-desc" style="margin-bottom:20px;">Choose how you pay</div>
-    <div class="card">
-      <div class="card-title">Select Payment</div>
-      <div class="payment-option selected" onclick="selectPayment(this)">
-        <div class="payment-option-icon"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-        <div>
-          <div class="payment-label">Cash</div>
-          <div class="payment-sub">Pay driver directly</div>
-        </div>
-      </div>
-      <div class="payment-option" onclick="selectPayment(this)">
-        <div class="payment-option-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
-        <div>
-          <div class="payment-label">Orange Money</div>
-          <div class="payment-sub">Mobile wallet payment</div>
-        </div>
-      </div>
-      <div class="payment-option" onclick="selectPayment(this)">
-        <div class="payment-option-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
-        <div>
-          <div class="payment-label">Smega</div>
-          <div class="payment-sub">Mobile wallet payment</div>
-        </div>
-      </div>
-      <button class="btn-primary" style="margin-top:6px;" onclick="showToast('Payment method saved!')">Save</button>
-    </div>
-  </div>
-
-  <!-- Ride History (in profile) -->
-  <div class="sub-page" id="profile-history">
-    <button class="back-btn" onclick="showSubPage('profile-main')">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Back
-    </button>
-    <div class="page-subtitle" style="margin-bottom:4px;">Ride History</div>
-    <div class="page-desc" style="margin-bottom:20px;">All your past rides</div>
-    <div class="card">
-      <div class="ride-item">
-        <div class="ride-icon"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="ride-details"><div class="ride-route">CBD → Block 5</div><div class="ride-date">13 May 2026 · <span class="badge badge-green" style="font-size:10px; padding:2px 8px;">Completed</span></div></div>
-        <div class="ride-fare">P45</div>
-      </div>
-      <div class="ride-item">
-        <div class="ride-icon"><svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="ride-details"><div class="ride-route">Riverwalk → Game City</div><div class="ride-date">12 May 2026 · <span class="badge badge-green" style="font-size:10px; padding:2px 8px;">Completed</span></div></div>
-        <div class="ride-fare">P30</div>
-      </div>
-      <div class="ride-item">
-        <div class="ride-icon" style="background:var(--red-pale);"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="ride-details"><div class="ride-route">Maun → Main Mall</div><div class="ride-date">11 May 2026 · <span class="badge badge-red" style="font-size:10px; padding:2px 8px;">Cancelled</span></div></div>
-        <div class="ride-fare">P60</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ BOTTOM NAVIGATION ═══ -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-home" onclick="switchPage('home')">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>Home</span>
-  </button>
-  <button class="nav-btn" id="nav-rides" onclick="switchPage('rides')">
-    <svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h10l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>
-    <span>My Rides</span>
-  </button>
-  <button class="nav-btn" id="nav-notifications" onclick="switchPage('notifications')">
-    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-    <span>Alerts</span>
-  </button>
-  <button class="nav-btn" id="nav-profile" onclick="switchPage('profile')">
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>Profile</span>
-  </button>
-</nav>
-
-<script>
-  function switchPage(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    document.getElementById('nav-' + page).classList.add('active');
-    if (page === 'profile') showSubPage('profile-main');
-    window.scrollTo(0, 0);
-  }
-
-  function goToProfile() {
-    switchPage('profile');
-  }
-
-  function showSubPage(id) {
-    document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    window.scrollTo(0, 0);
-  }
-
-  function selectType(el) {
-    document.querySelectorAll('.ride-type-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-
-  function selectPayment(el) {
-    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-
-  function requestRide() {
-    const pickup = document.getElementById('pickup').value.trim();
-    const dest = document.getElementById('destination').value.trim();
-    const fare = document.getElementById('fare').value;
-    if (!pickup || !dest) { showToast('Please enter pickup and destination'); return; }
-    document.getElementById('ride-form').style.display = 'none';
-    document.getElementById('active-ride').style.display = 'block';
-    showToast('Ride requested! Looking for drivers...');
-  }
-
-  function cancelRide() {
-    document.getElementById('active-ride').style.display = 'none';
-    document.getElementById('ride-form').style.display = 'block';
-    showToast('Ride cancelled');
-  }
-
-  function filterRides(filter, el) {
-    document.querySelectorAll('#page-rides .badge').forEach(b => {
-      b.className = 'badge badge-grey';
-    });
-    el.className = 'badge badge-blue';
-    document.querySelectorAll('.ride-item').forEach(item => {
-      if (filter === 'all' || item.dataset.status === filter) {
-        item.style.display = 'flex';
-      } else {
-        item.style.display = 'none';
-      }
-    });
-  }
-
-  function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-</script>
-</body>
-</html>
+    /* CHAT */
+    .chat-wrap { background: #0f0f13; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .chat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .chat-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #6c63ff; }
+    .chat-msgs { height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 6
