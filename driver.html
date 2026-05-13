@@ -6,429 +6,575 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <title>Spiti-Spiti | Driver</title>
+  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
+  <title>Spiti-Spiti Driver</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0a0a0f;
-      --surface: #13131a;
-      --ink: #f0f0f5;
-      --accent: #22c55e;
-      --sub: #52525b;
-      --border: #1e1e2a;
-      --font: 'DM Sans', sans-serif;
-      --mono: 'DM Mono', monospace;
-    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-
-    header { background: #060608; border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 200; }
-    .brand { font-size: 1rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; text-transform: uppercase; }
-    .brand span { color: #f59e0b; }
-    .conn-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 5px 12px; border-radius: 99px; font-size: 0.65rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.08em; }
-    .conn-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #333; transition: 0.3s; }
-    .conn-pill .dot.live { background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: blink 2s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-    .container { max-width: 480px; margin: 0 auto; padding: 24px 16px 80px; }
-    .page-header { margin-bottom: 20px; }
-    .page-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
-    .page-sub { font-size: 0.8rem; color: var(--sub); font-weight: 500; margin-top: 4px; }
-
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; margin-bottom: 14px; }
-    .card-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: block; }
-
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .switch { position: relative; width: 52px; height: 28px; }
+    body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e8e8f0; min-height: 100vh; }
+    nav { background: #16161d; border-bottom: 1px solid #2a2a3a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; }
+    .brand span { color: #22c55e; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-user { font-size: 0.75rem; color: #555; }
+    .nav-user strong { color: #e8e8f0; }
+    .logout-btn { background: none; border: 1px solid #2a2a3a; color: #555; font-family: 'Inter', sans-serif; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+    .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
+    .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; flex-shrink: 0; }
+    .conn-dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .container { max-width: 520px; margin: 0 auto; padding: 20px 16px 100px; }
+    .greeting { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
+    .greeting-sub { font-size: 0.8rem; color: #555; margin-bottom: 20px; }
+    .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #22c55e; margin-bottom: 12px; }
+    .avail-row { background: #16161d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .avail-label { font-size: 0.85rem; font-weight: 500; }
+    .avail-sub { font-size: 0.68rem; color: #555; margin-top: 2px; }
+    .switch { position: relative; width: 50px; height: 26px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background: #2a2a3a; transition: .3s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background: white; transition: .3s; border-radius: 50%; }
-    input:checked + .slider { background: var(--accent); }
-    input:checked + .slider:before { transform: translateX(24px); }
+    .slider { position: absolute; inset: 0; background: #2a2a3a; border-radius: 26px; cursor: pointer; transition: 0.3s; }
+    .slider::before { content:""; position:absolute; width:18px; height:18px; left:4px; bottom:4px; background:#fff; border-radius:50%; transition:0.3s; }
+    input:checked + .slider { background: #22c55e; }
+    input:checked + .slider::before { transform: translateX(24px); }
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+    .stat { background: #16161d; border: 1px solid #2a2a3a; border-radius: 12px; padding: 14px; }
+    .stat-num { font-size: 1.5rem; font-weight: 700; color: #22c55e; }
+    .stat-lbl { font-size: 0.65rem; color: #444; margin-top: 3px; }
 
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
-    .stat-val { font-size: 1.3rem; font-weight: 800; color: #fff; }
-    .stat-lbl { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+    /* PROGRESS */
+    .progress-bar { display: flex; align-items: flex-start; margin-bottom: 16px; padding: 0 4px; }
+    .prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #1e1e28; border: 2px solid #2a2a3a; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #333; transition: all 0.4s; }
+    .prog-dot.active { background: #22c55e22; border-color: #22c55e; color: #22c55e; box-shadow: 0 0 12px #22c55e44; }
+    .prog-dot.done { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .prog-line { flex: 1; height: 2px; background: #1e1e28; margin-top: 14px; transition: background 0.4s; }
+    .prog-line.done { background: #22c55e; }
+    .prog-label { font-size: 0.58rem; color: #333; margin-top: 5px; text-align: center; font-weight: 500; }
+    .prog-label.active { color: #22c55e; }
+    .prog-label.done { color: #22c55e; }
 
-    #map { height: 200px; border-radius: 14px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--border); }
-
-    .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-family: var(--font); font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background: #fff; color: #000; }
-    .btn-accent { background: var(--accent); color: #000; }
-    .btn-ghost { background: transparent; color: var(--sub); border: 1px solid var(--border); }
-    .btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-    .btn-loc { background: var(--surface); color: var(--sub); border: 1px solid var(--border); }
-    .btn-loc.streaming { background: var(--accent); color: #000; border-color: var(--accent); }
+    /* LOCATION MAP */
+    #driver-map { width: 100%; height: 160px; border-radius: 12px; margin-bottom: 10px; background: #0a0a0f; border: 1px solid #2a2a3a; position: relative; overflow: hidden; }
+    .loc-row { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: #444; margin-bottom: 10px; }
+    .loc-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
+    .loc-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .btn-full { width: 100%; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; margin-bottom: 8px; }
+    .btn-full:last-child { margin-bottom: 0; }
+    .btn-full:hover { opacity: 0.88; }
+    .btn-loc { background: #f59e0b; color: #000; }
+    .btn-stop { background: #ef4444; color: #fff; }
 
     /* INCOMING */
-    .incoming-card { background: linear-gradient(135deg, #052e16 0%, #064e3b 100%); border: 1.5px solid #16a34a; border-radius: 20px; padding: 22px; margin-bottom: 14px; display: none; animation: pulse-border 2s infinite; }
-    .incoming-card.active { display: block; }
-    @keyframes pulse-border { 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.3)} 70%{box-shadow:0 0 0 12px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
-    .incoming-label { font-size: 0.6rem; font-weight: 800; color: #86efac; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 16px; display: block; }
+    .incoming { background: linear-gradient(135deg,#081508,#0a1f0a); border: 1px solid #22c55e33; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
+    .incoming.visible { display: block; animation: ringpulse 2s infinite; }
+    @keyframes ringpulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.25)} 50%{box-shadow:0 0 0 14px rgba(34,197,94,0)} }
+    .inc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .inc-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .inc-title { font-size: 0.9rem; font-weight: 600; }
+    .inc-sub { font-size: 0.68rem; color: #86efac; margin-top: 2px; }
+    .route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .route-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
+    .route-dot.from { background: rgba(255,255,255,0.07); }
+    .route-dot.to { background: rgba(34,197,94,0.15); }
+    .route-lbl { font-size: 0.6rem; color: #86efac; margin-bottom: 1px; }
+    .route-val { font-size: 0.82rem; }
+    .price-row { background: rgba(34,197,94,0.08); border-radius: 10px; padding: 10px 13px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+    .price-lbl { font-size: 0.65rem; color: #86efac; }
+    .price-val { font-size: 1.3rem; font-weight: 700; color: #22c55e; }
+    .offer-row { margin-bottom: 12px; }
+    .offer-row label { font-size: 0.65rem; color: #86efac; display: block; margin-bottom: 5px; }
+    .offer-input { width: 100%; background: #0f0f13; border: 1px solid #22c55e22; border-radius: 10px; padding: 10px 13px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; outline: none; }
+    .offer-input:focus { border-color: #22c55e; }
+    .btn-row { display: flex; gap: 7px; }
+    .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-acc { background: #22c55e; color: #fff; }
+    .btn-ctr { background: #a855f7; color: #fff; }
+    .btn-dec { background: #1e1e28; color: #666; border: 1px solid #2a2a3a; }
 
-    .route-block { margin-bottom: 18px; }
-    .route-point { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .route-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
-    .route-label { font-size: 0.6rem; color: #86efac; font-weight: 700; text-transform: uppercase; }
-    .route-val { font-size: 0.9rem; font-weight: 600; color: #fff; }
+    /* ACTIVE RIDE */
+    .active-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
+    .active-card.visible { display: block; }
+    .fare-box { background: #0f0f13; border-radius: 10px; padding: 12px; text-align: center; margin: 10px 0; }
+    .fare-num { font-size: 1.7rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
+    .fare-lbl { font-size: 0.62rem; color: #444; margin-top: 2px; }
+    .action-row { display: flex; gap: 8px; margin-top: 12px; }
+    .act-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #555; transition: all 0.2s; }
+    .act-btn.start:hover { border-color: #f59e0b; color: #f59e0b; background: #1a1200; }
+    .act-btn.done:hover { border-color: #22c55e; color: #22c55e; background: #001500; }
 
-    .rider-fare-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; text-align: center; margin-bottom: 16px; }
-    .rider-fare-label { font-size: 0.6rem; font-weight: 700; color: #86efac; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-    .rider-fare-val { font-size: 1.8rem; font-weight: 800; color: #fff; }
+    /* CHAT */
+    .chat-wrap { background: #0f0f13; border-radius: 14px; padding: 13px; margin-top: 12px; }
+    .chat-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+    .chat-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #22c55e; }
+    .chat-msgs { height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 9px; }
+    .chat-msgs::-webkit-scrollbar { width: 2px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+    .msg { max-width: 82%; padding: 8px 11px; border-radius: 14px; font-size: 0.77rem; line-height: 1.45; word-break: break-word; }
+    .msg.me { background: #22c55e; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.them { background: #1e1e28; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-time { font-size: 0.55rem; opacity: 0.5; margin-top: 2px; }
+    .chat-row { display: flex; gap: 7px; }
+    .chat-in { flex: 1; background: #16161d; border: 1px solid #2a2a3a; border-radius: 10px; padding: 9px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.8rem; outline: none; }
+    .chat-in:focus { border-color: #22c55e; }
+    .chat-send { background: #22c55e; border: none; border-radius: 10px; padding: 9px 12px; color: #fff; cursor: pointer; }
 
-    .counter-section { margin-bottom: 16px; }
-    .counter-label { font-size: 0.6rem; font-weight: 700; color: #86efac; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-    .counter-input { width: 100%; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 14px; color: #fff; font-family: var(--mono); font-size: 1.4rem; font-weight: 700; text-align: center; outline: none; transition: border-color 0.2s; margin-bottom: 10px; }
-    .counter-input:focus { border-color: var(--accent); }
-    .counter-input::placeholder { color: rgba(255,255,255,0.2); }
+    /* RIDES LIST */
+    .ride-item { background: #0f0f13; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+    .ride-route { font-size: 0.8rem; }
+    .ride-meta { font-size: 0.63rem; color: #333; margin-top: 2px; }
+    .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+    .badge-requested { background: #1e293b; color: #94a3b8; }
+    .badge-accepted { background: #14532d; color: #22c55e; }
+    .badge-in_progress { background: #451a03; color: #f59e0b; }
+    .badge-completed { background: #1e1b4b; color: #818cf8; }
+    .badge-cancelled { background: #2d1515; color: #ef4444; }
+    .empty { text-align: center; color: #333; font-size: 0.8rem; padding: 18px; }
 
-    .action-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    /* PENDING DRIVERS (admin approval section) */
+    .pending-section { background: #1a1200; border: 1px solid #f59e0b22; border-radius: 14px; padding: 16px; margin-bottom: 14px; display: none; }
+    .pending-section.visible { display: block; }
 
-    /* ACTIVE */
-    .active-card { display: none; }
-    .active-card.show { display: block; }
-
-    .fare-big { text-align: center; margin-bottom: 20px; }
-    .fare-big-val { font-size: 2.2rem; font-weight: 800; color: var(--accent); letter-spacing: -0.04em; }
-    .fare-big-lbl { font-size: 0.6rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; }
-
-    .comms { background: var(--bg); border-radius: 14px; padding: 14px; border: 1px solid var(--border); margin-top: 16px; }
-    .comms-label { font-size: 0.6rem; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-    .msgs { height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; scrollbar-width: none; }
-    .msgs::-webkit-scrollbar { display: none; }
-    .msg { max-width: 80%; padding: 9px 13px; border-radius: 12px; font-size: 0.82rem; font-weight: 500; line-height: 1.4; }
-    .msg.me { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 3px; }
-    .msg.them { background: var(--surface); color: #fff; border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 3px; }
-    .comms-input-row { display: flex; gap: 8px; margin-top: 10px; }
-    .comms-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: #fff; font-family: var(--font); font-size: 0.85rem; outline: none; }
-    .comms-input:focus { border-color: var(--accent); }
-    .send-btn { width: 42px; height: 42px; border-radius: 10px; background: var(--accent); color: #000; border: none; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-    .status-block { font-family: var(--mono); background: #060608; color: var(--accent); padding: 14px 16px; border-radius: 14px; font-size: 10px; line-height: 1.8; margin-top: 24px; border: 1px solid var(--border); letter-spacing: 0.02em; }
-
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 11px 22px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; z-index: 1000; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; max-width: 88vw; text-align: center; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #ef4444; }
+    .toast.warn { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">Spiti<span>-Spiti</span> <span style="color:var(--sub);font-weight:500;font-size:0.8rem;">· Driver</span></div>
-  <div class="conn-pill">
-    <div class="dot" id="socket-dot"></div>
-    <span id="socket-label">Offline</span>
+<nav>
+  <div class="brand">Spiti-Spiti<span>.</span> Driver</div>
+  <div class="nav-right">
+    <div class="conn-dot" id="dot"></div>
+    <div class="nav-user">Hi, <strong id="nav-name">Driver</strong></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
-</header>
+</nav>
 
 <div class="container">
-  <div class="page-header">
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-sub">Driver ID #<span id="driver-id-display">1</span></p>
+  <div class="greeting" id="greeting">Driver Dashboard 🚗</div>
+  <div class="greeting-sub">Manage your rides in real time</div>
+
+  <div class="avail-row">
+    <div>
+      <div class="avail-label">Available for Rides</div>
+      <div class="avail-sub" id="avail-sub">You are offline</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="avail-toggle" onchange="toggleAvail()">
+      <span class="slider"></span>
+    </label>
   </div>
 
-  <!-- STATUS CARD -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Completed</div></div>
+    <div class="stat"><div class="stat-num" id="s-earn">P0</div><div class="stat-lbl">Earnings</div></div>
+  </div>
+
+  <!-- Location -->
   <div class="card">
-    <div class="toggle-row">
-      <div>
-        <span class="card-label" style="margin-bottom:4px;">Duty Status</span>
-        <p style="font-size:0.78rem;color:var(--sub);font-weight:600;" id="avail-txt">OFFLINE</p>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="avail-toggle" onchange="toggleAvail()">
-        <span class="slider"></span>
-      </label>
+    <div class="card-label">Your Location</div>
+    <div id="driver-map"></div>
+    <div class="loc-row"><div class="loc-dot" id="loc-dot"></div><span id="loc-text">Not sharing location</span></div>
+    <button class="btn-full btn-loc" id="btn-start" onclick="startLoc()">📍 Start Sharing Location</button>
+    <button class="btn-full btn-stop" id="btn-stop" style="display:none" onclick="stopLoc()">⏹ Stop Sharing</button>
+  </div>
+
+  <!-- Incoming -->
+  <div class="incoming" id="inc-card">
+    <div class="inc-head">
+      <div class="inc-icon">🔔</div>
+      <div><div class="inc-title">New Ride Request</div><div class="inc-sub">Rider is looking for a driver</div></div>
     </div>
-    <div class="stats">
-      <div class="stat-box"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Rides Today</div></div>
-      <div class="stat-box"><div class="stat-val" id="s-earn">P0</div><div class="stat-lbl">Earned</div></div>
+    <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl">Pickup</div><div class="route-val" id="inc-pickup">—</div></div></div>
+    <div class="route-row"><div class="route-dot to">🏁</div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="inc-dropoff">—</div></div></div>
+    <div class="price-row">
+      <div><div class="price-lbl">Rider's offered price</div><div class="price-val" id="inc-fare">P0.00</div></div>
+      <div style="font-size:0.65rem;color:#86efac">Min P15</div>
+    </div>
+    <div class="offer-row">
+      <label>Your price (edit to counter offer):</label>
+      <input class="offer-input" id="my-fare" type="number" min="15" />
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-acc" onclick="sendOffer(false)">✓ Accept</button>
+      <button class="btn btn-ctr" onclick="sendOffer(true)">💬 Counter</button>
+      <button class="btn btn-dec" onclick="declineIncoming()">✕</button>
     </div>
   </div>
 
-  <!-- MAP CARD -->
+  <!-- Active Ride -->
+  <div class="active-card" id="active-card">
+    <div class="card-label">Current Ride</div>
+
+    <!-- Progress -->
+    <div class="progress-bar">
+      <div class="prog-step">
+        <div class="prog-dot done" id="dp1">✓</div>
+        <div class="prog-label done" id="dpl1">Accepted</div>
+      </div>
+      <div class="prog-line" id="dpline1"></div>
+      <div class="prog-step">
+        <div class="prog-dot" id="dp2">2</div>
+        <div class="prog-label" id="dpl2">Started</div>
+      </div>
+      <div class="prog-line" id="dpline2"></div>
+      <div class="prog-step">
+        <div class="prog-dot" id="dp3">3</div>
+        <div class="prog-label" id="dpl3">Done</div>
+      </div>
+    </div>
+
+    <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl" style="color:#444">Pickup</div><div class="route-val" id="act-pickup">—</div></div></div>
+    <div class="route-row" style="margin-bottom:0"><div class="route-dot to">🏁</div><div><div class="route-lbl" style="color:#444">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div></div>
+
+    <div class="fare-box">
+      <div class="fare-num" id="act-fare">P0.00</div>
+      <div class="fare-lbl">Agreed Fare</div>
+    </div>
+
+    <div class="action-row">
+      <button class="act-btn start" id="btn-start-ride" onclick="updateStatus('in_progress')">▶ Start Ride</button>
+      <button class="act-btn done" id="btn-complete-ride" onclick="updateStatus('completed')">✓ Complete</button>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-wrap">
+      <div class="chat-head">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <rect width="30" height="30" rx="9" fill="#1e1e28"/>
+          <rect x="6" y="10" width="18" height="13" rx="3" fill="#22c55e"/>
+          <circle cx="10.5" cy="16.5" r="1.5" fill="white"/>
+          <circle cx="19.5" cy="16.5" r="1.5" fill="white"/>
+          <rect x="12" y="20" width="6" height="1.5" rx="0.75" fill="white"/>
+          <rect x="13.5" y="5" width="3" height="5" rx="1.5" fill="#22c55e"/>
+          <circle cx="15" cy="5" r="1.5" fill="#86efac"/>
+          <rect x="3" y="13" width="3" height="5" rx="1.5" fill="#22c55e"/>
+          <rect x="24" y="13" width="3" height="5" rx="1.5" fill="#22c55e"/>
+        </svg>
+        <div class="chat-title">Chat with Rider</div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="empty" style="padding:8px;font-size:0.73rem">No messages yet</div>
+      </div>
+      <div class="chat-row">
+        <input class="chat-in" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()" />
+        <button class="chat-send" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Rides -->
   <div class="card">
-    <span class="card-label">Live Location</span>
-    <div id="map"></div>
-    <button class="btn btn-loc" id="loc-btn" onclick="toggleLoc()">Start GPS Tracking</button>
+    <div class="card-label">All Rides</div>
+    <div id="rides-list"><div class="empty">No rides yet</div></div>
   </div>
-
-  <!-- INCOMING RIDE -->
-  <div class="incoming-card" id="inc-card">
-    <span class="incoming-label">⚡ New Ride Request</span>
-    <div class="route-block">
-      <div class="route-point">
-        <div class="route-icon">📍</div>
-        <div><div class="route-label">Pickup</div><div class="route-val" id="inc-pick">—</div></div>
-      </div>
-      <div class="route-point">
-        <div class="route-icon">🏁</div>
-        <div><div class="route-label">Dropoff</div><div class="route-val" id="inc-drop">—</div></div>
-      </div>
-    </div>
-    <div class="rider-fare-box">
-      <div class="rider-fare-label">Rider's Offered Fare</div>
-      <div class="rider-fare-val" id="inc-rate">P0.00</div>
-    </div>
-    <div class="counter-section">
-      <div class="counter-label">Your Counter Offer (BWP) — leave blank to accept as-is</div>
-      <input class="counter-input" type="number" id="counter-fare" min="15" placeholder="e.g. 45">
-    </div>
-    <div class="action-row-3">
-      <button class="btn btn-primary" onclick="acceptAsIs()">Accept</button>
-      <button class="btn btn-accent" onclick="sendCounter()">Counter</button>
-      <button class="btn btn-danger" onclick="closeInc()">Decline</button>
-    </div>
-  </div>
-
-  <!-- ACTIVE RIDE -->
-  <div class="card active-card" id="act-card">
-    <span class="card-label">Active Ride</span>
-    <div class="route-block">
-      <div class="route-point">
-        <div class="route-icon" style="background:rgba(255,255,255,0.05);">📍</div>
-        <div><div class="route-label" style="color:var(--sub);">From</div><div class="route-val" id="act-src">—</div></div>
-      </div>
-      <div class="route-point">
-        <div class="route-icon" style="background:rgba(255,255,255,0.05);">🏁</div>
-        <div><div class="route-label" style="color:var(--sub);">To</div><div class="route-val" id="act-dst">—</div></div>
-      </div>
-    </div>
-    <div class="fare-big">
-      <div class="fare-big-val" id="act-fare">P0.00</div>
-      <div class="fare-big-lbl">Agreed Fare</div>
-    </div>
-    <div class="action-row" style="margin-bottom:10px;">
-      <button class="btn btn-primary" id="start-btn" onclick="updateStatus('in_progress')">Start Trip</button>
-      <button class="btn btn-accent" onclick="updateStatus('completed')">Complete</button>
-    </div>
-    <div class="comms">
-      <div class="comms-label">Message Rider</div>
-      <div class="msgs" id="msgs"></div>
-      <div class="comms-input-row">
-        <input class="comms-input" type="text" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
-        <button class="send-btn" onclick="sendMsg()">➤</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="status-block">[READY] spiti-spiti: v1.0.0<br>[SYNC] socket: active<br>[STATUS] connected</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  const BASE = window.location.origin;
-  const DRIVER_ID = 1;
+  const BASE = "https://spiti-spiti-production.up.railway.app";
+
+  // Auth check
+  const driverData = JSON.parse(localStorage.getItem("spiti_driver") || "null");
+  if (!driverData) window.location.href = "login.html";
+  const DRIVER_ID = driverData?.id || 1;
+  const DRIVER_NAME = driverData?.name || "Driver";
+
+  document.getElementById("nav-name").textContent = DRIVER_NAME;
+  document.getElementById("greeting").textContent = `Hey ${DRIVER_NAME.split(" ")[0]} 🚗`;
+
+  function logout() {
+    localStorage.removeItem("spiti_driver");
+    window.location.href = "login.html";
+  }
+
+  let pending = null;
   let activeRide = null;
-  let pendingRide = null;
-  let map, driverMarker, locWatcher;
-  let ridesCompleted = 0;
-  let totalEarned = 0;
+  let locInterval = null;
+  let driverMapSvg = null;
+  let driverPinEl = null;
 
-  document.getElementById("driver-id-display").textContent = DRIVER_ID;
+  // Init location map
+  window.addEventListener("load", () => {
+    initDriverMap();
+    loadRides();
+  });
 
-  const socket = io(BASE);
+  function initDriverMap() {
+    const map = document.getElementById("driver-map");
+    const w = map.offsetWidth || 480;
+    const h = 160;
+    map.innerHTML = `
+      <svg width="100%" height="100%" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+        <rect width="${w}" height="${h}" fill="#0a0a0f"/>
+        <line x1="0" y1="${h*0.35}" x2="${w}" y2="${h*0.35}" stroke="#1a1a2a" stroke-width="16"/>
+        <line x1="0" y1="${h*0.7}" x2="${w}" y2="${h*0.7}" stroke="#1a1a2a" stroke-width="10"/>
+        <line x1="${w*0.25}" y1="0" x2="${w*0.25}" y2="${h}" stroke="#1a1a2a" stroke-width="12"/>
+        <line x1="${w*0.65}" y1="0" x2="${w*0.65}" y2="${h}" stroke="#1a1a2a" stroke-width="10"/>
+        <line x1="0" y1="${h*0.35}" x2="${w}" y2="${h*0.35}" stroke="#22c55e08" stroke-width="1" stroke-dasharray="4,8"/>
+        <line x1="${w*0.25}" y1="0" x2="${w*0.25}" y2="${h}" stroke="#22c55e08" stroke-width="1" stroke-dasharray="4,8"/>
+        <rect x="${w*0.05}" y="${h*0.08}" width="50" height="35" rx="3" fill="#13131f"/>
+        <rect x="${w*0.35}" y="${h*0.1}" width="65" height="40" rx="3" fill="#13131f"/>
+        <rect x="${w*0.72}" y="${h*0.42}" width="45" height="50" rx="3" fill="#13131f"/>
+        <rect x="${w*0.08}" y="${h*0.75}" width="55" height="30" rx="3" fill="#13131f"/>
+        <text x="${w*0.07}" y="${h*0.3}" font-size="6" fill="#22c55e15" font-family="Inter">MAIN MALL RD</text>
+        <text x="${w*0.3}" y="${h*0.65}" font-size="6" fill="#22c55e15" font-family="Inter">CBD AVE</text>
+      </svg>
+      <div id="d-pin" style="display:none;position:absolute;transform:translate(-50%,-50%);transition:all 0.5s ease">
+        <div style="position:absolute;top:-8px;left:-8px;width:28px;height:28px;border-radius:50%;border:2px solid #22c55e44;animation:ringPulse 2s infinite"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:#22c55e;border:3px solid #fff;box-shadow:0 0 10px #22c55e88"></div>
+      </div>
+      <style>@keyframes ringPulse{0%{transform:scale(1);opacity:1}100%{transform:scale(2.2);opacity:0}}</style>
+      <div style="position:absolute;bottom:6px;right:8px;font-size:0.52rem;color:#333;background:#0f0f13aa;padding:2px 6px;border-radius:5px">Spiti-Spiti Map</div>
+    `;
+    driverPinEl = document.getElementById("d-pin");
+  }
+
+  const socket = io(BASE, { transports: ["websocket", "polling"] });
 
   socket.on("connect", () => {
-    document.getElementById("socket-dot").classList.add("live");
-    document.getElementById("socket-label").textContent = "Live";
+    document.getElementById("dot").classList.add("live");
     socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
-    if (activeRide) socket.emit("join-ride", { rideId: activeRide.id });
+    console.log("Driver socket connected, DRIVER_ID:", DRIVER_ID);
+    loadRides();
   });
 
-  socket.on("disconnect", () => {
-    document.getElementById("socket-dot").classList.remove("live");
-    document.getElementById("socket-label").textContent = "Offline";
-  });
+  socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
 
   socket.on("new-ride", (ride) => {
     if (activeRide) return;
-    pendingRide = ride;
-    document.getElementById("inc-pick").textContent = ride.pickup;
-    document.getElementById("inc-drop").textContent = ride.dropoff;
-    document.getElementById("inc-rate").textContent = "P" + parseFloat(ride.offered_fare).toFixed(2);
-    document.getElementById("counter-fare").value = "";
-    document.getElementById("inc-card").classList.add("active");
-    showToast("New ride request!");
+    console.log("new-ride received", ride);
+    pending = ride;
+    document.getElementById("inc-pickup").textContent = ride.pickup;
+    document.getElementById("inc-dropoff").textContent = ride.dropoff;
+    document.getElementById("inc-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
+    document.getElementById("my-fare").value = ride.offered_fare || 15;
+    document.getElementById("inc-card").classList.add("visible");
+    showToast("New ride request! 🔔", "warn");
   });
 
   socket.on("offer-accepted", (ride) => {
+    console.log("offer-accepted", ride);
     activeRide = ride;
-    pendingRide = null;
-    document.getElementById("inc-card").classList.remove("active");
-    document.getElementById("act-card").classList.add("show");
-    document.getElementById("act-src").textContent = ride.pickup;
-    document.getElementById("act-dst").textContent = ride.dropoff;
-    document.getElementById("act-fare").textContent = "P" + parseFloat(ride.fare).toFixed(2);
+    document.getElementById("inc-card").classList.remove("visible");
+    document.getElementById("active-card").classList.add("visible");
+    document.getElementById("act-pickup").textContent = ride.pickup;
+    document.getElementById("act-dropoff").textContent = ride.dropoff;
+    document.getElementById("act-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+    updateDriverProgress("accepted");
     socket.emit("join-ride", { rideId: ride.id });
-    loadMessages(ride.id);
-    showToast("Offer accepted! Head to pickup.");
+    loadMsgs(ride.id);
+    showToast("Rider accepted! Head to pickup 🚗");
+    loadRides();
   });
 
-  socket.on("offer-declined", () => {
-    showToast("Rider declined your offer");
-  });
+  socket.on("offer-declined", () => showToast("Rider declined your offer", "error"));
 
   socket.on("ride-updated", (ride) => {
-    if (!activeRide || ride.id !== activeRide.id) return;
-    activeRide = ride;
-    if (ride.status === "completed") {
-      ridesCompleted++;
-      totalEarned += parseFloat(ride.fare || 0);
-      document.getElementById("s-done").textContent = ridesCompleted;
-      document.getElementById("s-earn").textContent = "P" + totalEarned.toFixed(0);
-      document.getElementById("act-card").classList.remove("show");
-      activeRide = null;
-      showToast("Ride complete!");
+    console.log("ride-updated on driver", ride.status);
+    if (activeRide && ride.id === activeRide.id) {
+      activeRide = ride;
+      updateDriverProgress(ride.status);
+      loadRides();
     }
   });
 
   socket.on("new-message", (msg) => {
-    const el = document.getElementById("msgs");
-    const mine = msg.sender_role === "driver";
-    const div = document.createElement("div");
-    div.className = "msg " + (mine ? "me" : "them");
-    div.textContent = msg.message;
-    el.appendChild(div);
-    el.scrollTop = el.scrollHeight;
+    if (!activeRide) return;
+    appendMsg(msg);
   });
 
-  async function toggleAvail() {
-    const on = document.getElementById("avail-toggle").checked;
-    document.getElementById("avail-txt").textContent = on ? "ONLINE — ACCEPTING RIDES" : "OFFLINE";
-    try {
-      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ available: on })
-      });
-    } catch(e) {}
+  socket.on("new-delivery", () => showToast("New delivery! 📦", "warn"));
+
+  function updateDriverProgress(status) {
+    const stateMap = { accepted: 1, in_progress: 2, completed: 3 };
+    const current = stateMap[status] || 0;
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`dp${i}`);
+      const lbl = document.getElementById(`dpl${i}`);
+      if (i < current) {
+        dot.className = "prog-dot done"; dot.textContent = "✓";
+        lbl.className = "prog-label done";
+        if (i < 3) document.getElementById(`dpline${i}`).className = "prog-line done";
+      } else if (i === current) {
+        dot.className = "prog-dot active"; dot.textContent = i;
+        lbl.className = "prog-label active";
+      } else {
+        dot.className = "prog-dot"; dot.textContent = i;
+        lbl.className = "prog-label";
+      }
+    }
   }
 
-  async function acceptAsIs() {
-    if (!pendingRide) return;
+  async function sendOffer(isCounter) {
+    if (!pending) return;
+    const fare = Math.max(15, parseFloat(document.getElementById("my-fare").value) || 15);
     try {
-      await fetch(`${BASE}/rides/${pendingRide.id}/accept-offer`, {
+      await fetch(`${BASE}/rides/${pending.id}/offer`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ driverId: DRIVER_ID, fare: pendingRide.offered_fare })
+        body: JSON.stringify({ fare_offer: fare, driverId: DRIVER_ID, driver_name: DRIVER_NAME })
       });
-      closeInc();
-    } catch(e) { showToast("Failed to accept"); }
+      document.getElementById("inc-card").classList.remove("visible");
+      showToast(isCounter ? `Counter P${fare.toFixed(2)} sent ✉️` : "Offer sent! Waiting for rider...");
+    } catch(e) { showToast("Failed", "error"); }
   }
 
-  async function sendCounter() {
-    const fareVal = document.getElementById("counter-fare").value;
-    const fare = parseFloat(fareVal);
-    if (!fareVal || isNaN(fare) || fare < 15) return showToast("Enter a valid amount (min P15)");
-    if (!pendingRide) return showToast("No pending ride");
-    try {
-      await fetch(`${BASE}/rides/${pendingRide.id}/offer`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ driverId: DRIVER_ID, driver_name: "Driver #" + DRIVER_ID, fare_offer: fare })
-      });
-      showToast("Counter offer sent — P" + fare.toFixed(2));
-      closeInc();
-    } catch(e) { showToast("Failed to send counter"); }
+  function declineIncoming() {
+    pending = null;
+    document.getElementById("inc-card").classList.remove("visible");
+    showToast("Declined");
   }
 
   async function updateStatus(status) {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
+      const ride = await res.json();
+      activeRide = ride;
+      updateDriverProgress(status);
       if (status === "in_progress") {
-        document.getElementById("start-btn").disabled = true;
-        document.getElementById("start-btn").textContent = "Trip In Progress";
-        showToast("Trip started!");
+        showToast("Ride started! 🚀");
+        document.getElementById("btn-start-ride").disabled = true;
+        document.getElementById("btn-start-ride").style.opacity = "0.3";
       }
       if (status === "completed") {
-        showToast("Ride complete!");
-        setTimeout(() => location.reload(), 3000);
+        showToast("Ride completed! 🎉");
+        setTimeout(() => {
+          document.getElementById("active-card").classList.remove("visible");
+          document.getElementById("chat-msgs").innerHTML = '<div class="empty" style="padding:8px;font-size:0.73rem">No messages yet</div>';
+          document.getElementById("btn-start-ride").disabled = false;
+          document.getElementById("btn-start-ride").style.opacity = "1";
+          activeRide = null;
+          loadRides();
+        }, 3000);
       }
-    } catch(e) { showToast("Failed to update status"); }
+      loadRides();
+    } catch(e) { showToast("Failed", "error"); }
   }
 
-  function toggleLoc() {
-    const btn = document.getElementById("loc-btn");
-    if (locWatcher) {
-      navigator.geolocation.clearWatch(locWatcher);
-      locWatcher = null;
-      btn.textContent = "Start GPS Tracking";
-      btn.classList.remove("streaming");
-    } else {
-      if (!navigator.geolocation) return showToast("GPS not available");
-      locWatcher = navigator.geolocation.watchPosition(sendLoc, () => showToast("GPS error"), { enableHighAccuracy: true });
-      btn.textContent = "GPS Streaming Live";
-      btn.classList.add("streaming");
-      initMap();
-    }
+  function startLoc() {
+    if (!navigator.geolocation) return showToast("Geolocation not supported", "error");
+    document.getElementById("loc-dot").classList.add("on");
+    document.getElementById("loc-text").textContent = "Sharing location...";
+    document.getElementById("btn-stop").style.display = "block";
+    document.getElementById("btn-start").style.display = "none";
+    sendLoc();
+    locInterval = setInterval(sendLoc, 5000);
+    showToast("Sharing location");
   }
 
-  async function sendLoc(p) {
-    const { latitude: lat, longitude: lng } = p.coords;
-    if (!map) initMap();
-    const icon = L.divIcon({
-      className: '',
-      html: '<div style="width:14px;height:14px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px rgba(34,197,94,0.7);"></div>',
-      iconSize: [14, 14], iconAnchor: [7, 7]
-    });
-    if (driverMarker) driverMarker.setLatLng([lat, lng]);
-    else driverMarker = L.marker([lat, lng], { icon }).addTo(map).bindPopup("You");
-    map.setView([lat, lng], 15);
+  function stopLoc() {
+    clearInterval(locInterval); locInterval = null;
+    document.getElementById("loc-dot").classList.remove("on");
+    document.getElementById("loc-text").textContent = "Not sharing location";
+    document.getElementById("btn-stop").style.display = "none";
+    document.getElementById("btn-start").style.display = "block";
+    showToast("Stopped sharing");
+  }
+
+  function sendLoc() {
+    navigator.geolocation.getCurrentPosition(async ({ coords: { latitude: lat, longitude: lng } }) => {
+      // Update driver map pin
+      if (driverPinEl) {
+        const map = document.getElementById("driver-map");
+        const w = map.offsetWidth;
+        const h = map.offsetHeight;
+        const base = { lat: -24.6541, lng: 25.9087 };
+        const scale = 6000;
+        const x = Math.max(10, Math.min(w-10, w/2 + (lng - base.lng) * scale));
+        const y = Math.max(10, Math.min(h-10, h/2 - (lat - base.lat) * scale));
+        driverPinEl.style.display = "block";
+        driverPinEl.style.left = x + "px";
+        driverPinEl.style.top = y + "px";
+      }
+      document.getElementById("loc-text").textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      try {
+        await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
+          method: "PATCH", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lng })
+        });
+      } catch(e) {}
+    }, () => showToast("Location error", "error"));
+  }
+
+  async function toggleAvail() {
+    const on = document.getElementById("avail-toggle").checked;
+    document.getElementById("avail-sub").textContent = on ? "You are online" : "You are offline";
     try {
-      await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
+      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat, lng })
+        body: JSON.stringify({ available: on })
       });
+      showToast(on ? "Online 🟢" : "Offline");
     } catch(e) {}
   }
 
-  function initMap() {
-    if (map) return;
-    map = L.map("map", { zoomControl: true, attributionControl: false }).setView([-24.6541, 25.9087], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-  }
-
-  async function loadMessages(rideId) {
+  async function loadMsgs(rideId) {
     try {
       const res = await fetch(`${BASE}/rides/${rideId}/messages`);
       const msgs = await res.json();
-      msgs.forEach(m => {
-        const el = document.getElementById("msgs");
-        const mine = m.sender_role === "driver";
-        const div = document.createElement("div");
-        div.className = "msg " + (mine ? "me" : "them");
-        div.textContent = m.message;
-        el.appendChild(div);
-      });
+      const el = document.getElementById("chat-msgs");
+      if (msgs.length) { el.innerHTML = ""; msgs.forEach(appendMsg); }
     } catch(e) {}
   }
 
+  function appendMsg(msg) {
+    const el = document.getElementById("chat-msgs");
+    if (el.querySelector(".empty")) el.innerHTML = "";
+    const mine = msg.sender_role === "driver";
+    const time = new Date(msg.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    el.innerHTML += `<div class="msg ${mine?"me":"them"}">${msg.message}<div class="msg-time">${time}</div></div>`;
+    el.scrollTop = el.scrollHeight;
+  }
+
   async function sendMsg() {
+    if (!activeRide) return;
     const input = document.getElementById("chat-in");
-    const msg = input.value.trim();
-    if (!msg || !activeRide) return;
+    const message = input.value.trim();
+    if (!message) return;
     input.value = "";
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sender_role: "driver", message: msg })
+        body: JSON.stringify({ sender_role: "driver", message })
       });
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function loadRides() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const mine = rides.filter(r => r.driver_id == DRIVER_ID);
+      document.getElementById("rides-list").innerHTML = mine.length ? mine.map(r => `
+        <div class="ride-item">
+          <div>
+            <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="ride-meta">#${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : r.offered_fare ? " · Offered P"+parseFloat(r.offered_fare).toFixed(2) : ""}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
+        </div>`).join("") : '<div class="empty">No rides yet</div>';
+      document.getElementById("s-total").textContent = mine.length;
+      document.getElementById("s-done").textContent = mine.filter(r => r.status === "completed").length;
+      const earn = mine.filter(r => r.status === "completed").reduce((s,r) => s + parseFloat(r.fare||0), 0);
+      document.getElementById("s-earn").textContent = "P" + earn.toFixed(2);
     } catch(e) {}
   }
 
-  function closeInc() { document.getElementById("inc-card").classList.remove("active"); }
-
-  function showToast(m) {
+  function showToast(msg, type="") {
     const t = document.getElementById("toast");
-    t.textContent = m; t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " "+type : "");
+    setTimeout(() => t.className = "toast", 3500);
   }
 </script>
 </body>
