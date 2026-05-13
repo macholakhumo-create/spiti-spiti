@@ -811,7 +811,10 @@ async function rejectDriver(id) {
     t.className = "toast show" + (type ? " " + type : "");
     setTimeout(() => t.className = "toast", 3000);
   }
-
+function logout() {
+  localStorage.removeItem("spiti_admin");
+  window.location.href = "login.html";
+}
   setInterval(loadAll, 30000);
 </script>
 </body>
