@@ -108,4 +108,507 @@
     .chat-wrap { background: #0f0f13; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
     .chat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .chat-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #6c63ff; }
-    .chat-msgs { height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 6
+    .chat-msgs { height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; padding-right: 2px; }
+    .chat-msgs::-webkit-scrollbar { width: 2px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+    .msg { max-width: 82%; padding: 8px 12px; border-radius: 14px; font-size: 0.78rem; line-height: 1.45; word-break: break-word; }
+    .msg.me { background: #6c63ff; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.them { background: #1e1e28; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-time { font-size: 0.56rem; opacity: 0.5; margin-top: 3px; }
+    .chat-row { display: flex; gap: 7px; }
+    .chat-in { flex: 1; background: #16161d; border: 1px solid #2a2a3a; border-radius: 10px; padding: 9px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.82rem; outline: none; }
+    .chat-in:focus { border-color: #6c63ff; }
+    .chat-send { background: #6c63ff; border: none; border-radius: 10px; padding: 9px 13px; color: #fff; cursor: pointer; font-size: 0.9rem; }
+
+    /* HISTORY */
+    .history-item { background: #0f0f13; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+    .h-route { font-size: 0.8rem; color: #ccc; }
+    .h-meta { font-size: 0.65rem; color: #333; margin-top: 2px; }
+    .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+    .badge-requested { background: #1e293b; color: #94a3b8; }
+    .badge-accepted { background: #14532d; color: #22c55e; }
+    .badge-in_progress { background: #451a03; color: #f59e0b; }
+    .badge-completed { background: #1e1b4b; color: #818cf8; }
+    .badge-cancelled { background: #2d1515; color: #ef4444; }
+    .empty { text-align: center; color: #333; font-size: 0.8rem; padding: 18px; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; max-width: 88vw; text-align: center; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #ef4444; }
+    .toast.warn { background: #f59e0b; color: #000; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Spiti-Spiti<span>.</span></div>
+  <div class="nav-right">
+    <div class="conn-dot" id="dot"></div>
+    <div class="nav-user">Hi, <strong id="nav-name">Rider</strong></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="greeting" id="greeting">Hey there 👋</div>
+  <div class="greeting-sub">Where are you headed today?</div>
+
+  <!-- REQUEST -->
+  <div id="panel-request" class="panel visible">
+    <div class="card">
+      <div class="card-label">Request a Ride</div>
+      <div class="field"><label>Pickup Location</label><input type="text" id="pickup" placeholder="Where are you?" /></div>
+      <div class="field"><label>Dropoff Location</label><input type="text" id="dropoff" placeholder="Where to?" /></div>
+      <div class="field">
+        <label>Your Offered Fare (BWP)</label>
+        <input type="number" id="offered-fare" min="15" placeholder="e.g. 30" />
+        <div class="fare-hint">⚡ Minimum P15.00 · Drivers can accept or counter offer</div>
+      </div>
+      <button class="btn btn-primary" onclick="createRide()">Request Ride →</button>
+    </div>
+  </div>
+
+  <!-- WAITING -->
+  <div id="panel-waiting" class="panel">
+    <div class="card">
+      <div class="card-label">Looking for Drivers...</div>
+      <div class="route-display">
+        <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl">Pickup</div><div class="route-val" id="w-pickup">—</div></div></div>
+        <div class="route-row"><div class="route-dot to">🏁</div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="w-dropoff">—</div></div></div>
+      </div>
+      <div class="fare-display">
+        <div class="fare-num purple" id="w-fare">P0.00</div>
+        <div class="fare-lbl">Your offered fare</div>
+      </div>
+      <div id="offers-section" style="display:none">
+        <div class="offers-wrap">
+          <div class="offers-head">🚗 Driver Offers</div>
+          <div id="offers-list"></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="cancelRequest()">Cancel Request</button>
+    </div>
+  </div>
+
+  <!-- ACTIVE -->
+  <div id="panel-active" class="panel">
+    <div class="card">
+      <div class="card-label">Active Ride</div>
+
+      <!-- Progress -->
+      <div class="progress-bar">
+        <div class="prog-step">
+          <div class="prog-dot done" id="p1">✓</div>
+          <div class="prog-label done" id="pl1">Accepted</div>
+        </div>
+        <div class="prog-line" id="pline1"></div>
+        <div class="prog-step">
+          <div class="prog-dot" id="p2">2</div>
+          <div class="prog-label" id="pl2">Started</div>
+        </div>
+        <div class="prog-line" id="pline2"></div>
+        <div class="prog-step">
+          <div class="prog-dot" id="p3">3</div>
+          <div class="prog-label" id="pl3">Done</div>
+        </div>
+      </div>
+
+      <div class="route-display">
+        <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl">Pickup</div><div class="route-val" id="a-pickup">—</div></div></div>
+        <div class="route-row"><div class="route-dot to">🏁</div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="a-dropoff">—</div></div></div>
+      </div>
+
+      <div class="fare-display">
+        <div class="fare-num green" id="a-fare">P0.00</div>
+        <div class="fare-lbl">Agreed Fare</div>
+      </div>
+
+      <div class="driver-card">
+        <div class="driver-av" id="driver-av">D</div>
+        <div>
+          <div class="driver-name" id="driver-name">Your Driver</div>
+          <div class="driver-sub" id="driver-sub">On the way to you 🚗</div>
+        </div>
+      </div>
+
+      <!-- Custom Map -->
+      <div id="rider-map">
+        <div class="map-placeholder" id="map-placeholder">
+          <div class="map-pulse">📍</div>
+          <div style="font-size:0.72rem;color:#444">Waiting for driver location...</div>
+        </div>
+      </div>
+      <div class="map-status-row">
+        <div class="map-live-dot" id="map-live-dot"></div>
+        <span id="map-status-text">Driver location not yet available</span>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat-wrap">
+        <div class="chat-head">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="10" fill="#1e1e28"/>
+            <rect x="7" y="11" width="18" height="13" rx="3" fill="#6c63ff"/>
+            <circle cx="11.5" cy="17.5" r="1.5" fill="white"/>
+            <circle cx="20.5" cy="17.5" r="1.5" fill="white"/>
+            <rect x="13" y="21" width="6" height="1.5" rx="0.75" fill="white"/>
+            <rect x="14.5" y="6" width="3" height="5" rx="1.5" fill="#6c63ff"/>
+            <circle cx="16" cy="6" r="1.5" fill="#a855f7"/>
+            <rect x="4" y="14" width="3" height="5" rx="1.5" fill="#6c63ff"/>
+            <rect x="25" y="14" width="3" height="5" rx="1.5" fill="#6c63ff"/>
+          </svg>
+          <div class="chat-title">Chat with Driver</div>
+        </div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="empty" style="padding:8px;font-size:0.75rem">Say hi to your driver! 👋</div>
+        </div>
+        <div class="chat-row">
+          <input class="chat-in" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()" />
+          <button class="chat-send" onclick="sendMsg()">➤</button>
+        </div>
+      </div>
+
+      <button class="btn btn-danger" onclick="cancelRide()">Cancel Ride</button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card">
+    <div class="card-label">Recent Rides</div>
+    <div id="history"><div class="empty">No rides yet</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const BASE = "https://spiti-spiti-production.up.railway.app";
+
+  // Auth check
+  const riderData = JSON.parse(localStorage.getItem("spiti_rider") || "null");
+  if (!riderData) window.location.href = "login.html";
+  const RIDER_ID = riderData?.id || 1;
+  const RIDER_NAME = riderData?.name || "Rider";
+
+  document.getElementById("nav-name").textContent = RIDER_NAME;
+  document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]} 👋`;
+
+  function logout() {
+    localStorage.removeItem("spiti_rider");
+    window.location.href = "login.html";
+  }
+
+  let activeRide = null;
+  let offers = {};
+  let driverPos = null;
+  let mapW = 0, mapH = 0;
+
+  const socket = io(BASE, { transports: ["websocket", "polling"] });
+
+  socket.on("connect", () => {
+    document.getElementById("dot").classList.add("live");
+    socket.emit("join-role", { role: "rider", userId: RIDER_ID });
+    loadHistory();
+  });
+
+  socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
+
+  socket.on("ride-created", (ride) => {
+    activeRide = ride;
+    showPanel("waiting");
+    document.getElementById("w-pickup").textContent = ride.pickup;
+    document.getElementById("w-dropoff").textContent = ride.dropoff;
+    document.getElementById("w-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
+    showToast("Ride posted! Waiting for offers...", "warn");
+  });
+
+  socket.on("driver-offer", (offer) => {
+    offers[offer.driverId] = offer;
+    renderOffers();
+    showToast(`New offer: P${parseFloat(offer.fare_offer).toFixed(2)} 🚗`, "warn");
+  });
+
+  socket.on("ride-updated", (ride) => {
+    if (!activeRide || ride.id !== activeRide.id) return;
+    activeRide = ride;
+    updateProgress(ride.status);
+    if (ride.status === "accepted") {
+      showActiveRide(ride);
+      showToast("Driver is on the way! 🚗");
+    }
+    if (ride.status === "in_progress") {
+      document.getElementById("driver-sub").textContent = "Ride in progress 🚀";
+      showToast("Your ride has started! 🚀");
+    }
+    if (ride.status === "completed") {
+      showToast("Ride completed! P" + parseFloat(ride.fare || 0).toFixed(2) + " 🎉");
+      setTimeout(() => { resetAll(); loadHistory(); }, 4000);
+    }
+    if (ride.status === "cancelled") {
+      showToast("Ride cancelled", "error");
+      setTimeout(() => { resetAll(); loadHistory(); }, 2000);
+    }
+  });
+
+  socket.on("driver-location", ({ lat, lng }) => {
+    if (!activeRide) return;
+    updateDriverPin(lat, lng);
+  });
+
+  socket.on("new-message", (msg) => {
+    if (!activeRide) return;
+    appendMsg(msg);
+  });
+
+  function showPanel(name) {
+    ["request","waiting","active"].forEach(p =>
+      document.getElementById("panel-" + p).classList.toggle("visible", p === name)
+    );
+  }
+
+  function updateProgress(status) {
+    const steps = [
+      { dot: "p1", label: "pl1", line: null },
+      { dot: "p2", label: "pl2", line: "pline1" },
+      { dot: "p3", label: "pl3", line: "pline2" }
+    ];
+    const stateMap = { accepted: 1, in_progress: 2, completed: 3 };
+    const current = stateMap[status] || 0;
+    steps.forEach((s, i) => {
+      const dot = document.getElementById(s.dot);
+      const lbl = document.getElementById(s.label);
+      if (i < current) {
+        dot.className = "prog-dot done"; dot.textContent = "✓";
+        lbl.className = "prog-label done";
+        if (s.line) document.getElementById(s.line).className = "prog-line done";
+      } else if (i === current) {
+        dot.className = "prog-dot active"; dot.textContent = i + 1;
+        lbl.className = "prog-label active";
+      } else {
+        dot.className = "prog-dot"; dot.textContent = i + 1;
+        lbl.className = "prog-label";
+      }
+    });
+  }
+
+  function renderOffers() {
+    const list = Object.values(offers);
+    const section = document.getElementById("offers-section");
+    const el = document.getElementById("offers-list");
+    if (!list.length) { section.style.display = "none"; return; }
+    section.style.display = "block";
+    const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 15;
+    el.innerHTML = list.map(o => {
+      const match = parseFloat(o.fare_offer) <= myFare;
+      return `
+        <div class="offer-card">
+          <div>
+            <div class="offer-name">🚗 ${o.driver_name || "Driver"}</div>
+            <div class="offer-price">P${parseFloat(o.fare_offer).toFixed(2)}</div>
+            <div class="offer-tag">${match ? "✅ Matches your price" : "💬 Counter offer"}</div>
+          </div>
+          <div class="offer-actions">
+            <button class="obtn acc" onclick="acceptOffer(${o.driverId},${o.fare_offer})">Accept</button>
+            <button class="obtn dec" onclick="declineOffer(${o.driverId})">✕</button>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  async function acceptOffer(driverId, fare) {
+    if (!activeRide) return;
+    try {
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId, fare })
+      });
+      const ride = await res.json();
+      activeRide = ride;
+      offers = {};
+      showActiveRide(ride);
+      showToast("Offer accepted! Driver is coming 🚗");
+    } catch(e) { showToast("Failed", "error"); }
+  }
+
+  async function declineOffer(driverId) {
+    if (!activeRide) return;
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId })
+      });
+      delete offers[driverId];
+      renderOffers();
+      showToast("Offer declined");
+    } catch(e) {}
+  }
+
+  function showActiveRide(ride) {
+    showPanel("active");
+    document.getElementById("a-pickup").textContent = ride.pickup;
+    document.getElementById("a-dropoff").textContent = ride.dropoff;
+    document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+    document.getElementById("driver-av").textContent = (ride.driver_name || "D").charAt(0).toUpperCase();
+    document.getElementById("driver-name").textContent = ride.driver_name || "Driver #" + ride.driver_id;
+    updateProgress(ride.status);
+    socket.emit("join-ride", { rideId: ride.id });
+    loadMsgs(ride.id);
+    initCustomMap();
+  }
+
+  function initCustomMap() {
+    const map = document.getElementById("rider-map");
+    mapW = map.offsetWidth;
+    mapH = map.offsetHeight;
+    map.innerHTML = `
+      <svg width="100%" height="100%" viewBox="0 0 ${mapW} ${mapH}" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+        <rect width="${mapW}" height="${mapH}" fill="#0a0a0f"/>
+        <line x1="0" y1="${mapH*0.3}" x2="${mapW}" y2="${mapH*0.3}" stroke="#1a1a2a" stroke-width="18"/>
+        <line x1="0" y1="${mapH*0.6}" x2="${mapW}" y2="${mapH*0.6}" stroke="#1a1a2a" stroke-width="12"/>
+        <line x1="${mapW*0.3}" y1="0" x2="${mapW*0.3}" y2="${mapH}" stroke="#1a1a2a" stroke-width="14"/>
+        <line x1="${mapW*0.7}" y1="0" x2="${mapW*0.7}" y2="${mapH}" stroke="#1a1a2a" stroke-width="10"/>
+        <line x1="0" y1="${mapH*0.3}" x2="${mapW}" y2="${mapH*0.3}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
+        <line x1="0" y1="${mapH*0.6}" x2="${mapW}" y2="${mapH*0.6}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
+        <line x1="${mapW*0.3}" y1="0" x2="${mapW*0.3}" y2="${mapH}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
+        <line x1="${mapW*0.7}" y1="0" x2="${mapW*0.7}" y2="${mapH}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
+        <rect x="${mapW*0.1}" y="${mapH*0.1}" width="60" height="40" rx="4" fill="#13131f"/>
+        <rect x="${mapW*0.5}" y="${mapH*0.15}" width="80" height="50" rx="4" fill="#13131f"/>
+        <rect x="${mapW*0.75}" y="${mapH*0.4}" width="50" height="60" rx="4" fill="#13131f"/>
+        <rect x="${mapW*0.1}" y="${mapH*0.65}" width="70" height="45" rx="4" fill="#13131f"/>
+        <rect x="${mapW*0.45}" y="${mapH*0.7}" width="90" height="40" rx="4" fill="#13131f"/>
+        <text x="${mapW*0.12}" y="${mapH*0.27}" font-size="7" fill="#ffffff15" font-family="Inter">MAIN MALL RD</text>
+        <text x="${mapW*0.35}" y="${mapH*0.57}" font-size="7" fill="#ffffff15" font-family="Inter">CBD AVE</text>
+      </svg>
+      <div id="driver-pin" class="driver-pin" style="display:none;left:50%;top:50%">
+        <div class="driver-pin-ring"></div>
+        <div class="driver-pin-dot"></div>
+      </div>
+      <div style="position:absolute;bottom:8px;right:8px;font-size:0.55rem;color:#333;background:#0f0f13aa;padding:3px 7px;border-radius:6px">Spiti-Spiti Map</div>
+    `;
+  }
+
+  function updateDriverPin(lat, lng) {
+    const pin = document.getElementById("driver-pin");
+    if (!pin) return;
+    pin.style.display = "block";
+    document.getElementById("map-placeholder") && (document.getElementById("map-placeholder").style.display = "none");
+    document.getElementById("map-live-dot").classList.add("on");
+    document.getElementById("map-status-text").textContent = "Driver location updating live";
+    // Simulate position on custom map using lat/lng offset
+    const baseCenter = { lat: -24.6541, lng: 25.9087 };
+    const scale = 8000;
+    const x = Math.max(10, Math.min(mapW - 10, mapW/2 + (lng - baseCenter.lng) * scale));
+    const y = Math.max(10, Math.min(mapH - 10, mapH/2 - (lat - baseCenter.lat) * scale));
+    pin.style.left = x + "px";
+    pin.style.top = y + "px";
+  }
+
+  async function loadMsgs(rideId) {
+    try {
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const msgs = await res.json();
+      if (msgs.length) { document.getElementById("chat-msgs").innerHTML = ""; msgs.forEach(appendMsg); }
+    } catch(e) {}
+  }
+
+  function appendMsg(msg) {
+    const el = document.getElementById("chat-msgs");
+    if (el.querySelector(".empty")) el.innerHTML = "";
+    const mine = msg.sender_role === "rider";
+    const time = new Date(msg.created_at).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    el.innerHTML += `<div class="msg ${mine?"me":"them"}">${msg.message}<div class="msg-time">${time}</div></div>`;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  async function sendMsg() {
+    if (!activeRide) return;
+    const input = document.getElementById("chat-in");
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = "";
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender_role: "rider", message })
+      });
+    } catch(e) { showToast("Message failed", "error"); }
+  }
+
+  async function createRide() {
+    const pickup = document.getElementById("pickup").value.trim();
+    const dropoff = document.getElementById("dropoff").value.trim();
+    const offered_fare = parseFloat(document.getElementById("offered-fare").value) || 0;
+    if (!pickup || !dropoff) return showToast("Enter pickup and dropoff", "error");
+    if (offered_fare < 15) return showToast("Minimum fare is P15.00", "error");
+    try {
+      const res = await fetch(`${BASE}/rides`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pickup, dropoff, riderId: RIDER_ID, offered_fare })
+      });
+      const ride = await res.json();
+      activeRide = ride;
+      showPanel("waiting");
+      document.getElementById("w-pickup").textContent = ride.pickup;
+      document.getElementById("w-dropoff").textContent = ride.dropoff;
+      document.getElementById("w-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
+      showToast("Ride posted!");
+      loadHistory();
+    } catch(e) { showToast("Failed to create ride", "error"); }
+  }
+
+  async function cancelRequest() {
+    if (activeRide) {
+      try {
+        await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+          method: "PATCH", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "cancelled" })
+        });
+      } catch(e) {}
+    }
+    resetAll(); showToast("Cancelled"); loadHistory();
+  }
+
+  function cancelRide() { resetAll(); loadHistory(); }
+
+  function resetAll() {
+    activeRide = null; offers = {};
+    showPanel("request");
+    document.getElementById("offers-list").innerHTML = "";
+    document.getElementById("offers-section").style.display = "none";
+    document.getElementById("chat-msgs").innerHTML = '<div class="empty" style="padding:8px;font-size:0.75rem">Say hi to your driver! 👋</div>';
+    document.getElementById("rider-map").innerHTML = "";
+    document.getElementById("map-live-dot").classList.remove("on");
+    document.getElementById("map-status-text").textContent = "Driver location not yet available";
+    ["p1","p2","p3"].forEach((id,i) => {
+      document.getElementById(id).className = "prog-dot";
+      document.getElementById(id).textContent = i+1;
+      document.getElementById("pl"+(i+1)).className = "prog-label";
+    });
+    ["pline1","pline2"].forEach(id => document.getElementById(id).className = "prog-line");
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const el = document.getElementById("history");
+      const mine = rides.filter(r => r.rider_id == RIDER_ID);
+      el.innerHTML = mine.length ? mine.slice(0,5).map(r => `
+        <div class="history-item">
+          <div>
+            <div class="h-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="h-meta">Ride #${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : ""}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
+        </div>`).join("") : '<div class="empty">No rides yet</div>';
+    } catch(e) {}
+  }
+
+  function showToast(msg, type="") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " "+type : "");
+    setTimeout(() => t.className = "toast", 3500);
+  }
+</script>
+</body>
+</html>
