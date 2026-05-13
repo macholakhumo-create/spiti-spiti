@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
+<head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Admin</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    <script>
-  const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
-  if (!adminData) window.location.href = "login.html";
-</script>
     body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e8e8f0; min-height: 100vh; display: flex; }
     .sidebar { width: 220px; background: #111118; border-right: 1px solid #1e1e2e; display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
-    .sidebar-brand { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.04em; padding: 0 20px 24px; border-bottom: 1px solid #1e1e2e; }
+    .sidebar-brand { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.04em; padding: 0 20px 20px; border-bottom: 1px solid #1e1e2e; display: flex; justify-content: space-between; align-items: center; }
     .sidebar-brand span { color: #f59e0b; }
     .sidebar-nav { padding: 16px 0; flex: 1; }
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; font-size: 0.82rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
@@ -26,9 +22,11 @@
     .nav-item.active { color: #f59e0b; border-left-color: #f59e0b; background: #1a1a10; }
     .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
     .sidebar-footer { padding: 16px 20px; border-top: 1px solid #1e1e2e; }
-    .conn-badge { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: #555; }
+    .conn-badge { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: #555; margin-bottom: 10px; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; flex-shrink: 0; }
     .dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
+    .logout-btn { width: 100%; padding: 8px; background: none; border: 1px solid #2a2a3a; color: #555; font-family: 'Inter', sans-serif; font-size: 0.72rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
     .main { margin-left: 220px; flex: 1; padding: 32px; min-height: 100vh; }
     .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
     .page-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; }
@@ -105,6 +103,8 @@
     .toast.show  { opacity: 1; }
     .toast.error { background: #ef4444; }
     .toast.warn  { background: #f59e0b; color: #000; }
+    .pending-card { background: #16161d; border: 1px solid #f59e0b33; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+    .pending-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #f59e0b; }
     @media (max-width: 900px) {
       .sidebar { width: 60px; }
       .nav-item span { display: none; }
@@ -131,6 +131,7 @@
       <div class="dot" id="dot"></div>
       <span id="conn-label">Connecting...</span>
     </div>
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
   </div>
 </div>
 
@@ -192,8 +193,8 @@
     <div class="card">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>Pickup</th><th>Dropoff</th><th>Status</th><th>Driver</th><th>Fare</th><th>Actions</th></tr></thead>
-          <tbody id="all-rides-body"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>ID</th><th>Pickup</th><th>Dropoff</th><th>Status</th><th>Driver</th><th>Offered</th><th>Fare</th><th>Actions</th></tr></thead>
+          <tbody id="all-rides-body"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -223,30 +224,38 @@
       </div>
     </div>
   </div>
-<!-- PENDING DRIVERS -->
-<div class="card" id="pending-drivers-card" style="border-color:#f59e0b33;margin-bottom:16px">
-  <div class="card-header">
-    <div class="card-title" style="color:#f59e0b">⏳ Pending Approval</div>
-    <div class="card-count" id="pending-count">0</div>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Name</th><th>Phone</th><th>ID Number</th><th>License</th><th>Actions</th></tr></thead>
-      <tbody id="pending-body"><tr><td colspan="5" class="empty">No pending drivers</td></tr></tbody>
-    </table>
-  </div>
-</div>
+
   <!-- DRIVERS -->
   <div class="page" id="page-drivers">
     <div class="topbar">
       <div><div class="page-title">Drivers</div><div class="page-sub">Manage your driver fleet</div></div>
       <button class="btn btn-amber" onclick="openModal('add-driver-modal')">+ Add Driver</button>
     </div>
-    <div class="card">
+
+    <!-- PENDING APPROVAL -->
+    <div class="pending-card">
+      <div class="card-header">
+        <div class="pending-title">⏳ Pending Approval</div>
+        <div class="card-count" id="pending-count">0</div>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="drivers-body"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Name</th><th>Phone</th><th>ID Number</th><th>License</th><th>Submitted</th><th>Actions</th></tr></thead>
+          <tbody id="pending-body"><tr><td colspan="6" class="empty">No pending drivers</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPROVED DRIVERS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Approved Drivers</div>
+        <div class="card-count" id="drivers-count">0</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>License</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="drivers-body"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -289,8 +298,8 @@
       <div class="card-header"><div class="card-title">Revenue by Ride</div></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Ride ID</th><th>Route</th><th>Status</th><th>Fare (BWP)</th></tr></thead>
-          <tbody id="revenue-body"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Ride ID</th><th>Route</th><th>Status</th><th>Offered</th><th>Fare (BWP)</th></tr></thead>
+          <tbody id="revenue-body"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -301,7 +310,7 @@
 <!-- ADD DRIVER MODAL -->
 <div class="modal-overlay" id="add-driver-modal">
   <div class="modal">
-    <div class="modal-title">Add New Driver</div>
+    <div class="modal-title">Add Driver Manually</div>
     <div class="form-row">
       <div class="field"><label>Full Name</label><input id="new-driver-name" placeholder="John Doe" /></div>
       <div class="field"><label>Phone Number</label><input id="new-driver-phone" placeholder="71234567" /></div>
@@ -383,10 +392,19 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  // Auth check — must be first
+  const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
+  if (!adminData) window.location.href = "login.html";
+
   const BASE = "https://spiti-spiti-production.up.railway.app";
   let allRides = [], allDrivers = [], allVehicles = [], allDeliveries = [];
 
-  const socket = io("https://spiti-spiti-production.up.railway.app");
+  function logout() {
+    localStorage.removeItem("spiti_admin");
+    window.location.href = "login.html";
+  }
+
+  const socket = io(BASE);
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
     document.getElementById("conn-label").textContent = "Live";
@@ -409,7 +427,7 @@
     if (el) el.classList.add("active");
     if (name === "rides")      loadRides();
     if (name === "deliveries") loadDeliveries();
-    if (name === "drivers")    loadDrivers();
+    if (name === "drivers")    { loadDrivers(); loadPending(); }
     if (name === "fleet")      { loadDrivers(); loadFleet(); }
     if (name === "revenue")    loadRevenue();
   }
@@ -442,10 +460,9 @@
         <tr>
           <td style="color:#555">#${r.id}</td>
           <td>${r.pickup} → ${r.dropoff}</td>
-          <td><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></td>
+          <td><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></td>
           <td>${r.driver_id || "—"}</td>
-        </tr>
-      `).join("") : '<tr><td colspan="4" class="empty">No active rides</td></tr>';
+        </tr>`).join("") : '<tr><td colspan="4" class="empty">No active rides</td></tr>';
 
       const online = drivers.filter(d => d.available);
       document.getElementById("online-count").textContent = online.length + " online";
@@ -459,8 +476,7 @@
             </div>
           </div>
           <span class="badge ${d.available ? 'badge-online' : 'badge-offline'}">${d.available ? 'Online' : 'Offline'}</span>
-        </div>
-      `).join("") : '<div class="empty">No drivers</div>';
+        </div>`).join("") : '<div class="empty">No drivers</div>';
 
       document.getElementById("recent-deliveries-body").innerHTML = deliveries.length ? deliveries.slice(0,5).map(d => `
         <tr>
@@ -470,12 +486,13 @@
           <td>${d.pickup_address}</td>
           <td>${d.dropoff_address}</td>
           <td>${d.package_description || "—"}</td>
-          <td><span class="badge badge-${d.status}">${d.status.replace("_"," ")}</span></td>
+          <td><span class="badge badge-${d.status}">${d.status.replace(/_/g," ")}</span></td>
           <td>${d.driver_name || "—"}</td>
-        </tr>
-      `).join("") : '<tr><td colspan="6" class="empty">No deliveries</td></tr>';
+        </tr>`).join("") : '<tr><td colspan="6" class="empty">No deliveries</td></tr>';
     } catch(e) { showToast("Failed to load overview", "error"); }
   }
+
+  // ─── RIDES ────────────────────────────────────────────────
 
   async function loadRides() {
     try {
@@ -496,23 +513,23 @@
         <td style="color:#555">#${r.id}</td>
         <td>${r.pickup}</td>
         <td>${r.dropoff}</td>
-        <td><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></td>
+        <td><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></td>
         <td>${r.driver_id || "—"}</td>
-        <td>${r.fare ? "P" + parseFloat(r.fare).toFixed(2) : "—"}</td>
+        <td>${r.offered_fare ? "P"+parseFloat(r.offered_fare).toFixed(2) : "—"}</td>
+        <td>${r.fare ? "P"+parseFloat(r.fare).toFixed(2) : "—"}</td>
         <td>
           <button class="action-btn success" onclick="updateRideStatus(${r.id},'completed')">Complete</button>
           <button class="action-btn" onclick="openReassign(${r.id})">Reassign</button>
           <button class="action-btn danger" onclick="cancelRide(${r.id})">Cancel</button>
         </td>
-      </tr>
-    `).join("") : '<tr><td colspan="7" class="empty">No rides found</td></tr>';
+      </tr>`).join("") : '<tr><td colspan="8" class="empty">No rides found</td></tr>';
   }
 
   async function updateRideStatus(id, status) {
     try {
-      await fetch(`${BASE}/rides/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      await fetch(`${BASE}/rides/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) });
       showToast("Ride updated"); loadAll();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function cancelRide(id) {
@@ -530,12 +547,13 @@
     const rideId = document.getElementById("reassign-ride-id").value;
     const driverId = document.getElementById("reassign-driver-select").value;
     try {
-      await fetch(`${BASE}/rides/${rideId}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driver_id: driverId }) });
+      await fetch(`${BASE}/rides/${rideId}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId}) });
       showToast("Driver reassigned"); closeModal(); loadAll();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
-  // DELIVERIES
+  // ─── DELIVERIES ───────────────────────────────────────────
+
   async function loadDeliveries() {
     try {
       const res = await fetch(`${BASE}/deliveries`);
@@ -546,54 +564,34 @@
       document.getElementById("del-delivered").textContent = allDeliveries.filter(d => d.status === "delivered").length;
       document.getElementById("del-pending").textContent   = allDeliveries.filter(d => d.status === "pending").length;
     } catch(e) {}
-async function approveDriver(id) {
-  try {
-    await fetch(`${BASE}/auth/drivers/${id}/approve`, { method: "PATCH" });
-    showToast("Driver approved! ✅");
-    loadPending();
-    loadDrivers();
-  } catch(e) { showToast("Failed", "error"); }
-}
-
-async function rejectDriver(id) {
-  if (!confirm("Reject and delete this driver application?")) return;
-  try {
-    await fetch(`${BASE}/auth/drivers/${id}/reject`, { method: "DELETE" });
-    showToast("Driver rejected");
-    loadPending();
-  } catch(e) { showToast("Failed", "error"); }
-}
   }
 
   function renderDeliveries(deliveries) {
     document.getElementById("deliveries-body").innerHTML = deliveries.length ? deliveries.map(d => `
       <tr>
         <td style="color:#555">#${d.id}</td>
-        <td>${d.sender_name || "—"}<br><small style="color:#444">${d.sender_phone || ""}</small></td>
-        <td>${d.recipient_name || "—"}<br><small style="color:#444">${d.recipient_phone || ""}</small></td>
+        <td>${d.sender_name||"—"}<br><small style="color:#444">${d.sender_phone||""}</small></td>
+        <td>${d.recipient_name||"—"}<br><small style="color:#444">${d.recipient_phone||""}</small></td>
         <td>${d.pickup_address}</td>
         <td>${d.dropoff_address}</td>
-        <td>${d.package_description || "—"}<br><small style="color:#444">${d.weight ? d.weight + "kg" : ""}</small></td>
+        <td>${d.package_description||"—"}<br><small style="color:#444">${d.weight?d.weight+"kg":""}</small></td>
         <td>
-          <select class="inline-select" onchange="updateDeliveryStatus(${d.id}, this.value)">
-            <option value="pending"    ${d.status==='pending'    ? 'selected':''}>Pending</option>
-            <option value="picked_up"  ${d.status==='picked_up'  ? 'selected':''}>Picked Up</option>
-            <option value="in_transit" ${d.status==='in_transit' ? 'selected':''}>In Transit</option>
-            <option value="delivered"  ${d.status==='delivered'  ? 'selected':''}>Delivered</option>
-            <option value="cancelled"  ${d.status==='cancelled'  ? 'selected':''}>Cancelled</option>
+          <select class="inline-select" onchange="updateDeliveryStatus(${d.id},this.value)">
+            <option value="pending"    ${d.status==='pending'   ?'selected':''}>Pending</option>
+            <option value="picked_up"  ${d.status==='picked_up' ?'selected':''}>Picked Up</option>
+            <option value="in_transit" ${d.status==='in_transit'?'selected':''}>In Transit</option>
+            <option value="delivered"  ${d.status==='delivered' ?'selected':''}>Delivered</option>
+            <option value="cancelled"  ${d.status==='cancelled' ?'selected':''}>Cancelled</option>
           </select>
         </td>
         <td>
-          <select class="inline-select" onchange="assignDelivery(${d.id}, this.value)">
+          <select class="inline-select" onchange="assignDelivery(${d.id},this.value)">
             <option value="">Unassigned</option>
-            ${allDrivers.map(dr => `<option value="${dr.id}" ${d.driver_id==dr.id?'selected':''}>${dr.name}</option>`).join("")}
+            ${allDrivers.map(dr=>`<option value="${dr.id}" ${d.driver_id==dr.id?'selected':''}>${dr.name}</option>`).join("")}
           </select>
         </td>
-        <td>
-          <button class="action-btn danger" onclick="deleteDelivery(${d.id})">Delete</button>
-        </td>
-      </tr>
-    `).join("") : '<tr><td colspan="9" class="empty">No deliveries yet</td></tr>';
+        <td><button class="action-btn danger" onclick="deleteDelivery(${d.id})">Delete</button></td>
+      </tr>`).join("") : '<tr><td colspan="9" class="empty">No deliveries yet</td></tr>';
   }
 
   async function addDelivery() {
@@ -607,41 +605,43 @@ async function rejectDriver(id) {
       package_description: document.getElementById("d-description").value.trim(),
       weight: document.getElementById("d-weight").value
     };
-    if (!body.pickup_address || !body.dropoff_address) return showToast("Enter pickup and dropoff", "error");
+    if (!body.pickup_address || !body.dropoff_address) return showToast("Enter pickup and dropoff","error");
     try {
-      await fetch(`${BASE}/deliveries`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      await fetch(`${BASE}/deliveries`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
       showToast("Delivery created!"); closeModal(); loadDeliveries();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function updateDeliveryStatus(id, status) {
     try {
-      await fetch(`${BASE}/deliveries/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      await fetch(`${BASE}/deliveries/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) });
       showToast("Delivery updated"); loadDeliveries();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function assignDelivery(id, driverId) {
     try {
-      await fetch(`${BASE}/deliveries/${id}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driver_id: driverId || null }) });
+      await fetch(`${BASE}/deliveries/${id}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId||null}) });
       showToast("Driver assigned"); loadDeliveries();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function deleteDelivery(id) {
     if (!confirm("Delete delivery #" + id + "?")) return;
     try {
-      await fetch(`${BASE}/deliveries/${id}`, { method: "DELETE" });
+      await fetch(`${BASE}/deliveries/${id}`, { method:"DELETE" });
       showToast("Delivery deleted"); loadDeliveries();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
-  // DRIVERS
+  // ─── DRIVERS ──────────────────────────────────────────────
+
   async function loadDrivers() {
     try {
       const res = await fetch(`${BASE}/drivers`);
       allDrivers = await res.json();
       renderDrivers(allDrivers);
+      document.getElementById("drivers-count").textContent = allDrivers.length;
     } catch(e) {}
   }
 
@@ -650,94 +650,113 @@ async function rejectDriver(id) {
       <tr>
         <td style="color:#555">#${d.id}</td>
         <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">${d.name.charAt(0).toUpperCase()}</div>${d.name}</div></td>
-        <td>${d.phone || "—"}</td>
-        <td><span class="badge ${d.available ? 'badge-online' : 'badge-offline'}">${d.available ? 'Online' : 'Offline'}</span></td>
+        <td>${d.phone||"—"}</td>
+        <td style="color:#f59e0b;font-size:0.78rem">${d.license_number||"—"}</td>
+        <td><span class="badge ${d.available?'badge-online':'badge-offline'}">${d.available?'Online':'Offline'}</span></td>
         <td>
-          <button class="action-btn ${d.available ? 'danger' : 'success'}" onclick="toggleDriver(${d.id}, ${!d.available})">${d.available ? 'Set Offline' : 'Set Online'}</button>
+          <button class="action-btn ${d.available?'danger':'success'}" onclick="toggleDriver(${d.id},${!d.available})">${d.available?'Set Offline':'Set Online'}</button>
           <button class="action-btn danger" onclick="deleteDriver(${d.id})">Remove</button>
         </td>
-      </tr>
-    `).join("") : '<tr><td colspan="5" class="empty">No drivers yet</td></tr>';
+      </tr>`).join("") : '<tr><td colspan="6" class="empty">No approved drivers yet</td></tr>';
+  }
+
+  async function loadPending() {
+    try {
+      const res = await fetch(`${BASE}/auth/drivers/pending`);
+      const drivers = await res.json();
+      document.getElementById("pending-count").textContent = drivers.length;
+      document.getElementById("pending-body").innerHTML = drivers.length ? drivers.map(d => `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${d.name.charAt(0).toUpperCase()}</div>${d.name}</div></td>
+          <td>${d.phone}</td>
+          <td style="color:#888;font-size:0.78rem">${d.id_number||"—"}</td>
+          <td style="color:#f59e0b;font-weight:600">${d.license_number}</td>
+          <td style="color:#444;font-size:0.72rem">${new Date(d.created_at).toLocaleDateString()}</td>
+          <td>
+            <button class="action-btn success" onclick="approveDriver(${d.id})">✓ Approve</button>
+            <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
+          </td>
+        </tr>`).join("") : '<tr><td colspan="6" class="empty">No pending drivers</td></tr>';
+    } catch(e) {}
+  }
+
+  async function approveDriver(id) {
+    try {
+      await fetch(`${BASE}/auth/drivers/${id}/approve`, { method:"PATCH" });
+      showToast("Driver approved! ✅");
+      loadPending();
+      loadDrivers();
+    } catch(e) { showToast("Failed","error"); }
+  }
+
+  async function rejectDriver(id) {
+    if (!confirm("Reject and delete this driver application?")) return;
+    try {
+      await fetch(`${BASE}/auth/drivers/${id}/reject`, { method:"DELETE" });
+      showToast("Driver rejected");
+      loadPending();
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function addDriver() {
     const name  = document.getElementById("new-driver-name").value.trim();
     const phone = document.getElementById("new-driver-phone").value.trim();
-    if (!name) return showToast("Enter driver name", "error");
+    if (!name) return showToast("Enter driver name","error");
     try {
-      await fetch(`${BASE}/drivers`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, phone }) });
+      await fetch(`${BASE}/drivers`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,phone}) });
       showToast("Driver added!"); closeModal();
       document.getElementById("new-driver-name").value = "";
       document.getElementById("new-driver-phone").value = "";
       loadAll();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function toggleDriver(id, available) {
     try {
-      await fetch(`${BASE}/drivers/${id}/availability`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ available }) });
+      await fetch(`${BASE}/drivers/${id}/availability`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({available}) });
       showToast("Driver updated"); loadAll();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function deleteDriver(id) {
     if (!confirm("Remove driver #" + id + "?")) return;
     try {
-      await fetch(`${BASE}/drivers/${id}`, { method: "DELETE" });
+      await fetch(`${BASE}/drivers/${id}`, { method:"DELETE" });
       showToast("Driver removed"); loadAll();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
- async function loadPending() {
-  try {
-    const res = await fetch(`${BASE}/auth/drivers/pending`);
-    const drivers = await res.json();
-    document.getElementById("pending-count").textContent = drivers.length;
-    document.getElementById("pending-body").innerHTML = drivers.length ? drivers.map(d => `
-      <tr>
-        <td>${d.name}</td>
-        <td>${d.phone}</td>
-        <td>${d.id_number || "—"}</td>
-        <td style="color:#f59e0b;font-weight:600">${d.license_number}</td>
-        <td>
-          <button class="action-btn success" onclick="approveDriver(${d.id})">✓ Approve</button>
-          <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
-        </td>
-      </tr>
-    `).join("") : '<tr><td colspan="5" class="empty">No pending drivers</td></tr>';
-  } catch(e) {}
-}
 
-  // FLEET
+  // ─── FLEET ────────────────────────────────────────────────
+
   async function loadFleet() {
     try {
       const res = await fetch(`${BASE}/vehicles`);
       allVehicles = await res.json();
       document.getElementById("fleet-total").textContent       = allVehicles.length;
-      document.getElementById("fleet-available").textContent   = allVehicles.filter(v => v.status === "available").length;
-      document.getElementById("fleet-maintenance").textContent = allVehicles.filter(v => v.status === "maintenance").length;
+      document.getElementById("fleet-available").textContent   = allVehicles.filter(v => v.status==="available").length;
+      document.getElementById("fleet-maintenance").textContent = allVehicles.filter(v => v.status==="maintenance").length;
       document.getElementById("fleet-body").innerHTML = allVehicles.length ? allVehicles.map(v => `
         <tr>
           <td style="color:#555">#${v.id}</td>
           <td style="font-weight:600;color:#f59e0b">${v.plate}</td>
-          <td>${v.make || "—"} ${v.model || ""}</td>
-          <td>${v.type || "—"}</td>
+          <td>${v.make||"—"} ${v.model||""}</td>
+          <td>${v.type||"—"}</td>
           <td>
-            <select class="inline-select" onchange="updateVehicleStatus(${v.id}, this.value)">
-              <option value="available"   ${v.status==='available'   ?'selected':''}>Available</option>
-              <option value="on_trip"     ${v.status==='on_trip'     ?'selected':''}>On Trip</option>
-              <option value="maintenance" ${v.status==='maintenance' ?'selected':''}>Maintenance</option>
+            <select class="inline-select" onchange="updateVehicleStatus(${v.id},this.value)">
+              <option value="available"   ${v.status==='available'  ?'selected':''}>Available</option>
+              <option value="on_trip"     ${v.status==='on_trip'    ?'selected':''}>On Trip</option>
+              <option value="maintenance" ${v.status==='maintenance'?'selected':''}>Maintenance</option>
             </select>
           </td>
           <td>
-            <select class="inline-select" onchange="assignVehicle(${v.id}, this.value)">
+            <select class="inline-select" onchange="assignVehicle(${v.id},this.value)">
               <option value="">Unassigned</option>
-              ${allDrivers.map(d => `<option value="${d.id}" ${v.driver_id==d.id?'selected':''}>${d.name}</option>`).join("")}
+              ${allDrivers.map(d=>`<option value="${d.id}" ${v.driver_id==d.id?'selected':''}>${d.name}</option>`).join("")}
             </select>
           </td>
           <td><button class="action-btn danger" onclick="deleteVehicle(${v.id})">Remove</button></td>
-        </tr>
-      `).join("") : '<tr><td colspan="7" class="empty">No vehicles yet</td></tr>';
-    } catch(e) { showToast("Failed to load fleet", "error"); }
+        </tr>`).join("") : '<tr><td colspan="7" class="empty">No vehicles yet</td></tr>';
+    } catch(e) { showToast("Failed to load fleet","error"); }
   }
 
   async function addVehicle() {
@@ -745,49 +764,50 @@ async function rejectDriver(id) {
     const make  = document.getElementById("v-make").value.trim();
     const model = document.getElementById("v-model").value.trim();
     const type  = document.getElementById("v-type").value;
-    if (!plate) return showToast("Enter plate number", "error");
+    if (!plate) return showToast("Enter plate number","error");
     try {
-      await fetch(`${BASE}/vehicles`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plate, make, model, type }) });
+      await fetch(`${BASE}/vehicles`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({plate,make,model,type}) });
       showToast("Vehicle added!"); closeModal();
       document.getElementById("v-plate").value = "";
       document.getElementById("v-make").value  = "";
       document.getElementById("v-model").value = "";
       loadFleet();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function updateVehicleStatus(id, status) {
     try {
-      await fetch(`${BASE}/vehicles/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      await fetch(`${BASE}/vehicles/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) });
       showToast("Vehicle updated"); loadFleet();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function assignVehicle(id, driverId) {
     try {
-      await fetch(`${BASE}/vehicles/${id}/assign`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driver_id: driverId || null }) });
+      await fetch(`${BASE}/vehicles/${id}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId||null}) });
       showToast("Vehicle assigned"); loadFleet();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
   async function deleteVehicle(id) {
     if (!confirm("Remove vehicle #" + id + "?")) return;
     try {
-      await fetch(`${BASE}/vehicles/${id}`, { method: "DELETE" });
+      await fetch(`${BASE}/vehicles/${id}`, { method:"DELETE" });
       showToast("Vehicle removed"); loadFleet();
-    } catch(e) { showToast("Failed", "error"); }
+    } catch(e) { showToast("Failed","error"); }
   }
 
-  // REVENUE
+  // ─── REVENUE ──────────────────────────────────────────────
+
   async function loadRevenue() {
     try {
       const res = await fetch(`${BASE}/rides`);
       const rides = await res.json();
       const completed = rides.filter(r => r.status === "completed");
-      const total = completed.reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
+      const total = completed.reduce((sum,r) => sum + parseFloat(r.fare||0), 0);
       const avg   = completed.length ? total / completed.length : 0;
       const today = completed.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString())
-                             .reduce((sum, r) => sum + parseFloat(r.fare || 0), 0);
+                             .reduce((sum,r) => sum + parseFloat(r.fare||0), 0);
       document.getElementById("rev-total").textContent     = "P" + total.toFixed(2);
       document.getElementById("rev-today").textContent     = "P" + today.toFixed(2);
       document.getElementById("rev-avg").textContent       = "P" + avg.toFixed(2);
@@ -796,26 +816,25 @@ async function rejectDriver(id) {
         <tr>
           <td style="color:#555">#${r.id}</td>
           <td>${r.pickup} → ${r.dropoff}</td>
-          <td><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></td>
-          <td>${r.fare ? "P" + parseFloat(r.fare).toFixed(2) : "—"}</td>
-        </tr>
-      `).join("") : '<tr><td colspan="4" class="empty">No rides yet</td></tr>';
-    } catch(e) { showToast("Failed to load revenue", "error"); }
+          <td><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></td>
+          <td>${r.offered_fare ? "P"+parseFloat(r.offered_fare).toFixed(2) : "—"}</td>
+          <td>${r.fare ? "P"+parseFloat(r.fare).toFixed(2) : "—"}</td>
+        </tr>`).join("") : '<tr><td colspan="5" class="empty">No rides yet</td></tr>';
+    } catch(e) { showToast("Failed to load revenue","error"); }
   }
+
+  // ─── UTILS ────────────────────────────────────────────────
 
   function openModal(id)  { document.getElementById(id).classList.add("open"); }
   function closeModal()   { document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open")); }
 
-  function showToast(msg, type = "") {
+  function showToast(msg, type="") {
     const t = document.getElementById("toast");
     t.textContent = msg;
-    t.className = "toast show" + (type ? " " + type : "");
+    t.className = "toast show" + (type ? " "+type : "");
     setTimeout(() => t.className = "toast", 3000);
   }
-function logout() {
-  localStorage.removeItem("spiti_admin");
-  window.location.href = "login.html";
-}
+
   setInterval(loadAll, 30000);
 </script>
 </body>
