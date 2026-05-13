@@ -1,3 +1,5 @@
+const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
+if (!adminData) window.location.href = "login.html";
 <!DOCTYPE html>
 <html lang="en">
   <head>
