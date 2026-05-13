@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-<<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
@@ -546,26 +546,6 @@
       document.getElementById("del-delivered").textContent = allDeliveries.filter(d => d.status === "delivered").length;
       document.getElementById("del-pending").textContent   = allDeliveries.filter(d => d.status === "pending").length;
     } catch(e) {}
-    async function loadPending() {
-  try {
-    const res = await fetch(`${BASE}/auth/drivers/pending`);
-    const drivers = await res.json();
-    document.getElementById("pending-count").textContent = drivers.length;
-    document.getElementById("pending-body").innerHTML = drivers.length ? drivers.map(d => `
-      <tr>
-        <td>${d.name}</td>
-        <td>${d.phone}</td>
-        <td>${d.id_number || "—"}</td>
-        <td style="color:#f59e0b;font-weight:600">${d.license_number}</td>
-        <td>
-          <button class="action-btn success" onclick="approveDriver(${d.id})">✓ Approve</button>
-          <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
-        </td>
-      </tr>
-    `).join("") : '<tr><td colspan="5" class="empty">No pending drivers</td></tr>';
-  } catch(e) {}
-}
-
 async function approveDriver(id) {
   try {
     await fetch(`${BASE}/auth/drivers/${id}/approve`, { method: "PATCH" });
@@ -707,6 +687,25 @@ async function rejectDriver(id) {
       showToast("Driver removed"); loadAll();
     } catch(e) { showToast("Failed", "error"); }
   }
+ async function loadPending() {
+  try {
+    const res = await fetch(`${BASE}/auth/drivers/pending`);
+    const drivers = await res.json();
+    document.getElementById("pending-count").textContent = drivers.length;
+    document.getElementById("pending-body").innerHTML = drivers.length ? drivers.map(d => `
+      <tr>
+        <td>${d.name}</td>
+        <td>${d.phone}</td>
+        <td>${d.id_number || "—"}</td>
+        <td style="color:#f59e0b;font-weight:600">${d.license_number}</td>
+        <td>
+          <button class="action-btn success" onclick="approveDriver(${d.id})">✓ Approve</button>
+          <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
+        </td>
+      </tr>
+    `).join("") : '<tr><td colspan="5" class="empty">No pending drivers</td></tr>';
+  } catch(e) {}
+}
 
   // FLEET
   async function loadFleet() {
