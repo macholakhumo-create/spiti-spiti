@@ -542,6 +542,43 @@
       document.getElementById("del-delivered").textContent = allDeliveries.filter(d => d.status === "delivered").length;
       document.getElementById("del-pending").textContent   = allDeliveries.filter(d => d.status === "pending").length;
     } catch(e) {}
+    async function loadPending() {
+  try {
+    const res = await fetch(`${BASE}/auth/drivers/pending`);
+    const drivers = await res.json();
+    document.getElementById("pending-count").textContent = drivers.length;
+    document.getElementById("pending-body").innerHTML = drivers.length ? drivers.map(d => `
+      <tr>
+        <td>${d.name}</td>
+        <td>${d.phone}</td>
+        <td>${d.id_number || "—"}</td>
+        <td style="color:#f59e0b;font-weight:600">${d.license_number}</td>
+        <td>
+          <button class="action-btn success" onclick="approveDriver(${d.id})">✓ Approve</button>
+          <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
+        </td>
+      </tr>
+    `).join("") : '<tr><td colspan="5" class="empty">No pending drivers</td></tr>';
+  } catch(e) {}
+}
+
+async function approveDriver(id) {
+  try {
+    await fetch(`${BASE}/auth/drivers/${id}/approve`, { method: "PATCH" });
+    showToast("Driver approved! ✅");
+    loadPending();
+    loadDrivers();
+  } catch(e) { showToast("Failed", "error"); }
+}
+
+async function rejectDriver(id) {
+  if (!confirm("Reject and delete this driver application?")) return;
+  try {
+    await fetch(`${BASE}/auth/drivers/${id}/reject`, { method: "DELETE" });
+    showToast("Driver rejected");
+    loadPending();
+  } catch(e) { showToast("Failed", "error"); }
+}
   }
 
   function renderDeliveries(deliveries) {
