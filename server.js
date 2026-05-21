@@ -478,7 +478,66 @@ app.delete("/deliveries/:id", async (req, res) => {
 });
 
 // ─── START SERVER ─────────────────────────────────────────────
+// RATE driver (by rider)
+app.post("/rides/:id/rate-driver", async (req, res) => {
+  const { rating, comment } = req.body;
+  if (rating < 1 || rating > 5) return res.status(400).json({ error: "Rating must be 1-5" });
+  try {
+    const result = await pool.query(
+      "UPDATE rides SET rider_rating=$1, rider_rating_comment=$2 WHERE id=$3 RETURNING *",
+      [rating, comment || "", req.params.id]
+    );
+    const ride = result.rows[0];
+    if (ride.driver_id) {
+      await pool.query(`
+        UPDATE drivers SET 
+          total_ratings = total_ratings + 1,
+          avg_rating = ((avg_rating * total_ratings) + $1) / (total_ratings + 1)
+        WHERE id = $2
+      `, [rating, ride.driver_id]);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
+// RATE rider (by driver)
+app.post("/rides/:id/rate-rider", async (req, res) => {
+  const { rating, comment } = req.body;
+  if (rating < 1 || rating > 5) return res.status(400).json({ error: "Rating must be 1-5" });
+  try {
+    const result = await pool.query(
+      "UPDATE rides SET driver_rating=$1, driver_rating_comment=$2 WHERE id=$3 RETURNING *",
+      [rating, comment || "", req.params.id]
+    );
+    const ride = result.rows[0];
+    if (ride.rider_id) {
+      await pool.query(`
+        UPDATE riders SET
+          total_ratings = total_ratings + 1,
+          avg_rating = ((avg_rating * total_ratings) + $1) / (total_ratings + 1)
+        WHERE id = $2
+      `, [rating, ride.rider_id]);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET driver rating
+app.get("/drivers/:id/rating", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT avg_rating, total_ratings FROM drivers WHERE id=$1",
+      [req.params.id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 server.listen(process.env.PORT || 5000, () => {
   console.log("Server running on port", process.env.PORT || 5000);
 });
