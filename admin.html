@@ -419,8 +419,7 @@
   socket.on("ride-updated",     () => { loadAll(); });
   socket.on("new-delivery",     () => { loadAll(); showToast("New delivery request!", "warn"); });
   socket.on("delivery-updated", () => { loadAll(); });
-  socket.on("driver-registered", () => { loadPending(); showToast("New driver application!", "warn"); });
-  
+
   function showPage(name, el) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
@@ -434,7 +433,7 @@
   }
 
   async function loadAll() {
-    await Promise.all([loadOverview(), loadRides(), loadDrivers(), loadPending() loadDeliveries()]);
+    await Promise.all([loadOverview(), loadRides(), loadDrivers(), loadDeliveries()]);
     document.getElementById("last-updated").textContent = "Last updated: " + new Date().toLocaleTimeString();
   }
 
@@ -678,7 +677,7 @@
             <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
           </td>
         </tr>`).join("") : '<tr><td colspan="6" class="empty">No pending drivers</td></tr>';
-    } catch(e) { showToast("Failed to load pending drivers", "error"); console.error(e); }
+    } catch(e) {}
   }
 
   async function approveDriver(id) {
