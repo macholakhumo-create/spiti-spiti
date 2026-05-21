@@ -77,9 +77,8 @@ app.post("/auth/rider/login", async (req, res) => {
     const result = await pool.query("SELECT * FROM riders WHERE phone=$1", [phone]);
     if (!result.rows.length) return res.status(401).json({ error: "Phone not registered" });
     const rider = result.rows[0];
-    if (!driver.password_hash) return res.status(401).json({ error: "Account has no password set. Please register again." });
-if (!rider.password_hash) return res.status(401).json({ error: "Account has no password set. Please register again." });
-const match = await bcrypt.compare(password, rider.password_hash);
+    if (!rider.password_hash) return res.status(401).json({ error: "Account has no password set. Please register again." });
+    const match = await bcrypt.compare(password, rider.password_hash);
     if (!match) return res.status(401).json({ error: "Incorrect password" });
     res.json({ success: true, rider: { id: rider.id, name: rider.name, phone: rider.phone } });
   } catch (err) {
