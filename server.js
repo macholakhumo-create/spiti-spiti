@@ -124,7 +124,7 @@ app.post("/auth/driver/login", async (req, res) => {
 // GET pending drivers (for admin)
 app.get("/auth/drivers/pending", async (req, res) => {
   try {
-    const result = await pool.query("SELECT id, name, phone, id_number, license_number, created_at FROM drivers WHERE approved=false ORDER BY id DESC");
+    const result = await pool.query("SELECT id, name, phone, id_number, license_number FROM drivers WHERE approved=false ORDER BY id DESC");
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
