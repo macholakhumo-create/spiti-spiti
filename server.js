@@ -147,7 +147,7 @@ app.patch("/auth/drivers/:id/approve", async (req, res) => {
 // REJECT driver
 app.delete("/auth/drivers/:id/reject", async (req, res) => {
   try {
-    await pool.query("DELETE FROM drivers WHERE id=$1 AND approved=false", [req.params.id]);
+    await pool.query("DELETE FROM drivers WHERE id=$1", [req.params.id]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
