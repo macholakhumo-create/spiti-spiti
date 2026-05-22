@@ -626,7 +626,6 @@
           <div>
             <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
             <div class="ride-meta">#${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : r.offered_fare ? " · Offered P"+parseFloat(r.offered_fare).toFixed(2) : ""}</div>
-            ${r.driver_rating ? `<div class="ride-rating">${"⭐".repeat(r.driver_rating)} Rider rated you</div>` : ""}
           </div>
           <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
         </div>`).join("") : '<div class="empty">No rides yet</div>';
