@@ -1,0 +1,56 @@
+<!-- splash.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f0f13;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .logo { width: 120px; height: 120px; }
+    .brand {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #e8e8f0;
+      margin-top: 18px;
+      letter-spacing: -0.03em;
+    }
+    .brand span { color: #22c55e; }
+    .tagline {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      color: #444;
+      margin-top: 6px;
+    }
+    .fade { animation: fadeIn 0.8s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+  </style>
+</head>
+<body>
+  <div class="fade">
+    <!-- Paste your SVG icon inline here -->
+    <svg class="logo" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+      <!-- ...your icon SVG code... -->
+    </svg>
+    <div class="brand">Spiti-Spiti<span>.</span></div>
+    <div class="tagline">Your ride, your way</div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      const driver = localStorage.getItem('spiti_driver');
+      const rider  = localStorage.getItem('spiti_rider');
+      if (driver) window.location.href = 'driver.html';
+      else if (rider) window.location.href = 'rider.html';
+      else window.location.href = 'login.html';
+    }, 2200);
+  </script>
+</body>
+</html>
