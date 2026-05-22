@@ -26,7 +26,6 @@
     .container { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
     .greeting { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
     .greeting-sub { font-size: 0.8rem; color: #555; margin-bottom: 20px; }
-
     .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
     .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #6c63ff; margin-bottom: 12px; }
     .field { margin-bottom: 11px; }
@@ -78,6 +77,7 @@
     .offer-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; }
     .offer-price { font-size: 1.2rem; font-weight: 700; color: #a855f7; }
     .offer-tag { font-size: 0.6rem; color: #555; margin-top: 2px; }
+    .offer-rating { font-size: 0.65rem; color: #f59e0b; margin-top: 2px; }
     .offer-actions { display: flex; gap: 6px; }
     .obtn { padding: 7px 12px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.73rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
     .obtn.acc { background: #22c55e; color: #fff; }
@@ -89,20 +89,18 @@
     .driver-av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#22c55e); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0; }
     .driver-name { font-size: 0.85rem; font-weight: 600; }
     .driver-sub { font-size: 0.68rem; color: #555; margin-top: 2px; }
+    .driver-stars { font-size: 0.72rem; color: #f59e0b; margin-top: 3px; }
 
     /* MAP */
     #rider-map { width: 100%; height: 200px; border-radius: 12px; margin-bottom: 10px; background: #0f0f13; border: 1px solid #2a2a3a; position: relative; overflow: hidden; }
-    .map-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-    .map-pulse { width: 48px; height: 48px; border-radius: 50%; background: #6c63ff22; border: 2px solid #6c63ff44; display: flex; align-items: center; justify-content: center; animation: mapPulse 2s infinite; }
-    @keyframes mapPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.7} }
     .map-status-row { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: #444; margin-bottom: 10px; }
     .map-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
     .map-live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .driver-pin { position: absolute; transition: all 0.5s ease; transform: translate(-50%, -50%); }
-    .driver-pin-dot { width: 18px; height: 18px; border-radius: 50%; background: #6c63ff; border: 3px solid #fff; box-shadow: 0 0 12px #6c63ff88; }
-    .driver-pin-ring { position: absolute; top: -6px; left: -6px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #6c63ff44; animation: ringPulse 2s infinite; }
+    .driver-pin-ring { position: absolute; top: -8px; left: -8px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #6c63ff44; animation: ringPulse 2s infinite; }
     @keyframes ringPulse { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
+    .driver-pin-dot { width: 14px; height: 14px; border-radius: 50%; background: #6c63ff; border: 3px solid #fff; box-shadow: 0 0 10px #6c63ff88; }
 
     /* CHAT */
     .chat-wrap { background: #0f0f13; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
@@ -120,10 +118,34 @@
     .chat-in:focus { border-color: #6c63ff; }
     .chat-send { background: #6c63ff; border: none; border-radius: 10px; padding: 9px 13px; color: #fff; cursor: pointer; font-size: 0.9rem; }
 
+    /* RATING MODAL */
+    .rating-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .rating-overlay.open { display: flex; }
+    .rating-modal { background: #16161d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
+    @keyframes popIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+    .rating-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#6c63ff,#22c55e); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0 auto 14px; }
+    .rating-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .rating-sub { font-size: 0.78rem; color: #555; margin-bottom: 20px; }
+    .stars-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .star { font-size: 2.2rem; cursor: pointer; transition: all 0.15s; filter: grayscale(1) opacity(0.4); }
+    .star.active { filter: none; transform: scale(1.15); }
+    .star:hover { filter: none; transform: scale(1.1); }
+    .rating-comment { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.82rem; outline: none; resize: none; margin-bottom: 16px; }
+    .rating-comment:focus { border-color: #6c63ff; }
+    .rating-btn-row { display: flex; gap: 10px; }
+    .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .rating-btn.submit { background: #6c63ff; color: #fff; }
+    .rating-btn.skip { background: #1e1e28; color: #666; border: 1px solid #2a2a3a; }
+    .rating-btn:hover { opacity: 0.88; }
+    .fare-completed { background: linear-gradient(135deg, #0d0d1a, #0a1f0a); border: 1px solid #22c55e33; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
+    .fare-completed-amount { font-size: 2.2rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
+    .fare-completed-label { font-size: 0.7rem; color: #86efac; margin-top: 3px; }
+
     /* HISTORY */
     .history-item { background: #0f0f13; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
     .h-route { font-size: 0.8rem; color: #ccc; }
     .h-meta { font-size: 0.65rem; color: #333; margin-top: 2px; }
+    .h-rating { font-size: 0.65rem; color: #f59e0b; margin-top: 2px; }
     .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
     .badge-requested { background: #1e293b; color: #94a3b8; }
     .badge-accepted { background: #14532d; color: #22c55e; }
@@ -193,8 +215,6 @@
   <div id="panel-active" class="panel">
     <div class="card">
       <div class="card-label">Active Ride</div>
-
-      <!-- Progress -->
       <div class="progress-bar">
         <div class="prog-step">
           <div class="prog-dot done" id="p1">✓</div>
@@ -211,38 +231,50 @@
           <div class="prog-label" id="pl3">Done</div>
         </div>
       </div>
-
       <div class="route-display">
         <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl">Pickup</div><div class="route-val" id="a-pickup">—</div></div></div>
         <div class="route-row"><div class="route-dot to">🏁</div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="a-dropoff">—</div></div></div>
       </div>
-
       <div class="fare-display">
         <div class="fare-num green" id="a-fare">P0.00</div>
         <div class="fare-lbl">Agreed Fare</div>
       </div>
-
       <div class="driver-card">
         <div class="driver-av" id="driver-av">D</div>
         <div>
           <div class="driver-name" id="driver-name">Your Driver</div>
           <div class="driver-sub" id="driver-sub">On the way to you 🚗</div>
+          <div class="driver-stars" id="driver-stars"></div>
         </div>
       </div>
-
-      <!-- Custom Map -->
       <div id="rider-map">
-        <div class="map-placeholder" id="map-placeholder">
-          <div class="map-pulse">📍</div>
-          <div style="font-size:0.72rem;color:#444">Waiting for driver location...</div>
+        <svg width="100%" height="100%" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+          <rect width="400" height="200" fill="#0a0a0f"/>
+          <line x1="0" y1="60" x2="400" y2="60" stroke="#1a1a2a" stroke-width="18"/>
+          <line x1="0" y1="120" x2="400" y2="120" stroke="#1a1a2a" stroke-width="12"/>
+          <line x1="100" y1="0" x2="100" y2="200" stroke="#1a1a2a" stroke-width="14"/>
+          <line x1="280" y1="0" x2="280" y2="200" stroke="#1a1a2a" stroke-width="10"/>
+          <line x1="0" y1="60" x2="400" y2="60" stroke="#6c63ff08" stroke-width="1" stroke-dasharray="4,8"/>
+          <line x1="100" y1="0" x2="100" y2="200" stroke="#6c63ff08" stroke-width="1" stroke-dasharray="4,8"/>
+          <rect x="20" y="15" width="55" height="35" rx="4" fill="#13131f"/>
+          <rect x="130" y="10" width="80" height="42" rx="4" fill="#13131f"/>
+          <rect x="300" y="70" width="60" height="38" rx="4" fill="#13131f"/>
+          <rect x="20" y="135" width="65" height="40" rx="4" fill="#13131f"/>
+          <rect x="160" y="140" width="75" height="35" rx="4" fill="#13131f"/>
+          <text x="22" y="52" font-size="6" fill="#6c63ff15" font-family="Inter">MAIN MALL RD</text>
+          <text x="110" y="115" font-size="6" fill="#6c63ff15" font-family="Inter">CBD AVE</text>
+          <text x="285" y="52" font-size="6" fill="#6c63ff15" font-family="Inter">AIRPORT RD</text>
+          <text x="290" y="192" font-size="7" fill="#333" font-family="Inter">Spiti-Spiti Map</text>
+        </svg>
+        <div id="driver-pin" class="driver-pin" style="display:none;left:50%;top:50%">
+          <div class="driver-pin-ring"></div>
+          <div class="driver-pin-dot"></div>
         </div>
       </div>
       <div class="map-status-row">
         <div class="map-live-dot" id="map-live-dot"></div>
-        <span id="map-status-text">Driver location not yet available</span>
+        <span id="map-status-text">Waiting for driver location...</span>
       </div>
-
-      <!-- Chat -->
       <div class="chat-wrap">
         <div class="chat-head">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -266,7 +298,6 @@
           <button class="chat-send" onclick="sendMsg()">➤</button>
         </div>
       </div>
-
       <button class="btn btn-danger" onclick="cancelRide()">Cancel Ride</button>
     </div>
   </div>
@@ -278,12 +309,35 @@
   </div>
 </div>
 
+<!-- RATING MODAL -->
+<div class="rating-overlay" id="rating-overlay">
+  <div class="rating-modal">
+    <div class="fare-completed">
+      <div class="fare-completed-amount" id="rating-fare">P0.00</div>
+      <div class="fare-completed-label">Ride Completed ✅</div>
+    </div>
+    <div class="rating-avatar" id="rating-avatar">D</div>
+    <div class="rating-title">Rate your driver</div>
+    <div class="rating-sub" id="rating-driver-name">How was your ride?</div>
+    <div class="stars-row" id="stars-row">
+      <span class="star" onclick="setStar(1)">⭐</span>
+      <span class="star" onclick="setStar(2)">⭐</span>
+      <span class="star" onclick="setStar(3)">⭐</span>
+      <span class="star" onclick="setStar(4)">⭐</span>
+      <span class="star" onclick="setStar(5)">⭐</span>
+    </div>
+    <textarea class="rating-comment" id="rating-comment" placeholder="Leave a comment (optional)" rows="3"></textarea>
+    <div class="rating-btn-row">
+      <button class="rating-btn skip" onclick="skipRating()">Skip</button>
+      <button class="rating-btn submit" onclick="submitRating()">Submit ⭐</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
   const BASE = "https://spiti-spiti-production.up.railway.app";
-
-  // Auth check
   const riderData = JSON.parse(localStorage.getItem("spiti_rider") || "null");
   if (!riderData) window.location.href = "login.html";
   const RIDER_ID = riderData?.id || 1;
@@ -292,15 +346,13 @@
   document.getElementById("nav-name").textContent = RIDER_NAME;
   document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]} 👋`;
 
-  function logout() {
-    localStorage.removeItem("spiti_rider");
-    window.location.href = "login.html";
-  }
+  function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
   let activeRide = null;
   let offers = {};
-  let driverPos = null;
-  let mapW = 0, mapH = 0;
+  let selectedStar = 0;
+  let completedRide = null;
+  let mapW = 400, mapH = 200;
 
   const socket = io(BASE, { transports: ["websocket", "polling"] });
 
@@ -309,7 +361,6 @@
     socket.emit("join-role", { role: "rider", userId: RIDER_ID });
     loadHistory();
   });
-
   socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
 
   socket.on("ride-created", (ride) => {
@@ -340,8 +391,9 @@
       showToast("Your ride has started! 🚀");
     }
     if (ride.status === "completed") {
-      showToast("Ride completed! P" + parseFloat(ride.fare || 0).toFixed(2) + " 🎉");
-      setTimeout(() => { resetAll(); loadHistory(); }, 4000);
+      completedRide = ride;
+      updateProgress("completed");
+      setTimeout(() => { showRatingModal(ride); }, 1500);
     }
     if (ride.status === "cancelled") {
       showToast("Ride cancelled", "error");
@@ -366,28 +418,23 @@
   }
 
   function updateProgress(status) {
-    const steps = [
-      { dot: "p1", label: "pl1", line: null },
-      { dot: "p2", label: "pl2", line: "pline1" },
-      { dot: "p3", label: "pl3", line: "pline2" }
-    ];
     const stateMap = { accepted: 1, in_progress: 2, completed: 3 };
     const current = stateMap[status] || 0;
-    steps.forEach((s, i) => {
-      const dot = document.getElementById(s.dot);
-      const lbl = document.getElementById(s.label);
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`p${i}`);
+      const lbl = document.getElementById(`pl${i}`);
       if (i < current) {
         dot.className = "prog-dot done"; dot.textContent = "✓";
         lbl.className = "prog-label done";
-        if (s.line) document.getElementById(s.line).className = "prog-line done";
+        if (i < 3) document.getElementById(`pline${i}`).className = "prog-line done";
       } else if (i === current) {
-        dot.className = "prog-dot active"; dot.textContent = i + 1;
+        dot.className = "prog-dot active"; dot.textContent = i;
         lbl.className = "prog-label active";
       } else {
-        dot.className = "prog-dot"; dot.textContent = i + 1;
+        dot.className = "prog-dot"; dot.textContent = i;
         lbl.className = "prog-label";
       }
-    });
+    }
   }
 
   function renderOffers() {
@@ -399,12 +446,14 @@
     const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 15;
     el.innerHTML = list.map(o => {
       const match = parseFloat(o.fare_offer) <= myFare;
+      const stars = o.avg_rating ? "⭐ " + parseFloat(o.avg_rating).toFixed(1) + " (" + (o.total_ratings||0) + " rides)" : "New driver";
       return `
         <div class="offer-card">
           <div>
             <div class="offer-name">🚗 ${o.driver_name || "Driver"}</div>
             <div class="offer-price">P${parseFloat(o.fare_offer).toFixed(2)}</div>
             <div class="offer-tag">${match ? "✅ Matches your price" : "💬 Counter offer"}</div>
+            <div class="offer-rating">${stars}</div>
           </div>
           <div class="offer-actions">
             <button class="obtn acc" onclick="acceptOffer(${o.driverId},${o.fare_offer})">Accept</button>
@@ -442,7 +491,7 @@
     } catch(e) {}
   }
 
-  function showActiveRide(ride) {
+  async function showActiveRide(ride) {
     showPanel("active");
     document.getElementById("a-pickup").textContent = ride.pickup;
     document.getElementById("a-dropoff").textContent = ride.dropoff;
@@ -452,52 +501,33 @@
     updateProgress(ride.status);
     socket.emit("join-ride", { rideId: ride.id });
     loadMsgs(ride.id);
-    initCustomMap();
-  }
-
-  function initCustomMap() {
-    const map = document.getElementById("rider-map");
-    mapW = map.offsetWidth;
-    mapH = map.offsetHeight;
-    map.innerHTML = `
-      <svg width="100%" height="100%" viewBox="0 0 ${mapW} ${mapH}" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
-        <rect width="${mapW}" height="${mapH}" fill="#0a0a0f"/>
-        <line x1="0" y1="${mapH*0.3}" x2="${mapW}" y2="${mapH*0.3}" stroke="#1a1a2a" stroke-width="18"/>
-        <line x1="0" y1="${mapH*0.6}" x2="${mapW}" y2="${mapH*0.6}" stroke="#1a1a2a" stroke-width="12"/>
-        <line x1="${mapW*0.3}" y1="0" x2="${mapW*0.3}" y2="${mapH}" stroke="#1a1a2a" stroke-width="14"/>
-        <line x1="${mapW*0.7}" y1="0" x2="${mapW*0.7}" y2="${mapH}" stroke="#1a1a2a" stroke-width="10"/>
-        <line x1="0" y1="${mapH*0.3}" x2="${mapW}" y2="${mapH*0.3}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
-        <line x1="0" y1="${mapH*0.6}" x2="${mapW}" y2="${mapH*0.6}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
-        <line x1="${mapW*0.3}" y1="0" x2="${mapW*0.3}" y2="${mapH}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
-        <line x1="${mapW*0.7}" y1="0" x2="${mapW*0.7}" y2="${mapH}" stroke="#ffffff08" stroke-width="1" stroke-dasharray="4,8"/>
-        <rect x="${mapW*0.1}" y="${mapH*0.1}" width="60" height="40" rx="4" fill="#13131f"/>
-        <rect x="${mapW*0.5}" y="${mapH*0.15}" width="80" height="50" rx="4" fill="#13131f"/>
-        <rect x="${mapW*0.75}" y="${mapH*0.4}" width="50" height="60" rx="4" fill="#13131f"/>
-        <rect x="${mapW*0.1}" y="${mapH*0.65}" width="70" height="45" rx="4" fill="#13131f"/>
-        <rect x="${mapW*0.45}" y="${mapH*0.7}" width="90" height="40" rx="4" fill="#13131f"/>
-        <text x="${mapW*0.12}" y="${mapH*0.27}" font-size="7" fill="#ffffff15" font-family="Inter">MAIN MALL RD</text>
-        <text x="${mapW*0.35}" y="${mapH*0.57}" font-size="7" fill="#ffffff15" font-family="Inter">CBD AVE</text>
-      </svg>
-      <div id="driver-pin" class="driver-pin" style="display:none;left:50%;top:50%">
-        <div class="driver-pin-ring"></div>
-        <div class="driver-pin-dot"></div>
-      </div>
-      <div style="position:absolute;bottom:8px;right:8px;font-size:0.55rem;color:#333;background:#0f0f13aa;padding:3px 7px;border-radius:6px">Spiti-Spiti Map</div>
-    `;
+    // Load driver rating
+    if (ride.driver_id) {
+      try {
+        const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
+        const data = await res.json();
+        if (data && data.avg_rating > 0) {
+          document.getElementById("driver-stars").textContent = "⭐ " + parseFloat(data.avg_rating).toFixed(1) + " · " + data.total_ratings + " rides";
+        } else {
+          document.getElementById("driver-stars").textContent = "New driver";
+        }
+      } catch(e) {}
+    }
   }
 
   function updateDriverPin(lat, lng) {
     const pin = document.getElementById("driver-pin");
-    if (!pin) return;
+    const map = document.getElementById("rider-map");
+    if (!pin || !map) return;
     pin.style.display = "block";
-    document.getElementById("map-placeholder") && (document.getElementById("map-placeholder").style.display = "none");
     document.getElementById("map-live-dot").classList.add("on");
     document.getElementById("map-status-text").textContent = "Driver location updating live";
-    // Simulate position on custom map using lat/lng offset
-    const baseCenter = { lat: -24.6541, lng: 25.9087 };
+    const w = map.offsetWidth || 400;
+    const h = map.offsetHeight || 200;
+    const base = { lat: -24.6541, lng: 25.9087 };
     const scale = 8000;
-    const x = Math.max(10, Math.min(mapW - 10, mapW/2 + (lng - baseCenter.lng) * scale));
-    const y = Math.max(10, Math.min(mapH - 10, mapH/2 - (lat - baseCenter.lat) * scale));
+    const x = Math.max(10, Math.min(w-10, w/2 + (lng - base.lng) * scale));
+    const y = Math.max(10, Math.min(h-10, h/2 - (lat - base.lat) * scale));
     pin.style.left = x + "px";
     pin.style.top = y + "px";
   }
@@ -531,6 +561,49 @@
         body: JSON.stringify({ sender_role: "rider", message })
       });
     } catch(e) { showToast("Message failed", "error"); }
+  }
+
+  // RATING
+  function showRatingModal(ride) {
+    document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+    document.getElementById("rating-avatar").textContent = (ride.driver_name || "D").charAt(0).toUpperCase();
+    document.getElementById("rating-driver-name").textContent = "How was your ride with " + (ride.driver_name || "your driver") + "?";
+    selectedStar = 0;
+    document.querySelectorAll(".star").forEach(s => s.classList.remove("active"));
+    document.getElementById("rating-comment").value = "";
+    document.getElementById("rating-overlay").classList.add("open");
+  }
+
+  function setStar(n) {
+    selectedStar = n;
+    document.querySelectorAll(".star").forEach((s, i) => {
+      s.classList.toggle("active", i < n);
+    });
+  }
+
+  async function submitRating() {
+    if (!completedRide) return;
+    if (selectedStar === 0) return showToast("Please select a star rating", "warn");
+    const comment = document.getElementById("rating-comment").value.trim();
+    try {
+      await fetch(`${BASE}/rides/${completedRide.id}/rate-driver`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: selectedStar, comment })
+      });
+      showToast("Rating submitted! Thanks 🌟");
+    } catch(e) {}
+    closeRatingAndReset();
+  }
+
+  function skipRating() {
+    closeRatingAndReset();
+  }
+
+  function closeRatingAndReset() {
+    document.getElementById("rating-overlay").classList.remove("open");
+    completedRide = null;
+    resetAll();
+    loadHistory();
   }
 
   async function createRide() {
@@ -575,28 +648,30 @@
     document.getElementById("offers-list").innerHTML = "";
     document.getElementById("offers-section").style.display = "none";
     document.getElementById("chat-msgs").innerHTML = '<div class="empty" style="padding:8px;font-size:0.75rem">Say hi to your driver! 👋</div>';
-    document.getElementById("rider-map").innerHTML = "";
+    document.getElementById("driver-pin").style.display = "none";
     document.getElementById("map-live-dot").classList.remove("on");
-    document.getElementById("map-status-text").textContent = "Driver location not yet available";
-    ["p1","p2","p3"].forEach((id,i) => {
-      document.getElementById(id).className = "prog-dot";
-      document.getElementById(id).textContent = i+1;
-      document.getElementById("pl"+(i+1)).className = "prog-label";
-    });
-    ["pline1","pline2"].forEach(id => document.getElementById(id).className = "prog-line");
+    document.getElementById("map-status-text").textContent = "Waiting for driver location...";
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById(`p${i}`).className = "prog-dot";
+      document.getElementById(`p${i}`).textContent = i;
+      document.getElementById(`pl${i}`).className = "prog-label";
+    }
+    document.getElementById("pline1").className = "prog-line";
+    document.getElementById("pline2").className = "prog-line";
   }
 
   async function loadHistory() {
     try {
       const res = await fetch(`${BASE}/rides`);
       const rides = await res.json();
-      const el = document.getElementById("history");
       const mine = rides.filter(r => r.rider_id == RIDER_ID);
+      const el = document.getElementById("history");
       el.innerHTML = mine.length ? mine.slice(0,5).map(r => `
         <div class="history-item">
           <div>
             <div class="h-route">${r.pickup} → ${r.dropoff}</div>
             <div class="h-meta">Ride #${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : ""}</div>
+            ${r.rider_rating ? `<div class="h-rating">${"⭐".repeat(r.rider_rating)} You rated</div>` : ""}
           </div>
           <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
         </div>`).join("") : '<div class="empty">No rides yet</div>';
