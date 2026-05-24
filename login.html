@@ -5,60 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Spiti-Spiti</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e8e8f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F5F0EA;
+      color: #1C1917;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    body.ready { opacity: 1; }
 
-    .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; margin-bottom: 6px; }
-    .logo span { color: #f59e0b; }
-    .tagline { font-size: 0.8rem; color: #444; margin-bottom: 36px; letter-spacing: 0.05em; }
+    .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; margin-bottom: 6px; color: #1C1917; }
+    .logo span { color: #F97316; }
+    .tagline { font-size: 0.8rem; color: #A8A29E; margin-bottom: 36px; letter-spacing: 0.05em; }
 
-    .role-select { display: flex; gap: 10px; margin-bottom: 28px; background: #111118; border-radius: 14px; padding: 6px; }
-    .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #555; transition: all 0.2s; }
-    .role-btn.active { background: #1e1e2e; color: #e8e8f0; }
-    .role-btn.active.rider { color: #6c63ff; }
-    .role-btn.active.driver { color: #22c55e; }
-    .role-btn.active.admin { color: #f59e0b; }
+    .role-select { display: flex; gap: 10px; margin-bottom: 28px; background: #EDE8E0; border-radius: 14px; padding: 6px; width: 100%; max-width: 400px; }
+    .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #A8A29E; transition: all 0.2s; }
+    .role-btn.active { background: #fff; color: #1C1917; box-shadow: 0 1px 4px rgba(28,25,23,0.08); }
+    .role-btn.active.rider { color: #F97316; }
+    .role-btn.active.driver { color: #F97316; }
 
-    .card { background: #111118; border: 1px solid #1e1e2e; border-radius: 20px; padding: 28px; width: 100%; max-width: 400px; }
-    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .card-sub { font-size: 0.75rem; color: #555; margin-bottom: 24px; }
+    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 400px; }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; }
+    .card-sub { font-size: 0.75rem; color: #78716C; margin-bottom: 24px; }
 
     .tabs { display: flex; gap: 8px; margin-bottom: 22px; }
-    .tab { flex: 1; padding: 9px; border: 1px solid #1e1e2e; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #555; transition: all 0.2s; }
-    .tab.active { border-color: #6c63ff; color: #6c63ff; background: #0d0d1a; }
-    .tab.active.green { border-color: #22c55e; color: #22c55e; background: #001a00; }
+    .tab { flex: 1; padding: 9px; border: 1px solid #E5DDD0; border-radius: 10px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #A8A29E; transition: all 0.2s; }
+    .tab.active { border-color: #F97316; color: #F97316; background: #FFF7ED; }
 
     .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 0.72rem; color: #555; margin-bottom: 5px; font-weight: 500; }
-    .field input { width: 100%; background: #0a0a0f; border: 1px solid #1e1e2e; border-radius: 10px; padding: 12px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
-    .field input:focus { border-color: #6c63ff; }
-    .field input.green:focus { border-color: #22c55e; }
-    .field input.amber:focus { border-color: #f59e0b; }
+    .field label { display: block; font-size: 0.72rem; color: #78716C; margin-bottom: 5px; font-weight: 500; }
+    .field input { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 12px 14px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: #F97316; }
 
-    .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-purple { background: #6c63ff; color: #fff; }
-    .btn-green { background: #22c55e; color: #fff; }
-    .btn-amber { background: #f59e0b; color: #000; }
+    .btn-orange { background: #F97316; color: #fff; }
+    .btn-dark { background: #1C1917; color: #fff; }
 
-    .divider { text-align: center; font-size: 0.7rem; color: #333; margin: 16px 0; }
-
-    .pending-box { background: #1a1200; border: 1px solid #f59e0b33; border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
+    .pending-box { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
     .pending-icon { font-size: 1.5rem; margin-bottom: 6px; }
-    .pending-title { font-size: 0.85rem; font-weight: 600; color: #f59e0b; margin-bottom: 4px; }
-    .pending-sub { font-size: 0.73rem; color: #888; line-height: 1.5; }
+    .pending-title { font-size: 0.85rem; font-weight: 600; color: #EA580C; margin-bottom: 4px; }
+    .pending-sub { font-size: 0.73rem; color: #78716C; line-height: 1.5; }
 
-    .error-box { background: #1a0000; border: 1px solid #ef444433; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #ef4444; margin-bottom: 14px; display: none; }
-    .success-box { background: #001a00; border: 1px solid #22c55e33; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #22c55e; margin-bottom: 14px; display: none; }
+    .error-box { background: #fee2e2; border: 1px solid #fca5a533; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #dc2626; margin-bottom: 14px; display: none; }
+    .success-box { background: #f0fdf4; border: 1px solid #86efac33; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #16a34a; margin-bottom: 14px; display: none; }
 
     .form-section { display: none; }
     .form-section.visible { display: block; }
-
-    .hint { font-size: 0.68rem; color: #444; margin-top: 4px; }
+    .hint { font-size: 0.68rem; color: #A8A29E; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -83,21 +87,17 @@
     </div>
     <div id="rider-error" class="error-box"></div>
     <div id="rider-success" class="success-box"></div>
-
-    <!-- LOGIN -->
     <div id="rider-login-form">
       <div class="field"><label>Phone Number</label><input type="tel" id="rl-phone" placeholder="71234567" /></div>
       <div class="field"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••" /></div>
-      <button class="btn btn-purple" onclick="riderLogin()">Login →</button>
+      <button class="btn btn-orange" onclick="riderLogin()">Login →</button>
     </div>
-
-    <!-- SIGNUP -->
     <div id="rider-signup-form" style="display:none">
       <div class="field"><label>Full Name</label><input type="text" id="rs-name" placeholder="John Doe" /></div>
       <div class="field"><label>Phone Number</label><input type="tel" id="rs-phone" placeholder="71234567" /></div>
       <div class="field"><label>ID Number</label><input type="text" id="rs-id" placeholder="123456789" /><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Password</label><input type="password" id="rs-pass" placeholder="Min 6 characters" /></div>
-      <button class="btn btn-purple" onclick="riderSignup()">Create Account →</button>
+      <button class="btn btn-orange" onclick="riderSignup()">Create Account →</button>
     </div>
   </div>
 
@@ -106,28 +106,23 @@
     <div class="card-title">Driver Portal 🚗</div>
     <div class="card-sub">Sign in or register as a driver</div>
     <div class="tabs">
-      <button class="tab active green" id="driver-login-tab" onclick="driverTab('login')">Login</button>
-      <button class="tab green" id="driver-signup-tab" onclick="driverTab('signup')">Register</button>
+      <button class="tab active" id="driver-login-tab" onclick="driverTab('login')">Login</button>
+      <button class="tab" id="driver-signup-tab" onclick="driverTab('signup')">Register</button>
     </div>
     <div id="driver-error" class="error-box"></div>
     <div id="driver-success" class="success-box"></div>
-
-    <!-- LOGIN -->
     <div id="driver-login-form">
-      <div class="field"><label>Phone Number</label><input class="green" type="tel" id="dl-phone" placeholder="71234567" /></div>
-      <div class="field"><label>Password</label><input class="green" type="password" id="dl-pass" placeholder="••••••••" /></div>
-      <button class="btn btn-green" onclick="driverLogin()">Login →</button>
+      <div class="field"><label>Phone Number</label><input type="tel" id="dl-phone" placeholder="71234567" /></div>
+      <div class="field"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••" /></div>
+      <button class="btn btn-dark" onclick="driverLogin()">Login →</button>
     </div>
-
-    <!-- SIGNUP -->
     <div id="driver-signup-form" style="display:none">
-      <div class="field"><label>Full Name</label><input class="green" type="text" id="ds-name" placeholder="John Doe" /></div>
-      <div class="field"><label>Phone Number</label><input class="green" type="tel" id="ds-phone" placeholder="71234567" /></div>
-      <div class="field"><label>ID Number</label><input class="green" type="text" id="ds-id" placeholder="123456789" /><div class="hint">Your national ID number</div></div>
-      <div class="field"><label>Driver's License Number</label><input class="green" type="text" id="ds-license" placeholder="e.g. DL-12345" /><div class="hint">Must match your official license</div></div>
-      <div class="field"><label>Password</label><input class="green" type="password" id="ds-pass" placeholder="Min 6 characters" /></div>
-      <button class="btn btn-green" onclick="driverSignup()">Register →</button>
-
+      <div class="field"><label>Full Name</label><input type="text" id="ds-name" placeholder="John Doe" /></div>
+      <div class="field"><label>Phone Number</label><input type="tel" id="ds-phone" placeholder="71234567" /></div>
+      <div class="field"><label>ID Number</label><input type="text" id="ds-id" placeholder="123456789" /><div class="hint">Your national ID number</div></div>
+      <div class="field"><label>Driver's License Number</label><input type="text" id="ds-license" placeholder="e.g. DL-12345" /><div class="hint">Must match your official license</div></div>
+      <div class="field"><label>Password</label><input type="password" id="ds-pass" placeholder="Min 6 characters" /></div>
+      <button class="btn btn-dark" onclick="driverSignup()">Register →</button>
       <div class="pending-box" id="pending-box" style="display:none">
         <div class="pending-icon">⏳</div>
         <div class="pending-title">Application Submitted!</div>
@@ -136,31 +131,19 @@
     </div>
   </div>
 
-  <!-- ADMIN -->
-  <div class="form-section" id="section-admin">
-    <div class="card-title">Admin Access 🔐</div>
-    <div class="card-sub">Spiti-Spiti operations dashboard</div>
-    <div id="admin-error" class="error-box"></div>
-    <div class="field"><label>Username</label><input class="amber" type="text" id="al-user" placeholder="Username" /></div>
-    <div class="field"><label>Password</label><input class="amber" type="password" id="al-pass" placeholder="••••••••" /></div>
-    <button class="btn btn-amber" onclick="adminLogin()">Access Dashboard →</button>
-  </div>
-
 </div>
 
 <script>
   const BASE = "https://spiti-spiti-production.up.railway.app";
   let currentRole = "rider";
 
-  // Check if already logged in
-  window.addEventListener("load", () => {
-    const rider = localStorage.getItem("spiti_rider");
-    const driver = localStorage.getItem("spiti_driver");
-    const admin = localStorage.getItem("spiti_admin");
-    if (rider) window.location.href = "rider.html";
-    else if (driver) window.location.href = "driver.html";
-    else if (admin) window.location.href = "admin.html";
-  });
+  const rider = localStorage.getItem("spiti_rider");
+  const driver = localStorage.getItem("spiti_driver");
+  const admin = localStorage.getItem("spiti_admin");
+  if (rider) { window.location.href = "rider.html"; }
+  else if (driver) { window.location.href = "driver.html"; }
+  else if (admin) { window.location.href = "admin.html"; }
+  else { document.body.classList.add("ready"); }
 
   function setRole(role) {
     currentRole = role;
@@ -188,15 +171,13 @@
 
   function showError(prefix, msg) {
     const el = document.getElementById(`${prefix}-error`);
-    el.textContent = msg;
-    el.style.display = "block";
+    el.textContent = msg; el.style.display = "block";
     document.getElementById(`${prefix}-success`) && (document.getElementById(`${prefix}-success`).style.display = "none");
   }
 
   function showSuccess(prefix, msg) {
     const el = document.getElementById(`${prefix}-success`);
-    el.textContent = msg;
-    el.style.display = "block";
+    el.textContent = msg; el.style.display = "block";
     document.getElementById(`${prefix}-error`) && (document.getElementById(`${prefix}-error`).style.display = "none");
   }
 
@@ -210,10 +191,7 @@
     const password = document.getElementById("rl-pass").value;
     if (!phone || !password) return showError("rider", "Please fill in all fields");
     try {
-      const res = await fetch(`${BASE}/auth/rider/login`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password })
-      });
+      const res = await fetch(`${BASE}/auth/rider/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone, password }) });
       const data = await res.json();
       if (!res.ok) return showError("rider", data.error);
       localStorage.setItem("spiti_rider", JSON.stringify(data.rider));
@@ -229,17 +207,11 @@
     if (!name || !phone || !id_number || !password) return showError("rider", "Please fill in all fields");
     if (password.length < 6) return showError("rider", "Password must be at least 6 characters");
     try {
-      const res = await fetch(`${BASE}/auth/rider/signup`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, id_number, password })
-      });
+      const res = await fetch(`${BASE}/auth/rider/signup`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, phone, id_number, password }) });
       const data = await res.json();
       if (!res.ok) return showError("rider", data.error);
       showSuccess("rider", "Account created! Logging you in...");
-      setTimeout(() => {
-        localStorage.setItem("spiti_rider", JSON.stringify(data.rider));
-        window.location.href = "rider.html";
-      }, 1000);
+      setTimeout(() => { localStorage.setItem("spiti_rider", JSON.stringify(data.rider)); window.location.href = "rider.html"; }, 1000);
     } catch(e) { showError("rider", "Connection failed. Try again."); }
   }
 
@@ -248,16 +220,10 @@
     const password = document.getElementById("dl-pass").value;
     if (!phone || !password) return showError("driver", "Please fill in all fields");
     try {
-      const res = await fetch(`${BASE}/auth/driver/login`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password })
-      });
+      const res = await fetch(`${BASE}/auth/driver/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone, password }) });
       const data = await res.json();
       if (!res.ok) {
-        if (res.status === 403) {
-          document.getElementById("pending-box").style.display = "block";
-          driverTab("signup");
-        }
+        if (res.status === 403) { document.getElementById("pending-box").style.display = "block"; driverTab("signup"); }
         return showError("driver", data.error);
       }
       localStorage.setItem("spiti_driver", JSON.stringify(data.driver));
@@ -274,36 +240,13 @@
     if (!name || !phone || !id_number || !license_number || !password) return showError("driver", "Please fill in all fields");
     if (password.length < 6) return showError("driver", "Password must be at least 6 characters");
     try {
-      const res = await fetch(`${BASE}/auth/driver/signup`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, id_number, license_number, password })
-      });
+      const res = await fetch(`${BASE}/auth/driver/signup`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, phone, id_number, license_number, password }) });
       const data = await res.json();
       if (!res.ok) return showError("driver", data.error);
       document.getElementById("pending-box").style.display = "block";
       showSuccess("driver", "Application submitted! Awaiting admin approval.");
-      document.getElementById("ds-name").value = "";
-      document.getElementById("ds-phone").value = "";
-      document.getElementById("ds-id").value = "";
-      document.getElementById("ds-license").value = "";
-      document.getElementById("ds-pass").value = "";
+      ["ds-name","ds-phone","ds-id","ds-license","ds-pass"].forEach(id => document.getElementById(id).value = "");
     } catch(e) { showError("driver", "Connection failed. Try again."); }
-  }
-
-  async function adminLogin() {
-    const username = document.getElementById("al-user").value.trim();
-    const password = document.getElementById("al-pass").value;
-    if (!username || !password) return showError("admin", "Please fill in all fields");
-    try {
-      const res = await fetch(`${BASE}/auth/admin/login`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (!res.ok) return showError("admin", data.error);
-      localStorage.setItem("spiti_admin", JSON.stringify({ name: "Admin", role: "admin" }));
-      window.location.href = "admin.html";
-    } catch(e) { showError("admin", "Connection failed. Try again."); }
   }
 </script>
 </body>
