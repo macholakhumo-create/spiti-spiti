@@ -5,163 +5,154 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Driver</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0f0f13; color: #e8e8f0; min-height: 100vh; }
-    nav { background: #16161d; border-bottom: 1px solid #2a2a3a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; }
-    .brand span { color: #22c55e; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F0EA; color: #1C1917; min-height: 100vh; }
+    nav { background: #fff; border-bottom: 1px solid #E5DDD0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; }
+    .brand span { color: #F97316; }
     .nav-right { display: flex; align-items: center; gap: 12px; }
-    .nav-user { font-size: 0.75rem; color: #555; }
-    .nav-user strong { color: #e8e8f0; }
-    .logout-btn { background: none; border: 1px solid #2a2a3a; color: #555; font-family: 'Inter', sans-serif; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+    .nav-user { font-size: 0.75rem; color: #78716C; }
+    .nav-user strong { color: #1C1917; }
+    .logout-btn { background: none; border: 1px solid #E5DDD0; color: #78716C; font-family: inherit; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
     .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
-    .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; flex-shrink: 0; }
+    .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #D4CCBF; transition: all 0.3s; flex-shrink: 0; }
     .conn-dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
     .container { max-width: 520px; margin: 0 auto; padding: 20px 16px 100px; }
     .greeting { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
-    .greeting-sub { font-size: 0.8rem; color: #555; margin-bottom: 20px; }
-    .card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
-    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #22c55e; margin-bottom: 12px; }
-    .avail-row { background: #16161d; border: 1px solid #2a2a3a; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .avail-label { font-size: 0.85rem; font-weight: 500; }
-    .avail-sub { font-size: 0.68rem; color: #555; margin-top: 2px; }
+    .greeting-sub { font-size: 0.8rem; color: #78716C; margin-bottom: 20px; }
+    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F97316; margin-bottom: 12px; }
+    .avail-row { background: #fff; border: 1px solid #E5DDD0; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .avail-label { font-size: 0.85rem; font-weight: 500; color: #1C1917; }
+    .avail-sub { font-size: 0.68rem; color: #78716C; margin-top: 2px; }
     .switch { position: relative; width: 50px; height: 26px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; inset: 0; background: #2a2a3a; border-radius: 26px; cursor: pointer; transition: 0.3s; }
+    .slider { position: absolute; inset: 0; background: #E5DDD0; border-radius: 26px; cursor: pointer; transition: 0.3s; }
     .slider::before { content:""; position:absolute; width:18px; height:18px; left:4px; bottom:4px; background:#fff; border-radius:50%; transition:0.3s; }
-    input:checked + .slider { background: #22c55e; }
+    input:checked + .slider { background: #F97316; }
     input:checked + .slider::before { transform: translateX(24px); }
     .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
-    .stat { background: #16161d; border: 1px solid #2a2a3a; border-radius: 12px; padding: 14px; }
-    .stat-num { font-size: 1.4rem; font-weight: 700; color: #22c55e; }
-    .stat-lbl { font-size: 0.62rem; color: #444; margin-top: 3px; }
+    .stat { background: #fff; border: 1px solid #E5DDD0; border-radius: 12px; padding: 14px; }
+    .stat-num { font-size: 1.4rem; font-weight: 700; color: #F97316; }
+    .stat-lbl { font-size: 0.62rem; color: #A8A29E; margin-top: 3px; }
     .stat-num.gold { color: #f59e0b; }
 
-    /* PROGRESS */
     .progress-bar { display: flex; align-items: flex-start; margin-bottom: 16px; padding: 0 4px; }
     .prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
-    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #1e1e28; border: 2px solid #2a2a3a; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #333; transition: all 0.4s; }
-    .prog-dot.active { background: #22c55e22; border-color: #22c55e; color: #22c55e; box-shadow: 0 0 12px #22c55e44; }
-    .prog-dot.done { background: #22c55e; border-color: #22c55e; color: #fff; }
-    .prog-line { flex: 1; height: 2px; background: #1e1e28; margin-top: 14px; transition: background 0.4s; }
-    .prog-line.done { background: #22c55e; }
-    .prog-label { font-size: 0.58rem; color: #333; margin-top: 5px; text-align: center; font-weight: 500; }
-    .prog-label.active { color: #22c55e; }
-    .prog-label.done { color: #22c55e; }
+    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #EDE8E0; border: 2px solid #E5DDD0; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #A8A29E; transition: all 0.4s; }
+    .prog-dot.active { background: #FFF7ED; border-color: #F97316; color: #F97316; box-shadow: 0 0 12px #F9731644; }
+    .prog-dot.done { background: #F97316; border-color: #F97316; color: #fff; }
+    .prog-line { flex: 1; height: 2px; background: #E5DDD0; margin-top: 14px; transition: background 0.4s; }
+    .prog-line.done { background: #F97316; }
+    .prog-label { font-size: 0.58rem; color: #A8A29E; margin-top: 5px; text-align: center; font-weight: 500; }
+    .prog-label.active { color: #F97316; }
+    .prog-label.done { color: #F97316; }
 
-    /* LOCATION MAP */
-    #driver-map { width: 100%; height: 160px; border-radius: 12px; margin-bottom: 10px; background: #0a0a0f; border: 1px solid #2a2a3a; position: relative; overflow: hidden; }
-    .loc-row { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: #444; margin-bottom: 10px; }
-    .loc-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; flex-shrink: 0; }
+    #driver-map { width: 100%; height: 160px; border-radius: 12px; margin-bottom: 10px; background: #EDE8E0; border: 1px solid #E5DDD0; position: relative; overflow: hidden; }
+    .loc-row { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: #78716C; margin-bottom: 10px; }
+    .loc-dot { width: 6px; height: 6px; border-radius: 50%; background: #D4CCBF; flex-shrink: 0; }
     .loc-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .btn-full { width: 100%; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; margin-bottom: 8px; }
+    .btn-full { width: 100%; padding: 11px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; margin-bottom: 8px; }
     .btn-full:last-child { margin-bottom: 0; }
     .btn-full:hover { opacity: 0.88; }
-    .btn-loc { background: #f59e0b; color: #000; }
+    .btn-loc { background: #F97316; color: #fff; }
     .btn-stop { background: #ef4444; color: #fff; }
 
-    /* INCOMING */
-    .incoming { background: linear-gradient(135deg,#081508,#0a1f0a); border: 1px solid #22c55e33; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
+    .incoming { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
     .incoming.visible { display: block; animation: ringpulse 2s infinite; }
-    @keyframes ringpulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.25)} 50%{box-shadow:0 0 0 14px rgba(34,197,94,0)} }
+    @keyframes ringpulse { 0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,0.25)} 50%{box-shadow:0 0 0 14px rgba(249,115,22,0)} }
     .inc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .inc-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-    .inc-title { font-size: 0.9rem; font-weight: 600; }
-    .inc-sub { font-size: 0.68rem; color: #86efac; margin-top: 2px; }
+    .inc-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(249,115,22,0.15); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .inc-title { font-size: 0.9rem; font-weight: 600; color: #1C1917; }
+    .inc-sub { font-size: 0.68rem; color: #EA580C; margin-top: 2px; }
     .route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .route-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
-    .route-dot.from { background: rgba(255,255,255,0.07); }
-    .route-dot.to { background: rgba(34,197,94,0.15); }
-    .route-lbl { font-size: 0.6rem; color: #86efac; margin-bottom: 1px; }
-    .route-val { font-size: 0.82rem; }
-    .price-row { background: rgba(34,197,94,0.08); border-radius: 10px; padding: 10px 13px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
-    .price-lbl { font-size: 0.65rem; color: #86efac; }
-    .price-val { font-size: 1.3rem; font-weight: 700; color: #22c55e; }
+    .route-dot.from { background: #EDE8E0; }
+    .route-dot.to { background: #FFF7ED; }
+    .route-lbl { font-size: 0.6rem; color: #A8A29E; margin-bottom: 1px; }
+    .route-val { font-size: 0.82rem; color: #1C1917; }
+    .price-row { background: #FFF7ED; border-radius: 10px; padding: 10px 13px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+    .price-lbl { font-size: 0.65rem; color: #EA580C; }
+    .price-val { font-size: 1.3rem; font-weight: 700; color: #F97316; }
     .offer-row { margin-bottom: 12px; }
-    .offer-row label { font-size: 0.65rem; color: #86efac; display: block; margin-bottom: 5px; }
-    .offer-input { width: 100%; background: #0f0f13; border: 1px solid #22c55e22; border-radius: 10px; padding: 10px 13px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; outline: none; }
-    .offer-input:focus { border-color: #22c55e; }
+    .offer-row label { font-size: 0.65rem; color: #78716C; display: block; margin-bottom: 5px; }
+    .offer-input { width: 100%; background: #fff; border: 1px solid #FED7AA; border-radius: 10px; padding: 10px 13px; color: #1C1917; font-family: inherit; font-size: 1rem; font-weight: 600; outline: none; }
+    .offer-input:focus { border-color: #F97316; }
     .btn-row { display: flex; gap: 7px; }
-    .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-acc { background: #22c55e; color: #fff; }
-    .btn-ctr { background: #a855f7; color: #fff; }
-    .btn-dec { background: #1e1e28; color: #666; border: 1px solid #2a2a3a; }
+    .btn-acc { background: #F97316; color: #fff; }
+    .btn-ctr { background: #1C1917; color: #fff; }
+    .btn-dec { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
 
-    /* ACTIVE RIDE */
-    .active-card { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
+    .active-card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
     .active-card.visible { display: block; }
-    .fare-box { background: #0f0f13; border-radius: 10px; padding: 12px; text-align: center; margin: 10px 0; }
-    .fare-num { font-size: 1.7rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
-    .fare-lbl { font-size: 0.62rem; color: #444; margin-top: 2px; }
+    .fare-box { background: #F5F0EA; border-radius: 10px; padding: 12px; text-align: center; margin: 10px 0; }
+    .fare-num { font-size: 1.7rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
+    .fare-lbl { font-size: 0.62rem; color: #78716C; margin-top: 2px; }
     .action-row { display: flex; gap: 8px; margin-top: 12px; }
-    .act-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #555; transition: all 0.2s; }
-    .act-btn.start:hover { border-color: #f59e0b; color: #f59e0b; background: #1a1200; }
-    .act-btn.done:hover { border-color: #22c55e; color: #22c55e; background: #001500; }
+    .act-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid #E5DDD0; background: #F5F0EA; color: #78716C; transition: all 0.2s; }
+    .act-btn.start:hover { border-color: #F97316; color: #F97316; background: #FFF7ED; }
+    .act-btn.done:hover { border-color: #22c55e; color: #22c55e; background: #f0fdf4; }
     .act-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-    /* CHAT */
-    .chat-wrap { background: #0f0f13; border-radius: 14px; padding: 13px; margin-top: 12px; }
+    .chat-wrap { background: #F5F0EA; border-radius: 14px; padding: 13px; margin-top: 12px; }
     .chat-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
-    .chat-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #22c55e; }
+    .chat-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; }
     .chat-msgs { height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 9px; }
     .chat-msgs::-webkit-scrollbar { width: 2px; }
-    .chat-msgs::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: #E5DDD0; border-radius: 2px; }
     .msg { max-width: 82%; padding: 8px 11px; border-radius: 14px; font-size: 0.77rem; line-height: 1.45; word-break: break-word; }
-    .msg.me { background: #22c55e; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .msg.them { background: #1e1e28; color: #ccc; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg.me { background: #F97316; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.them { background: #EDE8E0; color: #1C1917; align-self: flex-start; border-bottom-left-radius: 4px; }
     .msg-time { font-size: 0.55rem; opacity: 0.5; margin-top: 2px; }
     .chat-row { display: flex; gap: 7px; }
-    .chat-in { flex: 1; background: #16161d; border: 1px solid #2a2a3a; border-radius: 10px; padding: 9px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.8rem; outline: none; }
-    .chat-in:focus { border-color: #22c55e; }
-    .chat-send { background: #22c55e; border: none; border-radius: 10px; padding: 9px 12px; color: #fff; cursor: pointer; }
+    .chat-in { flex: 1; background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 9px 12px; color: #1C1917; font-family: inherit; font-size: 0.8rem; outline: none; }
+    .chat-in:focus { border-color: #F97316; }
+    .chat-send { background: #F97316; border: none; border-radius: 10px; padding: 9px 12px; color: #fff; cursor: pointer; }
 
-    /* RATING MODAL */
-    .rating-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
     .rating-overlay.open { display: flex; }
-    .rating-modal { background: #16161d; border: 1px solid #2a2a3a; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
+    .rating-modal { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
     @keyframes popIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
-    .rating-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#22c55e,#6c63ff); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0 auto 14px; }
-    .rating-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .rating-sub { font-size: 0.78rem; color: #555; margin-bottom: 20px; }
-    .fare-completed { background: linear-gradient(135deg, #0d0d1a, #0a1f0a); border: 1px solid #22c55e33; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
-    .fare-completed-amount { font-size: 2.2rem; font-weight: 700; color: #22c55e; letter-spacing: -0.04em; }
-    .fare-completed-label { font-size: 0.7rem; color: #86efac; margin-top: 3px; }
+    .rating-avatar { width: 64px; height: 64px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0 auto 14px; }
+    .rating-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; }
+    .rating-sub { font-size: 0.78rem; color: #78716C; margin-bottom: 20px; }
+    .fare-completed { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
+    .fare-completed-amount { font-size: 2.2rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
+    .fare-completed-label { font-size: 0.7rem; color: #EA580C; margin-top: 3px; }
     .stars-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; }
     .star { font-size: 2.2rem; cursor: pointer; transition: all 0.15s; filter: grayscale(1) opacity(0.4); }
     .star.active { filter: none; transform: scale(1.15); }
     .star:hover { filter: none; transform: scale(1.1); }
-    .rating-comment { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.82rem; outline: none; resize: none; margin-bottom: 16px; }
-    .rating-comment:focus { border-color: #22c55e; }
+    .rating-comment { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 10px 12px; color: #1C1917; font-family: inherit; font-size: 0.82rem; outline: none; resize: none; margin-bottom: 16px; }
+    .rating-comment:focus { border-color: #F97316; }
     .rating-btn-row { display: flex; gap: 10px; }
-    .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .rating-btn.submit { background: #22c55e; color: #fff; }
-    .rating-btn.skip { background: #1e1e28; color: #666; border: 1px solid #2a2a3a; }
+    .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .rating-btn.submit { background: #F97316; color: #fff; }
+    .rating-btn.skip { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
     .rating-btn:hover { opacity: 0.88; }
 
-    /* RIDES LIST */
-    .ride-item { background: #0f0f13; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
-    .ride-route { font-size: 0.8rem; }
-    .ride-meta { font-size: 0.63rem; color: #333; margin-top: 2px; }
-    .ride-rating { font-size: 0.63rem; color: #f59e0b; margin-top: 2px; }
+    .ride-item { background: #F5F0EA; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+    .ride-route { font-size: 0.8rem; color: #1C1917; }
+    .ride-meta { font-size: 0.63rem; color: #A8A29E; margin-top: 2px; }
     .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
-    .badge-requested { background: #1e293b; color: #94a3b8; }
-    .badge-accepted { background: #14532d; color: #22c55e; }
-    .badge-in_progress { background: #451a03; color: #f59e0b; }
-    .badge-completed { background: #1e1b4b; color: #818cf8; }
-    .badge-cancelled { background: #2d1515; color: #ef4444; }
-    .empty { text-align: center; color: #333; font-size: 0.8rem; padding: 18px; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; max-width: 88vw; text-align: center; white-space: nowrap; }
+    .badge-requested { background: #EDE8E0; color: #78716C; }
+    .badge-accepted { background: #dcfce7; color: #16a34a; }
+    .badge-in_progress { background: #FFF7ED; color: #EA580C; }
+    .badge-completed { background: #ede9fe; color: #7c3aed; }
+    .badge-cancelled { background: #fee2e2; color: #dc2626; }
+    .empty { text-align: center; color: #A8A29E; font-size: 0.8rem; padding: 18px; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; max-width: 88vw; text-align: center; white-space: nowrap; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
-    .toast.warn { background: #f59e0b; color: #000; }
+    .toast.warn { background: #F97316; color: #fff; }
   </style>
 </head>
 <body>
@@ -197,29 +188,28 @@
     <div class="stat"><div class="stat-num gold" id="s-rating">—</div><div class="stat-lbl">Rating ⭐</div></div>
   </div>
 
-  <!-- Location -->
   <div class="card">
     <div class="card-label">Your Location</div>
     <div id="driver-map">
       <svg width="100%" height="100%" viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
-        <rect width="480" height="160" fill="#0a0a0f"/>
-        <line x1="0" y1="55" x2="480" y2="55" stroke="#1a1a2a" stroke-width="16"/>
-        <line x1="0" y1="110" x2="480" y2="110" stroke="#1a1a2a" stroke-width="10"/>
-        <line x1="120" y1="0" x2="120" y2="160" stroke="#1a1a2a" stroke-width="12"/>
-        <line x1="312" y1="0" x2="312" y2="160" stroke="#1a1a2a" stroke-width="10"/>
-        <line x1="0" y1="55" x2="480" y2="55" stroke="#22c55e08" stroke-width="1" stroke-dasharray="4,8"/>
-        <line x1="120" y1="0" x2="120" y2="160" stroke="#22c55e08" stroke-width="1" stroke-dasharray="4,8"/>
-        <rect x="24" y="10" width="60" height="36" rx="3" fill="#13131f"/>
-        <rect x="168" y="8" width="80" height="38" rx="3" fill="#13131f"/>
-        <rect x="345" y="68" width="55" height="32" rx="3" fill="#13131f"/>
-        <rect x="24" y="122" width="65" height="30" rx="3" fill="#13131f"/>
-        <text x="26" y="48" font-size="6" fill="#22c55e15" font-family="Inter">MAIN MALL RD</text>
-        <text x="130" y="105" font-size="6" fill="#22c55e15" font-family="Inter">CBD AVE</text>
-        <text x="340" y="152" font-size="7" fill="#333" font-family="Inter">Spiti-Spiti Map</text>
+        <rect width="480" height="160" fill="#EDE8E0"/>
+        <line x1="0" y1="55" x2="480" y2="55" stroke="#D4CCBF" stroke-width="16"/>
+        <line x1="0" y1="110" x2="480" y2="110" stroke="#D4CCBF" stroke-width="10"/>
+        <line x1="120" y1="0" x2="120" y2="160" stroke="#D4CCBF" stroke-width="12"/>
+        <line x1="312" y1="0" x2="312" y2="160" stroke="#D4CCBF" stroke-width="10"/>
+        <line x1="0" y1="55" x2="480" y2="55" stroke="#F9731622" stroke-width="1" stroke-dasharray="4,8"/>
+        <line x1="120" y1="0" x2="120" y2="160" stroke="#F9731622" stroke-width="1" stroke-dasharray="4,8"/>
+        <rect x="24" y="10" width="60" height="36" rx="3" fill="#fff"/>
+        <rect x="168" y="8" width="80" height="38" rx="3" fill="#fff"/>
+        <rect x="345" y="68" width="55" height="32" rx="3" fill="#fff"/>
+        <rect x="24" y="122" width="65" height="30" rx="3" fill="#fff"/>
+        <text x="26" y="48" font-size="6" fill="#F9731640" font-family="sans-serif">MAIN MALL RD</text>
+        <text x="130" y="105" font-size="6" fill="#F9731640" font-family="sans-serif">CBD AVE</text>
+        <text x="340" y="152" font-size="7" fill="#A8A29E" font-family="sans-serif">Spiti-Spiti Map</text>
       </svg>
       <div id="d-pin" style="display:none;position:absolute;transform:translate(-50%,-50%);transition:all 0.5s ease">
-        <div style="position:absolute;top:-8px;left:-8px;width:28px;height:28px;border-radius:50%;border:2px solid #22c55e44;animation:ringPulse 2s infinite"></div>
-        <div style="width:14px;height:14px;border-radius:50%;background:#22c55e;border:3px solid #fff;box-shadow:0 0 10px #22c55e88"></div>
+        <div style="position:absolute;top:-8px;left:-8px;width:28px;height:28px;border-radius:50%;border:2px solid #F9731644;animation:ringPulse 2s infinite"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:#F97316;border:3px solid #fff;box-shadow:0 0 10px #F9731688"></div>
       </div>
       <style>@keyframes ringPulse{0%{transform:scale(1);opacity:1}100%{transform:scale(2.2);opacity:0}}</style>
     </div>
@@ -228,7 +218,6 @@
     <button class="btn-full btn-stop" id="btn-stop" style="display:none" onclick="stopLoc()">⏹ Stop Sharing</button>
   </div>
 
-  <!-- Incoming -->
   <div class="incoming" id="inc-card">
     <div class="inc-head">
       <div class="inc-icon">🔔</div>
@@ -238,7 +227,7 @@
     <div class="route-row"><div class="route-dot to">🏁</div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="inc-dropoff">—</div></div></div>
     <div class="price-row">
       <div><div class="price-lbl">Rider's offered price</div><div class="price-val" id="inc-fare">P0.00</div></div>
-      <div style="font-size:0.65rem;color:#86efac">Min P15</div>
+      <div style="font-size:0.65rem;color:#EA580C">Min P15</div>
     </div>
     <div class="offer-row">
       <label>Your price (edit to counter offer):</label>
@@ -251,27 +240,17 @@
     </div>
   </div>
 
-  <!-- Active Ride -->
   <div class="active-card" id="active-card">
     <div class="card-label">Current Ride</div>
     <div class="progress-bar">
-      <div class="prog-step">
-        <div class="prog-dot done" id="dp1">✓</div>
-        <div class="prog-label done" id="dpl1">Accepted</div>
-      </div>
+      <div class="prog-step"><div class="prog-dot done" id="dp1">✓</div><div class="prog-label done" id="dpl1">Accepted</div></div>
       <div class="prog-line" id="dpline1"></div>
-      <div class="prog-step">
-        <div class="prog-dot" id="dp2">2</div>
-        <div class="prog-label" id="dpl2">Started</div>
-      </div>
+      <div class="prog-step"><div class="prog-dot" id="dp2">2</div><div class="prog-label" id="dpl2">Started</div></div>
       <div class="prog-line" id="dpline2"></div>
-      <div class="prog-step">
-        <div class="prog-dot" id="dp3">3</div>
-        <div class="prog-label" id="dpl3">Done</div>
-      </div>
+      <div class="prog-step"><div class="prog-dot" id="dp3">3</div><div class="prog-label" id="dpl3">Done</div></div>
     </div>
-    <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl" style="color:#444">Pickup</div><div class="route-val" id="act-pickup">—</div></div></div>
-    <div class="route-row" style="margin-bottom:0"><div class="route-dot to">🏁</div><div><div class="route-lbl" style="color:#444">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div></div>
+    <div class="route-row"><div class="route-dot from">📍</div><div><div class="route-lbl">Pickup</div><div class="route-val" id="act-pickup">—</div></div></div>
+    <div class="route-row" style="margin-bottom:0"><div class="route-dot to">🏁</div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div></div>
     <div class="fare-box">
       <div class="fare-num" id="act-fare">P0.00</div>
       <div class="fare-lbl">Agreed Fare</div>
@@ -283,15 +262,15 @@
     <div class="chat-wrap">
       <div class="chat-head">
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-          <rect width="30" height="30" rx="9" fill="#1e1e28"/>
-          <rect x="6" y="10" width="18" height="13" rx="3" fill="#22c55e"/>
+          <rect width="30" height="30" rx="9" fill="#FFF7ED"/>
+          <rect x="6" y="10" width="18" height="13" rx="3" fill="#F97316"/>
           <circle cx="10.5" cy="16.5" r="1.5" fill="white"/>
           <circle cx="19.5" cy="16.5" r="1.5" fill="white"/>
           <rect x="12" y="20" width="6" height="1.5" rx="0.75" fill="white"/>
-          <rect x="13.5" y="5" width="3" height="5" rx="1.5" fill="#22c55e"/>
-          <circle cx="15" cy="5" r="1.5" fill="#86efac"/>
-          <rect x="3" y="13" width="3" height="5" rx="1.5" fill="#22c55e"/>
-          <rect x="24" y="13" width="3" height="5" rx="1.5" fill="#22c55e"/>
+          <rect x="13.5" y="5" width="3" height="5" rx="1.5" fill="#F97316"/>
+          <circle cx="15" cy="5" r="1.5" fill="#EA580C"/>
+          <rect x="3" y="13" width="3" height="5" rx="1.5" fill="#F97316"/>
+          <rect x="24" y="13" width="3" height="5" rx="1.5" fill="#F97316"/>
         </svg>
         <div class="chat-title">Chat with Rider</div>
       </div>
@@ -305,14 +284,12 @@
     </div>
   </div>
 
-  <!-- All Rides -->
   <div class="card">
     <div class="card-label">All Rides</div>
     <div id="rides-list"><div class="empty">No rides yet</div></div>
   </div>
 </div>
 
-<!-- RATING MODAL -->
 <div class="rating-overlay" id="rating-overlay">
   <div class="rating-modal">
     <div class="fare-completed">
@@ -351,36 +328,16 @@
 
   function logout() { localStorage.removeItem("spiti_driver"); window.location.href = "login.html"; }
 
-  let pending = null;
-  let activeRide = null;
-  let locInterval = null;
-  let driverPinEl = null;
-  let selectedStar = 0;
-  let completedRide = null;
+  let pending = null, activeRide = null, locInterval = null, driverPinEl = null, selectedStar = 0, completedRide = null;
 
-  window.addEventListener("load", () => {
-    driverPinEl = document.getElementById("d-pin");
-    loadRides();
-    loadMyRating();
-  });
+  window.addEventListener("load", () => { driverPinEl = document.getElementById("d-pin"); loadRides(); loadMyRating(); });
 
   async function loadMyRating() {
-    try {
-      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/rating`);
-      const data = await res.json();
-      if (data && data.avg_rating > 0) {
-        document.getElementById("s-rating").textContent = parseFloat(data.avg_rating).toFixed(1);
-      }
-    } catch(e) {}
+    try { const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/rating`); const data = await res.json(); if (data && data.avg_rating > 0) document.getElementById("s-rating").textContent = parseFloat(data.avg_rating).toFixed(1); } catch(e) {}
   }
 
   const socket = io(BASE, { transports: ["websocket", "polling"] });
-
-  socket.on("connect", () => {
-    document.getElementById("dot").classList.add("live");
-    socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
-    loadRides();
-  });
+  socket.on("connect", () => { document.getElementById("dot").classList.add("live"); socket.emit("join-role", { role: "drivers", userId: DRIVER_ID }); loadRides(); });
   socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
 
   socket.on("new-ride", (ride) => {
@@ -409,110 +366,55 @@
   });
 
   socket.on("offer-declined", () => showToast("Rider declined your offer", "error"));
-
-  socket.on("ride-updated", (ride) => {
-    if (activeRide && ride.id === activeRide.id) {
-      activeRide = ride;
-      updateDriverProgress(ride.status);
-      loadRides();
-    }
-  });
-
-  socket.on("new-message", (msg) => {
-    if (!activeRide) return;
-    appendMsg(msg);
-  });
-
+  socket.on("ride-updated", (ride) => { if (activeRide && ride.id === activeRide.id) { activeRide = ride; updateDriverProgress(ride.status); loadRides(); } });
+  socket.on("new-message", (msg) => { if (!activeRide) return; appendMsg(msg); });
   socket.on("new-delivery", () => showToast("New delivery! 📦", "warn"));
 
   function updateDriverProgress(status) {
     const stateMap = { accepted: 1, in_progress: 2, completed: 3 };
     const current = stateMap[status] || 0;
     for (let i = 1; i <= 3; i++) {
-      const dot = document.getElementById(`dp${i}`);
-      const lbl = document.getElementById(`dpl${i}`);
-      if (i < current) {
-        dot.className = "prog-dot done"; dot.textContent = "✓";
-        lbl.className = "prog-label done";
-        if (i < 3) document.getElementById(`dpline${i}`).className = "prog-line done";
-      } else if (i === current) {
-        dot.className = "prog-dot active"; dot.textContent = i;
-        lbl.className = "prog-label active";
-      } else {
-        dot.className = "prog-dot"; dot.textContent = i;
-        lbl.className = "prog-label";
-      }
+      const dot = document.getElementById(`dp${i}`); const lbl = document.getElementById(`dpl${i}`);
+      if (i < current) { dot.className = "prog-dot done"; dot.textContent = "✓"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`dpline${i}`).className = "prog-line done"; }
+      else if (i === current) { dot.className = "prog-dot active"; dot.textContent = i; lbl.className = "prog-label active"; }
+      else { dot.className = "prog-dot"; dot.textContent = i; lbl.className = "prog-label"; }
     }
   }
 
   async function sendOffer(isCounter) {
     if (!pending) return;
     const fare = Math.max(15, parseFloat(document.getElementById("my-fare").value) || 15);
-    try {
-      await fetch(`${BASE}/rides/${pending.id}/offer`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fare_offer: fare, driverId: DRIVER_ID, driver_name: DRIVER_NAME })
-      });
-      document.getElementById("inc-card").classList.remove("visible");
-      showToast(isCounter ? `Counter P${fare.toFixed(2)} sent ✉️` : "Offer sent! Waiting for rider...");
-    } catch(e) { showToast("Failed", "error"); }
+    try { await fetch(`${BASE}/rides/${pending.id}/offer`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fare_offer: fare, driverId: DRIVER_ID, driver_name: DRIVER_NAME }) }); document.getElementById("inc-card").classList.remove("visible"); showToast(isCounter ? `Counter P${fare.toFixed(2)} sent ✉️` : "Offer sent! Waiting for rider..."); } catch(e) { showToast("Failed", "error"); }
   }
 
-  function declineIncoming() {
-    pending = null;
-    document.getElementById("inc-card").classList.remove("visible");
-    showToast("Declined");
-  }
+  function declineIncoming() { pending = null; document.getElementById("inc-card").classList.remove("visible"); showToast("Declined"); }
 
   async function updateStatus(status) {
     if (!activeRide) return;
     try {
-      const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
-      });
-      const ride = await res.json();
-      activeRide = ride;
-      updateDriverProgress(status);
-      if (status === "in_progress") {
-        showToast("Ride started! 🚀");
-        document.getElementById("btn-start-ride").disabled = true;
-      }
-      if (status === "completed") {
-        completedRide = ride;
-        showToast("Ride completed! 🎉");
-        setTimeout(() => showRatingModal(ride), 1500);
-      }
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      const ride = await res.json(); activeRide = ride; updateDriverProgress(status);
+      if (status === "in_progress") { showToast("Ride started! 🚀"); document.getElementById("btn-start-ride").disabled = true; }
+      if (status === "completed") { completedRide = ride; showToast("Ride completed! 🎉"); setTimeout(() => showRatingModal(ride), 1500); }
       loadRides();
     } catch(e) { showToast("Failed", "error"); }
   }
 
-  // RATING
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
     document.getElementById("rating-avatar").textContent = "R";
-    selectedStar = 0;
-    document.querySelectorAll(".star").forEach(s => s.classList.remove("active"));
+    selectedStar = 0; document.querySelectorAll(".star").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
     document.getElementById("rating-overlay").classList.add("open");
   }
 
-  function setStar(n) {
-    selectedStar = n;
-    document.querySelectorAll(".star").forEach((s, i) => s.classList.toggle("active", i < n));
-  }
+  function setStar(n) { selectedStar = n; document.querySelectorAll(".star").forEach((s, i) => s.classList.toggle("active", i < n)); }
 
   async function submitRating() {
     if (!completedRide) return;
     if (selectedStar === 0) return showToast("Please select a star rating", "warn");
     const comment = document.getElementById("rating-comment").value.trim();
-    try {
-      await fetch(`${BASE}/rides/${completedRide.id}/rate-rider`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating: selectedStar, comment })
-      });
-      showToast("Rating submitted! 🌟");
-    } catch(e) {}
+    try { await fetch(`${BASE}/rides/${completedRide.id}/rate-rider`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rating: selectedStar, comment }) }); showToast("Rating submitted! 🌟"); } catch(e) {}
     closeRatingAndReset();
   }
 
@@ -524,9 +426,7 @@
     document.getElementById("active-card").classList.remove("visible");
     document.getElementById("chat-msgs").innerHTML = '<div class="empty" style="padding:8px;font-size:0.73rem">No messages yet</div>';
     document.getElementById("btn-start-ride").disabled = false;
-    activeRide = null;
-    loadRides();
-    loadMyRating();
+    activeRide = null; loadRides(); loadMyRating();
   }
 
   function startLoc() {
@@ -535,9 +435,7 @@
     document.getElementById("loc-text").textContent = "Sharing location...";
     document.getElementById("btn-stop").style.display = "block";
     document.getElementById("btn-start").style.display = "none";
-    sendLoc();
-    locInterval = setInterval(sendLoc, 5000);
-    showToast("Sharing location");
+    sendLoc(); locInterval = setInterval(sendLoc, 5000); showToast("Sharing location");
   }
 
   function stopLoc() {
@@ -552,45 +450,25 @@
   function sendLoc() {
     navigator.geolocation.getCurrentPosition(async ({ coords: { latitude: lat, longitude: lng } }) => {
       if (driverPinEl) {
-        const map = document.getElementById("driver-map");
-        const w = map.offsetWidth || 480;
-        const h = map.offsetHeight || 160;
-        const base = { lat: -24.6541, lng: 25.9087 };
-        const scale = 6000;
-        const x = Math.max(10, Math.min(w-10, w/2 + (lng - base.lng) * scale));
-        const y = Math.max(10, Math.min(h-10, h/2 - (lat - base.lat) * scale));
+        const map = document.getElementById("driver-map"); const w = map.offsetWidth || 480; const h = map.offsetHeight || 160;
+        const base = { lat: -24.6541, lng: 25.9087 }; const scale = 6000;
         driverPinEl.style.display = "block";
-        driverPinEl.style.left = x + "px";
-        driverPinEl.style.top = y + "px";
+        driverPinEl.style.left = Math.max(10, Math.min(w-10, w/2 + (lng - base.lng) * scale)) + "px";
+        driverPinEl.style.top = Math.max(10, Math.min(h-10, h/2 - (lat - base.lat) * scale)) + "px";
       }
       document.getElementById("loc-text").textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      try {
-        await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
-          method: "PATCH", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lat, lng })
-        });
-      } catch(e) {}
+      try { await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lat, lng }) }); } catch(e) {}
     }, () => showToast("Location error", "error"));
   }
 
   async function toggleAvail() {
     const on = document.getElementById("avail-toggle").checked;
     document.getElementById("avail-sub").textContent = on ? "You are online" : "You are offline";
-    try {
-      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ available: on })
-      });
-      showToast(on ? "Online 🟢" : "Offline");
-    } catch(e) {}
+    try { await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ available: on }) }); showToast(on ? "Online 🟢" : "Offline"); } catch(e) {}
   }
 
   async function loadMsgs(rideId) {
-    try {
-      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
-      const msgs = await res.json();
-      if (msgs.length) { document.getElementById("chat-msgs").innerHTML = ""; msgs.forEach(appendMsg); }
-    } catch(e) {}
+    try { const res = await fetch(`${BASE}/rides/${rideId}/messages`); const msgs = await res.json(); if (msgs.length) { document.getElementById("chat-msgs").innerHTML = ""; msgs.forEach(appendMsg); } } catch(e) {}
   }
 
   function appendMsg(msg) {
@@ -604,31 +482,14 @@
 
   async function sendMsg() {
     if (!activeRide) return;
-    const input = document.getElementById("chat-in");
-    const message = input.value.trim();
-    if (!message) return;
-    input.value = "";
-    try {
-      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sender_role: "driver", message })
-      });
-    } catch(e) { showToast("Failed", "error"); }
+    const input = document.getElementById("chat-in"); const message = input.value.trim(); if (!message) return; input.value = "";
+    try { await fetch(`${BASE}/rides/${activeRide.id}/messages`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sender_role: "driver", message }) }); } catch(e) { showToast("Failed", "error"); }
   }
 
   async function loadRides() {
     try {
-      const res = await fetch(`${BASE}/rides`);
-      const rides = await res.json();
-      const mine = rides.filter(r => r.driver_id == DRIVER_ID);
-      document.getElementById("rides-list").innerHTML = mine.length ? mine.map(r => `
-        <div class="ride-item">
-          <div>
-            <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
-            <div class="ride-meta">#${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : r.offered_fare ? " · Offered P"+parseFloat(r.offered_fare).toFixed(2) : ""}</div>
-          </div>
-          <span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span>
-        </div>`).join("") : '<div class="empty">No rides yet</div>';
+      const res = await fetch(`${BASE}/rides`); const rides = await res.json(); const mine = rides.filter(r => r.driver_id == DRIVER_ID);
+      document.getElementById("rides-list").innerHTML = mine.length ? mine.map(r => `<div class="ride-item"><div><div class="ride-route">${r.pickup} → ${r.dropoff}</div><div class="ride-meta">#${r.id}${r.fare ? " · P"+parseFloat(r.fare).toFixed(2) : r.offered_fare ? " · Offered P"+parseFloat(r.offered_fare).toFixed(2) : ""}</div></div><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></div>`).join("") : '<div class="empty">No rides yet</div>';
       document.getElementById("s-total").textContent = mine.length;
       document.getElementById("s-done").textContent = mine.filter(r => r.status === "completed").length;
       const earn = mine.filter(r => r.status === "completed").reduce((s,r) => s + parseFloat(r.fare||0), 0);
@@ -637,9 +498,7 @@
   }
 
   function showToast(msg, type="") {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.className = "toast show" + (type ? " "+type : "");
+    const t = document.getElementById("toast"); t.textContent = msg; t.className = "toast show" + (type ? " "+type : "");
     setTimeout(() => t.className = "toast", 3500);
   }
 </script>
