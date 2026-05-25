@@ -19,7 +19,7 @@
     .nav-right { display: flex; align-items: center; gap: 12px; }
     .nav-user { font-size: 0.75rem; color: #78716C; display: flex; align-items: center; gap: 4px; }
     .nav-user strong { color: #1C1917; }
-    .logout-btn { background: none; border: 1px solid #E5DDD0; color: #78716C; font-family: inherit; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .logout-btn { background: none; border: 1px solid #E5DDD0; color: #78716C; font-family: inherit; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
     .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
     .logout-btn:hover svg { stroke: #ef4444; }
     .conn-dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
@@ -47,7 +47,7 @@
     .switch-handle svg { width: 12px; height: 12px; fill: none; stroke: #A8A29E; stroke-width: 2.5; transition: stroke 0.3s; }
     .switch-bg.on .switch-handle svg { stroke: #10B981; }
 
-    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; position: relative; }
+    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; position: relative; margin-bottom: 4px; }
     .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #10B981; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
     
     /* ADJUSTABLE INTERACTIVE MAP MODULE */
@@ -89,7 +89,7 @@
     .fare-lbl { font-size: 0.65rem; color: #78716C; margin-top: 1px; }
     
     .counter-input-row { display: flex; gap: 8px; margin-top: 10px; width: 100%; }
-    .counter-in { flex: 1; background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 0.85rem; outline: none; }
+    .counter-in { flex: 1; background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 0.85rem; outline: none; color: #1C1917; }
     .counter-in:focus { border-color: #10B981; }
 
     .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -105,7 +105,8 @@
     .rider-sub { font-size: 0.68rem; color: #78716C; margin-top: 2px; }
 
     /* FLOATING ACTION OVERLAYS (CHAT SYSTEM) */
-    .chat-fab { position: fixed; bottom: 24px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #10B981; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(16,185,129,0.4); z-index: 800; }
+    .chat-fab { position: fixed; bottom: 24px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #10B981; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(16,185,129,0.4); z-index: 800; transition: transform 0.2s; }
+    .chat-fab:active { transform: scale(0.95); }
     .chat-fab.visible { display: flex; }
     .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
     .chat-fab-badge.show { display: flex; }
@@ -120,19 +121,21 @@
     .chat-popup-title-text { font-size: 0.85rem; font-weight: 700; color: #1C1917; }
     .chat-popup-title-sub { font-size: 0.68rem; color: #78716C; margin-top: 1px; }
     .chat-close { background: #EDE8E0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; min-height: 200px; max-height: 45vh; }
-    .msg { max-width: 78%; padding: 9px 13px; border-radius: 16px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
+    .chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; min-height: 200px; max-height: 45vh; background: #FAF8F5; }
+    .msg { max-width: 78%; padding: 9px 13px; border-radius: 16px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; position: relative; }
     .msg.me { background: #10B981; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg.them { background: #EDE8E0; color: #1C1917; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .msg-time { font-size: 0.58rem; opacity: 0.55; margin-top: 3px; }
+    .msg-time { font-size: 0.58rem; opacity: 0.65; margin-top: 3px; text-align: right; }
     .chat-input-area { padding: 12px 16px 24px; border-top: 1px solid #E5DDD0; display: flex; gap: 8px; background: #fff; }
     .chat-in { flex: 1; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 22px; padding: 10px 16px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; }
-    .chat-in:focus { border-color: #10B981; }
-    .chat-send { background: #10B981; border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .chat-in:focus { border-color: #10B981; background: #fff; }
+    .chat-send { background: #10B981; border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
+    .chat-send:hover { background: #059669; }
 
     .history-item { background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
-    .h-route { font-size: 0.8rem; color: #1C1917; display: flex; align-items: center; gap: 5px; }
+    .h-route { font-size: 0.8rem; color: #1C1917; display: flex; align-items: center; gap: 5px; max-width: 70%; }
     .h-route svg { width: 12px; height: 12px; flex-shrink: 0; fill: none; stroke: #A8A29E; stroke-width: 2.5; }
+    .h-text-wrapper { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
     .h-meta { font-size: 0.65rem; color: #A8A29E; margin-top: 4px; }
     .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
     .badge-completed { background: #E0F2FE; color: #0369A1; }
@@ -167,7 +170,7 @@
   
   <div class="map-module minimized" id="map-wrapper">
     <div id="driver-map-canvas">
-      <svg id="vector-grid-svg" width="100%" height="100%" viewBox="0 0 480 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+      <svg id="vector-grid-svg" width="100%" height="100%" viewBox="0 0 480 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
         <rect width="100%" height="100%" fill="#EDE8E0"/>
         <g stroke="#D4CCBF" stroke-linecap="round">
           <line x1="-100" y1="60" x2="600" y2="60" stroke-width="16"/>
@@ -513,10 +516,17 @@
   function sendCounterPrice(id) {
     const v = parseFloat(document.getElementById(`c-input-${id}`).value);
     if (isNaN(v) || v <= 0) return;
-    socket.emit("driver-offer", { rideId: id, driverId: DRIVER_ID, driver_name: driverData.name, fare_offer: v });
+    socket.emit("driver-offer", { rideId: id, driverId: DRIVER_ID, driver_name: (driverData?.name || "Driver"), fare_offer: v });
     showToast("Counter offer sent to passenger");
     document.getElementById(`lobby-offer-${id}`).remove();
     checkLobbyCount();
+  }
+
+  function checkLobbyCount() {
+    const root = document.getElementById("offers-feed-target");
+    if(root.children.length === 0) {
+      root.innerHTML = `<div class="empty">Waiting for requests in your area...</div>`;
+    }
   }
 
   async function acceptLobbyJob(id, fare) {
@@ -571,15 +581,17 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
-      const data = await res.json();
-      if (status === "completed") {
-        showToast("Job finalized successfully! 🎉");
-        clearActiveRideInterface();
-        loadHistory();
-      } else {
-        renderActiveRideState(data);
+      if (res.ok) {
+        const data = await res.json();
+        if (status === "completed") {
+          showToast("Job finalized successfully! 🎉");
+          clearActiveRideInterface();
+          loadHistory();
+        } else {
+          renderActiveRideState(data);
+        }
       }
-    } catch(e) { showToast("Failed to update status", "error"); }
+    } catch(e) { showToast("Failed to transform execution state matrix", "error"); }
   }
 
   function clearActiveRideInterface() {
@@ -589,89 +601,100 @@
     closeChat();
     if (isOnline) {
       document.getElementById("lobby-view").style.display = "block";
-      document.getElementById("offers-feed-target").innerHTML = '<div class="empty">Waiting for requests in your area...</div>';
     } else {
       stopTelemetryStreaming();
     }
   }
 
-  function checkLobbyCount() {
-    const feeds = document.getElementById("offers-feed-target");
-    if (feeds.children.length === 0) {
-      feeds.innerHTML = '<div class="empty">Waiting for requests in your area...</div>';
-    }
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/history`);
+      const data = await res.json();
+      const container = document.getElementById("history-target");
+      if (data && data.length > 0) {
+        container.innerHTML = "";
+        data.forEach(item => {
+          const statusBadge = item.status === 'completed' ? '<span class="badge badge-completed">Done</span>' : '<span class="badge badge-cancelled">Dropped</span>';
+          const node = document.createElement("div");
+          node.className = "history-item";
+          node.innerHTML = `
+            <div class="h-route">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div class="h-text-wrapper">
+                <strong>${item.pickup}</strong> to <strong>${item.dropoff}</strong>
+                <div class="h-meta">Fare Settlement: P${parseFloat(item.fare).toFixed(2)}</div>
+              </div>
+            </div>
+            ${statusBadge}
+          `;
+          container.appendChild(node);
+        });
+      } else {
+        container.innerHTML = `<div class="empty">No completed jobs parsed</div>`;
+      }
+    } catch(e) {}
   }
 
-  // CHAT INTERACTIVE PIPELINE
+  // CHAT LAYER EXECUTION
   function openChat() {
     document.getElementById("chat-overlay").classList.add("open");
     document.getElementById("chat-popup").classList.add("open");
-    unreadCount = 0;
     document.getElementById("chat-badge").classList.remove("show");
-    setTimeout(() => { const m = document.getElementById("chat-msgs"); m.scrollTop = m.scrollHeight; }, 200);
+    unreadCount = 0;
+    const box = document.getElementById("chat-msgs");
+    box.scrollTop = box.scrollHeight;
   }
+
   function closeChat() {
     document.getElementById("chat-overlay").classList.remove("open");
     document.getElementById("chat-popup").classList.remove("open");
   }
 
-  async function loadMsgs(id) {
+  async function loadMsgs(rideId) {
     try {
-      const res = await fetch(`${BASE}/rides/${id}/messages`);
-      const msgs = await res.json();
-      const container = document.getElementById("chat-msgs");
-      container.innerHTML = "";
-      if(!msgs.length) {
-        container.innerHTML = '<div class="empty" style="padding:12px; font-size:0.75rem;">Coordinate path points via chat text</div>';
-      } else {
-        msgs.forEach(appendMsg);
-      }
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const messages = await res.json();
+      document.getElementById("chat-msgs").innerHTML = "";
+      messages.forEach(appendMsg);
     } catch(e) {}
   }
 
   function appendMsg(msg) {
-    const container = document.getElementById("chat-msgs");
-    const empty = container.querySelector('.empty');
-    if (empty) empty.remove();
+    const box = document.getElementById("chat-msgs");
+    const isMe = msg.sender_role === "driver" || msg.senderId === DRIVER_ID;
+    const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
     const div = document.createElement("div");
-    const isMe = msg.sender_role === 'driver';
     div.className = `msg ${isMe ? 'me' : 'them'}`;
-    div.innerHTML = `<div>${msg.message}</div><div class="msg-time">${new Date(msg.created_at || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
+    div.innerHTML = `
+      <div>${msg.message_text || msg.message}</div>
+      <div class="msg-time">${timeStr}</div>
+    `;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
   }
 
   function sendMsg() {
     const input = document.getElementById("chat-in");
-    const text = input.value.trim();
-    if (!text || !activeRide) return;
-    const payload = { rideId: activeRide.id, message: text, sender_role: 'driver', sender_id: DRIVER_ID };
+    const val = input.value.trim();
+    if (!val || !activeRide) return;
+
+    const payload = {
+      rideId: activeRide.id,
+      senderId: DRIVER_ID,
+      sender_role: "driver",
+      message: val
+    };
+
     socket.emit("send-message", payload);
-    appendMsg({ ...payload, created_at: new Date() });
+    appendMsg({ sender_role: "driver", message_text: val });
     input.value = "";
   }
 
-  async function loadHistory() {
-    try {
-      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/rides`);
-      const rides = await res.json();
-      const target = document.getElementById("history-target");
-      target.innerHTML = "";
-      if (!rides.length) { target.innerHTML = '<div class="empty">No completed jobs parsed</div>'; return; }
-      
-      const routeMarkerSvg = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>`;
-      rides.forEach(r => {
-        const item = document.createElement("div");
-        item.className = "history-item";
-        item.innerHTML = `<div><div class="h-route">${routeMarkerSvg} ${r.pickup.substring(0,16)}... → ${r.dropoff.substring(0,16)}...</div><div class="h-meta">P${parseFloat(r.fare||0).toFixed(2)} · ${new Date(r.created_at).toLocaleDateString()}</div></div><span class="badge badge-${r.status}">${r.status}</span>`;
-        target.appendChild(item);
-      });
-    } catch(e) {}
-  }
-
-  function showToast(msg, type = "info") {
+  function showToast(txt, type = "") {
     const el = document.getElementById("toast");
-    el.textContent = msg; el.className = `toast show ${type !== 'info' ? type : ''}`;
+    el.className = `toast ${type} show`;
+    el.textContent = txt;
     setTimeout(() => el.classList.remove("show"), 3500);
   }
 </script>
