@@ -5,7 +5,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0f0f13;
+      background: #F5F0EA;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -17,15 +17,15 @@
     .brand {
       font-size: 1.6rem;
       font-weight: 700;
-      color: #e8e8f0;
+      color: #1C1917;
       margin-top: 24px;
       letter-spacing: -0.03em;
       animation: fadeIn 1s ease 0.3s both;
     }
-    .brand span { color: #22c55e; }
+    .brand span { color: #F97316; }
     .tagline {
       font-size: 0.78rem;
-      color: #444;
+      color: #A8A29E;
       margin-top: 6px;
       animation: fadeIn 1s ease 0.6s both;
     }
@@ -43,8 +43,8 @@
       left: 0;
       width: 100%;
       height: 52px;
-      background: #16161d;
-      border-top: 3px solid #1e1e28;
+      background: #EDE8E0;
+      border-top: 3px solid #E0D8CC;
     }
     .dash-track {
       position: absolute;
@@ -58,8 +58,8 @@
     .dash {
       width: 32px;
       height: 4px;
-      background: #22c55e;
-      opacity: 0.35;
+      background: #D4CCBF;
+      opacity: 0.8;
       border-radius: 2px;
       flex-shrink: 0;
     }
@@ -81,7 +81,7 @@
     .puff {
       position: absolute;
       border-radius: 50%;
-      background: #aaa;
+      background: #C8BFB5;
       bottom: 18px;
       animation: puffOut 0.8s ease-out infinite;
     }
@@ -95,7 +95,6 @@
   </style>
 </head>
 <body>
-
   <div class="track-wrap">
     <div class="road">
       <div class="dash-track">
@@ -113,15 +112,14 @@
       <div class="puff p1"></div>
       <div class="puff p2"></div>
       <div class="puff p3"></div>
-
       <svg width="90" height="48" viewBox="0 0 90 48" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6" y="18" width="78" height="22" rx="5" fill="#22c55e"/>
-        <path d="M22 18 Q28 4 45 3 Q64 3 62 18Z" fill="#1a8f3c"/>
-        <path d="M28 17 Q32 7 45 6 Q58 6 56 17Z" fill="#0f2a1a" opacity="0.75"/>
-        <rect x="78" y="22" width="7" height="5" rx="2" fill="#f59e0b" opacity="0.9"/>
-        <rect x="5" y="22" width="5" height="5" rx="2" fill="#ef4444" opacity="0.85"/>
-        <g><circle cx="22" cy="40" r="8" fill="#0f0f13" stroke="#22c55e" stroke-width="2.5"/><circle cx="22" cy="40" r="3.5" fill="#0f0f13" stroke="#22c55e" stroke-width="1.5"/></g>
-        <g><circle cx="64" cy="40" r="8" fill="#0f0f13" stroke="#22c55e" stroke-width="2.5"/><circle cx="64" cy="40" r="3.5" fill="#0f0f13" stroke="#22c55e" stroke-width="1.5"/></g>
+        <rect x="6" y="18" width="78" height="22" rx="5" fill="#F97316"/>
+        <path d="M22 18 Q28 4 45 3 Q64 3 62 18Z" fill="#EA6A0A"/>
+        <path d="M28 17 Q32 7 45 6 Q58 6 56 17Z" fill="#1a0a00" opacity="0.18"/>
+        <rect x="78" y="22" width="7" height="5" rx="2" fill="#FDE68A" opacity="0.9"/>
+        <rect x="5" y="22" width="5" height="5" rx="2" fill="#DC2626" opacity="0.85"/>
+        <g><circle cx="22" cy="40" r="8" fill="#1C1917" stroke="#F97316" stroke-width="2.5"/><circle cx="22" cy="40" r="3.5" fill="#1C1917" stroke="#F97316" stroke-width="1.5"/></g>
+        <g><circle cx="64" cy="40" r="8" fill="#1C1917" stroke="#F97316" stroke-width="2.5"/><circle cx="64" cy="40" r="3.5" fill="#1C1917" stroke="#F97316" stroke-width="1.5"/></g>
       </svg>
     </div>
   </div>
@@ -130,6 +128,14 @@
   <div class="tagline">Your ride, your way</div>
 
   <script>
+    if (sessionStorage.getItem('splashed')) {
+      const driver = localStorage.getItem('spiti_driver');
+      const rider  = localStorage.getItem('spiti_rider');
+      if (driver) window.location.href = 'driver.html';
+      else if (rider) window.location.href = 'rider.html';
+      else window.location.href = 'login.html';
+    }
+    sessionStorage.setItem('splashed', '1');
     setTimeout(() => {
       const driver = localStorage.getItem('spiti_driver');
       const rider  = localStorage.getItem('spiti_rider');
