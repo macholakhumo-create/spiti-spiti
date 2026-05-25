@@ -599,9 +599,11 @@
 
     if (!riderLocation) riderLocation = { lat: -24.6541, lng: 25.9087 };
 
-    const scaleFactor = 15000;
-    let pixelX = 240 + (lng - riderLocation.lng) * scaleFactor;
-    let pixelY = 100 - (lat - riderLocation.lat) * scaleFactor;
+    // Optimized trace scaling vector calculation 
+    const scaleFactorX = 22000;
+    const scaleFactorY = 25000;
+    let pixelX = 240 + (lng - riderLocation.lng) * scaleFactorX;
+    let pixelY = 100 - (lat - riderLocation.lat) * scaleFactorY;
 
     pixelX = Math.max(15, Math.min(465, pixelX));
     pixelY = Math.max(15, Math.min(185, pixelY));
