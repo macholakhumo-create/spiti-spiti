@@ -12,30 +12,32 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F0EA; color: #1C1917; min-height: 100vh; }
-    nav { background: #fff; border-bottom: 1px solid #E5DDD0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; }
+    nav { background: #fff; border-bottom: 1px solid #E5DDD0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; display: flex; align-items: center; gap: 6px; }
     .brand span { color: #F97316; }
     .nav-right { display: flex; align-items: center; gap: 12px; }
     .nav-user { font-size: 0.75rem; color: #78716C; display: flex; align-items: center; gap: 4px; }
     .nav-user strong { color: #1C1917; }
     .logout-btn { background: none; border: 1px solid #E5DDD0; color: #78716C; font-family: inherit; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
-    .logout-btn:hover svg { stroke: #ef4444; }
     .conn-dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
     .conn-dot svg { fill: #D4CCBF; transition: all 0.3s; }
     .conn-dot.live svg { fill: #22c55e; filter: drop-shadow(0 0 4px #22c55e88); }
-    .container { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
-    .greeting { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; color: #1C1917; display: flex; align-items: center; gap: 6px; }
+    .container { max-width: 480px; margin: 0 auto; padding: 16px 16px 120px; }
+    .greeting { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; color: #1C1917; }
     .greeting-sub { font-size: 0.8rem; color: #78716C; margin-bottom: 20px; }
     .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
-    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F97316; margin-bottom: 12px; }
+    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F97316; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+    .card-label svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
     .field { margin-bottom: 11px; }
-    label { display: block; font-size: 0.7rem; color: #78716C; margin-bottom: 4px; font-weight: 500; }
-    input[type=text], input[type=number] { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
-    input:focus { border-color: #F97316; }
-    .fare-hint { font-size: 0.65rem; color: #A8A29E; margin-top: 3px; }
+    .field label { display: block; font-size: 0.7rem; color: #78716C; margin-bottom: 4px; font-weight: 500; }
+    .field input { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: #F97316; }
+    .fare-hint { font-size: 0.65rem; color: #A8A29E; margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+    .fare-hint svg { width: 10px; height: 10px; stroke: #A8A29E; fill: none; stroke-width: 2; flex-shrink: 0; }
     .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn:last-child { margin-bottom: 0; }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .btn-primary { background: #F97316; color: #fff; }
     .btn-danger { background: #ef4444; color: #fff; }
     .btn-ghost { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
@@ -43,15 +45,16 @@
 
     .progress-bar { display: flex; align-items: flex-start; margin-bottom: 18px; padding: 0 4px; }
     .prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
-    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #EDE8E0; border: 2px solid #E5DDD0; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #A8A29E; transition: all 0.4s; position: relative; z-index: 1; }
-    .prog-dot svg { width: 14px; height: 14px; display: none; }
+    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #EDE8E0; border: 2px solid #E5DDD0; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #A8A29E; transition: all 0.4s; }
+    .prog-dot svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 3; stroke-linecap: round; display: none; }
+    .prog-dot span { display: block; }
     .prog-dot.active { background: #FFF7ED; border-color: #F97316; color: #F97316; box-shadow: 0 0 12px #F9731644; }
-    .prog-dot.done { background: #F97316; border-color: #F97316; color: #fff; }
+    .prog-dot.done { background: #F97316; border-color: #F97316; }
     .prog-dot.done span { display: none; }
     .prog-dot.done svg { display: block; }
     .prog-line { flex: 1; height: 2px; background: #E5DDD0; margin-top: 14px; transition: background 0.4s; }
     .prog-line.done { background: #F97316; }
-    .prog-label { font-size: 0.58rem; color: #A8A29E; margin-top: 5px; text-align: center; font-weight: 500; transition: color 0.3s; }
+    .prog-label { font-size: 0.58rem; color: #A8A29E; margin-top: 5px; text-align: center; font-weight: 500; }
     .prog-label.active { color: #F97316; }
     .prog-label.done { color: #F97316; }
 
@@ -62,9 +65,12 @@
     .route-row { display: flex; align-items: center; gap: 10px; }
     .route-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .route-dot.from { background: #EDE8E0; }
+    .route-dot.from svg { stroke: #78716C; }
     .route-dot.to { background: #FFF7ED; }
+    .route-dot.to svg { stroke: #F97316; }
+    .route-dot svg { width: 14px; height: 14px; fill: none; stroke-width: 2.5; }
     .route-lbl { font-size: 0.62rem; color: #A8A29E; margin-bottom: 1px; }
-    .route-val { font-size: 0.83rem; color: #1C1917; }
+    .route-val { font-size: 0.83rem; color: #1C1917; font-weight: 500; }
 
     .fare-display { background: #F5F0EA; border-radius: 10px; padding: 12px; text-align: center; margin-bottom: 12px; }
     .fare-num { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; }
@@ -72,98 +78,128 @@
     .fare-num.green { color: #22c55e; }
     .fare-lbl { font-size: 0.65rem; color: #78716C; margin-top: 2px; }
 
-    .offers-wrap { margin-bottom: 12px; }
-    .offers-head { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+    /* OFFERS */
+    .offers-section { margin-bottom: 12px; display: none; }
+    .offers-head { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .offers-head svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
     .offer-card { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 12px 14px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.25s ease; }
-    @keyframes slideIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
-    .offer-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; color: #1C1917; display: flex; align-items: center; gap: 4px; }
+    @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+    .offer-name { font-size: 0.82rem; font-weight: 600; color: #1C1917; display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+    .offer-name svg { width: 13px; height: 13px; stroke: #78716C; fill: none; stroke-width: 2; }
     .offer-price { font-size: 1.2rem; font-weight: 700; color: #F97316; }
-    .offer-tag { font-size: 0.6rem; color: #78716C; margin-top: 2px; }
-    .offer-rating { font-size: 0.65rem; color: #f59e0b; margin-top: 2px; display: flex; align-items: center; gap: 3px; }
+    .offer-tag { font-size: 0.6rem; color: #78716C; margin-top: 2px; display: flex; align-items: center; gap: 3px; }
+    .offer-tag svg { width: 10px; height: 10px; stroke: #22c55e; fill: none; stroke-width: 3; }
+    .offer-rating { font-size: 0.65rem; color: #78716C; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
+    .offer-rating svg { width: 11px; height: 11px; fill: #f59e0b; }
     .offer-actions { display: flex; gap: 6px; }
-    .obtn { padding: 7px 12px; border-radius: 8px; font-family: inherit; font-size: 0.73rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+    .obtn { padding: 7px 12px; border-radius: 8px; font-family: inherit; font-size: 0.73rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .obtn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .obtn.acc { background: #F97316; color: #fff; }
-    .obtn.dec { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; width: 30px; height: 30px; padding: 0; }
+    .obtn.dec { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; width: 32px; height: 32px; padding: 0; }
     .obtn:hover { opacity: 0.85; }
 
+    /* DRIVER CARD */
     .driver-card { background: #F5F0EA; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .driver-av { width: 40px; height: 40px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0; }
     .driver-name { font-size: 0.85rem; font-weight: 600; color: #1C1917; }
     .driver-sub { font-size: 0.68rem; color: #78716C; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
-    .driver-stars { font-size: 0.72rem; color: #f59e0b; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
+    .driver-sub svg { width: 11px; height: 11px; stroke: #78716C; fill: none; stroke-width: 2; }
+    .driver-stars { font-size: 0.72rem; color: #78716C; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
+    .driver-stars svg { width: 11px; height: 11px; fill: #f59e0b; }
 
-    #rider-map { width: 100%; height: 200px; border-radius: 12px; margin-bottom: 10px; background: #EDE8E0; border: 1px solid #E5DDD0; position: relative; overflow: hidden; }
-    .map-status-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; color: #78716C; margin-bottom: 10px; padding: 0 2px; }
-    .map-status-left { display: flex; align-items: center; gap: 6px; }
+    /* MAP — expandable */
+    .map-module { border: 1px solid #E5DDD0; background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 10px; position: relative; transition: height 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .map-module.collapsed { height: 44px; }
+    .map-module.expanded { height: 240px; }
+    .map-module.fullscreen { position: fixed; top: 57px; left: 0; right: 0; bottom: 0; z-index: 600; border-radius: 0; border: none; height: auto !important; max-width: 100%; }
+
+    .map-header { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; height: 44px; cursor: pointer; user-select: none; background: #fff; }
+    .map-header-left { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 700; color: #78716C; letter-spacing: 0.05em; text-transform: uppercase; }
+    .map-header-left svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
+    .map-header-right { display: flex; align-items: center; gap: 5px; }
+    .map-ctrl-sm { width: 26px; height: 26px; border-radius: 6px; background: #F5F0EA; border: 1px solid #E5DDD0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .map-ctrl-sm svg { width: 12px; height: 12px; stroke: #78716C; fill: none; stroke-width: 2; }
+    .map-ctrl-sm:hover { background: #EDE8E0; }
+
+    .map-canvas { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; background: #EDE8E0; overflow: hidden; }
+    .map-module.collapsed .map-canvas { display: none; }
+    .map-canvas svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+
+    .map-overlay-bar { position: absolute; top: 8px; left: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; border-radius: 8px; padding: 5px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.68rem; pointer-events: none; z-index: 10; }
     .map-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #D4CCBF; flex-shrink: 0; }
     .map-live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .eta-display-badge { font-weight: 700; background: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; padding: 2px 7px; border-radius: 6px; font-size: 0.65rem; }
-    
-    .driver-pin { position: absolute; transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform: translate(-50%, -50%); z-index: 20; }
-    .driver-pin-ring { position: absolute; top: -8px; left: -8px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #F9731644; animation: ringPulse 2s infinite; }
-    @keyframes ringPulse { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
-    .driver-pin-dot { width: 14px; height: 14px; border-radius: 50%; background: #F97316; border: 3px solid #fff; box-shadow: 0 0 10px #F9731688; }
-    @keyframes dash { to { stroke-dashoffset: -1000; } }
+    .eta-badge { background: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; display: none; }
 
-    /* FLOATING CHAT BUTTON */
-    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #F97316; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(249,115,22,0.4); z-index: 800; transition: transform 0.2s; }
+    .driver-pin { position: absolute; transform: translate(-50%,-50%); z-index: 20; transition: left 0.8s cubic-bezier(0.4,0,0.2,1), top 0.8s cubic-bezier(0.4,0,0.2,1); display: none; }
+    .driver-pin-ring { position: absolute; top: -8px; left: -8px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #F9731444; animation: pinPulse 2s infinite; }
+    .driver-pin-dot { width: 14px; height: 14px; border-radius: 50%; background: #F97316; border: 3px solid #fff; box-shadow: 0 0 10px #F9731688; }
+    @keyframes pinPulse { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
+
+    .map-status-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; color: #78716C; margin-bottom: 10px; padding: 0 2px; }
+
+    /* CHAT FAB */
+    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #F97316; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(249,115,22,0.4); z-index: 800; -webkit-transform: translateZ(0); transform: translateZ(0); }
     .chat-fab.visible { display: flex; }
-    .chat-fab:hover { transform: scale(1.08); }
-    .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
+    .chat-fab:active { transform: scale(0.95) translateZ(0); }
+    .chat-fab svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #1C1917; color: #fff; font-size: 0.62rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
     .chat-fab-badge.show { display: flex; }
-    
-    /* CHAT POPUP */
-    .chat-popup-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 850; display: none; }
-    .chat-popup-overlay.open { display: block; }
-    .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 0; z-index: 860; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; }
-    .chat-popup.open { transform: translateY(0); }
-    .chat-popup-handle { width: 40px; height: 4px; background: #E5DDD0; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
-    .chat-popup-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 12px; border-bottom: 1px solid #E5DDD0; flex-shrink: 0; }
-    .chat-popup-title { display: flex; align-items: center; gap: 10px; }
-    .chat-popup-title-text { font-size: 0.85rem; font-weight: 700; color: #1C1917; }
-    .chat-popup-title-sub { font-size: 0.68rem; color: #78716C; margin-top: 1px; }
+
+    .chat-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 850; display: none; -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .chat-overlay.open { display: block; }
+    .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 860; transform: translateY(100%) translateZ(0); -webkit-transform: translateY(100%) translateZ(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; will-change: transform; }
+    .chat-popup.open { transform: translateY(0) translateZ(0); -webkit-transform: translateY(0) translateZ(0); }
+    .chat-handle { width: 40px; height: 4px; background: #E5DDD0; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
+    .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 12px; border-bottom: 1px solid #E5DDD0; flex-shrink: 0; }
+    .chat-head-left { display: flex; align-items: center; gap: 10px; }
+    .chat-head-icon { width: 34px; height: 34px; border-radius: 9px; background: #FFF7ED; display: flex; align-items: center; justify-content: center; }
+    .chat-head-icon svg { width: 18px; height: 18px; stroke: #F97316; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .chat-title { font-size: 0.85rem; font-weight: 700; color: #1C1917; }
+    .chat-subtitle { font-size: 0.68rem; color: #78716C; margin-top: 1px; }
     .chat-close { background: #EDE8E0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; min-height: 200px; max-height: 45vh; }
+    .chat-close svg { width: 12px; height: 12px; stroke: #78716C; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .chat-msgs { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; min-height: 180px; max-height: 45vh; }
     .chat-msgs::-webkit-scrollbar { width: 2px; }
-    .chat-msgs::-webkit-scrollbar-thumb { background: #E5DDD0; border-radius: 2px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: #E5DDD0; }
     .msg { max-width: 78%; padding: 9px 13px; border-radius: 16px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
     .msg.me { background: #F97316; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg.them { background: #EDE8E0; color: #1C1917; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .msg-time { font-size: 0.58rem; opacity: 0.55; margin-top: 3px; }
-    .chat-input-area { padding: 12px 16px 24px; border-top: 1px solid #E5DDD0; display: flex; gap: 8px; flex-shrink: 0; background: #fff; }
+    .msg-time { font-size: 0.56rem; opacity: 0.55; margin-top: 3px; }
+    .chat-input-wrap { padding: 10px 14px 28px; border-top: 1px solid #E5DDD0; display: flex; gap: 8px; background: #fff; flex-shrink: 0; }
     .chat-in { flex: 1; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 22px; padding: 10px 16px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; }
     .chat-in:focus { border-color: #F97316; }
-    .chat-send { background: #F97316; border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+    .chat-send { background: #F97316; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .chat-send svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
 
-    .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
+    /* RATING */
+    .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); }
     .rating-overlay.open { display: flex; }
     .rating-modal { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
-    @keyframes popIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
-    .rating-avatar { width: 64px; height: 64px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; color: #fff; margin: 0 auto 14px; }
-    .rating-avatar svg { width: 32px; height: 32px; fill: none; stroke: #fff; stroke-width: 2; }
+    @keyframes popIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+    .rating-avatar { width: 64px; height: 64px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+    .rating-avatar svg { width: 30px; height: 30px; stroke: #fff; fill: none; stroke-width: 2; }
     .rating-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; }
     .rating-sub { font-size: 0.78rem; color: #78716C; margin-bottom: 20px; }
+    .fare-completed { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
+    .fare-completed-amount { font-size: 2.2rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
+    .fare-completed-label { font-size: 0.7rem; color: #78716C; margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .fare-completed-label svg { width: 13px; height: 13px; stroke: #22c55e; fill: none; stroke-width: 3; stroke-linecap: round; }
     .stars-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; }
-    .star-svg-btn { width: 32px; height: 32px; cursor: pointer; transition: all 0.15s; }
-    .star-svg-btn svg { width: 100%; height: 100%; fill: #E5DDD0; transition: fill 0.2s, transform 0.2s; }
-    .star-svg-btn.active svg { fill: #f59e0b; transform: scale(1.1); }
-    .star-svg-btn:hover svg { transform: scale(1.15); }
+    .star-btn { width: 34px; height: 34px; cursor: pointer; }
+    .star-btn svg { width: 100%; height: 100%; fill: #E5DDD0; transition: fill 0.15s, transform 0.15s; }
+    .star-btn.active svg { fill: #f59e0b; transform: scale(1.12); }
     .rating-comment { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 10px 12px; color: #1C1917; font-family: inherit; font-size: 0.82rem; outline: none; resize: none; margin-bottom: 16px; }
     .rating-comment:focus { border-color: #F97316; }
     .rating-btn-row { display: flex; gap: 10px; }
-    .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; }
     .rating-btn.submit { background: #F97316; color: #fff; }
     .rating-btn.skip { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
-    .rating-btn:hover { opacity: 0.88; }
-    .fare-completed { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
-    .fare-completed-amount { font-size: 2.2rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
-    .fare-completed-label { font-size: 0.7rem; color: #78716C; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 4px; }
 
+    /* HISTORY */
     .history-item { background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
-    .h-route { font-size: 0.8rem; color: #1C1917; display: flex; align-items: center; gap: 4px; }
-    .h-route svg { width: 12px; height: 12px; flex-shrink: 0; }
-    .h-meta { font-size: 0.65rem; color: #A8A29E; margin-top: 4px; }
+    .h-route { font-size: 0.8rem; color: #1C1917; font-weight: 500; }
+    .h-meta { font-size: 0.65rem; color: #A8A29E; margin-top: 3px; }
     .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
     .badge-requested { background: #EDE8E0; color: #78716C; }
     .badge-accepted { background: #dcfce7; color: #16a34a; }
@@ -174,66 +210,73 @@
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1200; max-width: 88vw; text-align: center; white-space: nowrap; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
-    .toast.warn { background: #F97316; color: #fff; }
+    .toast.warn { background: #F97316; }
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="brand">Spiti-Spiti<span>.</span></div>
+  <div class="brand">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="1" y="7" width="16" height="7" rx="2" fill="#F97316"/>
+      <path d="M3 7V5C3 3.3 4.3 2 6 2H12C13.7 2 15 3.3 15 5V7" stroke="#F97316" stroke-width="1.5" fill="none"/>
+      <circle cx="5" cy="14" r="2" fill="#1C1917"/><circle cx="13" cy="14" r="2" fill="#1C1917"/>
+      <circle cx="5" cy="14" r="1" fill="#F5F0EA"/><circle cx="13" cy="14" r="1" fill="#F5F0EA"/>
+    </svg>
+    Spiti-Spiti<span>.</span>
+  </div>
   <div class="nav-right">
-    <div class="conn-dot" id="dot">
-      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
-    </div>
-    <div class="nav-user">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Hi, <strong id="nav-name">Rider</strong>
-    </div>
+    <div class="conn-dot" id="dot"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg></div>
+    <div class="nav-user"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Hi, <strong id="nav-name">Rider</strong></div>
     <button class="logout-btn" onclick="logout()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Logout
     </button>
   </div>
 </nav>
 
 <div class="container">
-  <div class="greeting" id="greeting">
-    Hey <span id="greet-name">Rider</span>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" fill="#FFF7ED"/></svg>
-  </div>
+  <div class="greeting" id="greeting">Hey there</div>
   <div class="greeting-sub">Where are you headed today?</div>
 
+  <!-- REQUEST PANEL -->
   <div id="panel-request" class="panel visible">
     <div class="card">
-      <div class="card-label">Request a Ride</div>
-      <div class="field"><label>Pickup Location</label><input type="text" id="pickup" placeholder="Where are you?" /></div>
-      <div class="field"><label>Dropoff Location</label><input type="text" id="dropoff" placeholder="Where to?" /></div>
+      <div class="card-label">
+        <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Request a Ride
+      </div>
+      <div class="field"><label>Pickup Location</label><input type="text" id="pickup" placeholder="Where are you?"/></div>
+      <div class="field"><label>Dropoff Location</label><input type="text" id="dropoff" placeholder="Where to?"/></div>
       <div class="field">
         <label>Your Offered Fare (BWP)</label>
-        <input type="number" id="offered-fare" min="15" placeholder="e.g. 30" />
-        <div class="fare-hint">⚡ Minimum P15.00 · Drivers can accept or counter offer</div>
+        <input type="number" id="offered-fare" min="15" placeholder="e.g. 30"/>
+        <div class="fare-hint">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Minimum P15.00 · Drivers can accept or counter
+        </div>
       </div>
       <button class="btn btn-primary" onclick="createRide()">
         Request Ride
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 17"/></svg>
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
   </div>
 
+  <!-- WAITING PANEL -->
   <div id="panel-waiting" class="panel">
     <div class="card">
-      <div class="card-label">Looking for Drivers...</div>
+      <div class="card-label">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Looking for Drivers
+      </div>
       <div class="route-display">
         <div class="route-row">
-          <div class="route-dot from">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
-          </div>
+          <div class="route-dot from"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
           <div><div class="route-lbl">Pickup</div><div class="route-val" id="w-pickup">—</div></div>
         </div>
         <div class="route-row">
-          <div class="route-dot to">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          </div>
+          <div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
           <div><div class="route-lbl">Dropoff</div><div class="route-val" id="w-dropoff">—</div></div>
         </div>
       </div>
@@ -241,58 +284,50 @@
         <div class="fare-num orange" id="w-fare">P0.00</div>
         <div class="fare-lbl">Your offered fare</div>
       </div>
-      <div id="offers-section" style="display:none">
-        <div class="offers-wrap">
-          <div class="offers-head">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="22" height="13" rx="2" ry="2"/><path d="M7 21h10"/><path d="M12 16v5"/></svg>
-            Driver Offers
-          </div>
-          <div id="offers-list"></div>
+      <div class="offers-section" id="offers-section">
+        <div class="offers-head">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Driver Offers
         </div>
+        <div id="offers-list"></div>
       </div>
-      <button class="btn btn-ghost" onclick="cancelRequest()">Cancel Request</button>
+      <button class="btn btn-ghost" onclick="cancelRequest()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Cancel Request
+      </button>
     </div>
   </div>
 
+  <!-- ACTIVE PANEL -->
   <div id="panel-active" class="panel">
     <div class="card">
-      <div class="card-label">Active Ride</div>
+      <div class="card-label">
+        <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        Active Ride
+      </div>
       <div class="progress-bar">
         <div class="prog-step">
-          <div class="prog-dot done" id="p1">
-            <span>1</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
+          <div class="prog-dot done" id="p1"><span>1</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="prog-label done" id="pl1">Accepted</div>
         </div>
         <div class="prog-line" id="pline1"></div>
         <div class="prog-step">
-          <div class="prog-dot" id="p2">
-            <span>2</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
+          <div class="prog-dot" id="p2"><span>2</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="prog-label" id="pl2">Started</div>
         </div>
         <div class="prog-line" id="pline2"></div>
         <div class="prog-step">
-          <div class="prog-dot" id="p3">
-            <span>3</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
+          <div class="prog-dot" id="p3"><span>3</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="prog-label" id="pl3">Done</div>
         </div>
       </div>
       <div class="route-display">
         <div class="route-row">
-          <div class="route-dot from">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
-          </div>
+          <div class="route-dot from"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
           <div><div class="route-lbl">Pickup</div><div class="route-val" id="a-pickup">—</div></div>
         </div>
         <div class="route-row">
-          <div class="route-dot to">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-          </div>
+          <div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
           <div><div class="route-lbl">Dropoff</div><div class="route-val" id="a-dropoff">—</div></div>
         </div>
       </div>
@@ -305,75 +340,106 @@
         <div>
           <div class="driver-name" id="driver-name">Your Driver</div>
           <div class="driver-sub" id="driver-sub">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><rect x="1" y="3" width="22" height="13" rx="2" ry="2"/><path d="M7 21h10"/><path d="M12 16v5"/></svg>
+            <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             On the way to you
           </div>
           <div class="driver-stars" id="driver-stars"></div>
         </div>
       </div>
-      
-      <div id="rider-map">
-        <svg id="rider-map-svg" width="100%" height="100%" viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
-          <rect width="480" height="200" fill="#EDE8E0"/>
-          <g stroke="#D4CCBF" stroke-linecap="round">
-            <line x1="0" y1="60" x2="480" y2="60" stroke-width="16"/>
-            <line x1="0" y1="140" x2="480" y2="140" stroke-width="12"/>
-            <line x1="140" y1="0" x2="140" y2="200" stroke-width="14"/>
-            <line x1="340" y1="0" x2="340" y2="200" stroke-width="10"/>
-          </g>
-          <g fill="#1C1917" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="9">
-            <text x="15" y="52">MAIN MALL RD</text>
-            <text x="150" y="132">CBD AVE</text>
-            <text x="148" y="25" transform="rotate(90, 148, 25)">KHAMA CRESCENT</text>
-          </g>
-          <path id="rider-tracking-path" d="" stroke="#F97316" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="1 1" style="animation: dash 30s linear infinite;" />
-        </svg>
-        <div id="driver-pin" class="driver-pin" style="display:none;">
-          <div class="driver-pin-ring"></div>
-          <div class="driver-pin-dot"></div>
+
+      <!-- EXPANDABLE TRACKING MAP -->
+      <div class="map-module expanded" id="tracking-map-module">
+        <div class="map-header" onclick="toggleTrackingMap()">
+          <div class="map-header-left">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
+            Live Driver Tracking
+          </div>
+          <div class="map-header-right">
+            <div class="map-ctrl-sm" onclick="toggleTrackingFullscreen(event)" title="Fullscreen">
+              <svg id="t-fs-expand" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              <svg id="t-fs-contract" viewBox="0 0 24 24" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="10" y1="14" x2="3" y2="21"/></svg>
+            </div>
+            <div class="map-ctrl-sm" id="tracking-chevron-wrap">
+              <svg id="t-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg id="t-chevron-up" viewBox="0 0 24 24" style="display:none"><polyline points="18 15 12 9 6 15"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="map-canvas" id="tracking-canvas">
+          <svg viewBox="0 0 480 196" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <rect width="480" height="196" fill="#EDE8E0"/>
+            <g stroke="#D4CCBF" stroke-linecap="round">
+              <line x1="0" y1="60" x2="480" y2="60" stroke-width="16"/>
+              <line x1="0" y1="140" x2="480" y2="140" stroke-width="12"/>
+              <line x1="140" y1="0" x2="140" y2="196" stroke-width="14"/>
+              <line x1="320" y1="0" x2="320" y2="196" stroke-width="10"/>
+            </g>
+            <rect x="20" y="10" width="80" height="40" rx="3" fill="#fff"/>
+            <rect x="160" y="8" width="100" height="44" rx="3" fill="#fff"/>
+            <rect x="340" y="68" width="70" height="36" rx="3" fill="#fff"/>
+            <rect x="20" y="155" width="80" height="36" rx="3" fill="#fff"/>
+            <rect x="180" y="160" width="90" height="33" rx="3" fill="#fff"/>
+            <g font-family="-apple-system,sans-serif" font-size="7" fill="#1C191730" font-weight="600">
+              <text x="22" y="55">MAIN MALL RD</text>
+              <text x="148" y="132">CBD AVENUE</text>
+              <text x="148" y="22" transform="rotate(90,148,22)">KHAMA CRES</text>
+              <text x="322" y="18" transform="rotate(90,322,18)">AIRPORT RD</text>
+            </g>
+            <!-- Rider's position marker (fixed centre) -->
+            <circle cx="240" cy="98" r="7" fill="#fff" stroke="#1C1917" stroke-width="2"/>
+            <circle cx="240" cy="98" r="3" fill="#1C1917"/>
+            <!-- Driver trail path -->
+            <path id="rider-tracking-path" d="" stroke="#F97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
+          </svg>
+          <div class="driver-pin" id="driver-pin">
+            <div class="driver-pin-ring"></div>
+            <div class="driver-pin-dot"></div>
+          </div>
+          <div class="map-overlay-bar">
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.68rem;color:#1C1917;font-weight:600">
+              <div class="map-live-dot" id="map-live-dot"></div>
+              <span id="map-status-text">Waiting for driver location...</span>
+            </div>
+            <span class="eta-badge" id="eta-badge"></span>
+          </div>
         </div>
       </div>
-      
-      <div class="map-status-row">
-        <div class="map-status-left">
-          <div class="map-live-dot" id="map-live-dot"></div>
-          <span id="map-status-text">Waiting for driver location...</span>
-        </div>
-        <div class="eta-display-badge" id="eta-badge" style="display:none">ETA: -- mins</div>
-      </div>
+
       <button class="btn btn-danger" onclick="cancelRide()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         Cancel Ride
       </button>
     </div>
   </div>
 
+  <!-- HISTORY -->
   <div class="card">
-    <div class="card-label">Recent Rides</div>
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Recent Rides
+    </div>
     <div id="history"><div class="empty">No rides yet</div></div>
   </div>
 </div>
 
+<!-- RATING MODAL -->
 <div class="rating-overlay" id="rating-overlay">
   <div class="rating-modal">
     <div class="fare-completed">
       <div class="fare-completed-amount" id="rating-fare">P0.00</div>
       <div class="fare-completed-label">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Ride Completed
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Ride Completed
       </div>
     </div>
-    <div class="rating-avatar" id="rating-avatar">
-      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </div>
+    <div class="rating-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     <div class="rating-title">Rate your driver</div>
     <div class="rating-sub" id="rating-driver-name">How was your ride?</div>
-    <div class="stars-row" id="stars-row">
-      <div class="star-svg-btn" onclick="setStar(1)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-      <div class="star-svg-btn" onclick="setStar(2)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-      <div class="star-svg-btn" onclick="setStar(3)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-      <div class="star-svg-btn" onclick="setStar(4)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-      <div class="star-svg-btn" onclick="setStar(5)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+    <div class="stars-row">
+      <div class="star-btn" onclick="setStar(1)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(2)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(3)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(4)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(5)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
     </div>
     <textarea class="rating-comment" id="rating-comment" placeholder="Leave a comment (optional)" rows="3"></textarea>
     <div class="rating-btn-row">
@@ -386,32 +452,23 @@
 <div class="toast" id="toast"></div>
 
 <button class="chat-fab" id="chat-fab" onclick="openChat()">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
   <div class="chat-fab-badge" id="chat-badge">0</div>
 </button>
-
-<div class="chat-popup-overlay" id="chat-overlay" onclick="closeChat()"></div>
-
+<div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
 <div class="chat-popup" id="chat-popup">
-  <div class="chat-popup-handle"></div>
-  <div class="chat-popup-header">
-    <div class="chat-popup-title">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <div>
-        <div class="chat-popup-title-text">Chat with Driver</div>
-        <div class="chat-popup-title-sub" id="chat-driver-name-title">Your driver</div>
-      </div>
+  <div class="chat-handle"></div>
+  <div class="chat-head">
+    <div class="chat-head-left">
+      <div class="chat-head-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><div class="chat-title">Chat with Driver</div><div class="chat-subtitle" id="chat-driver-name-title">Your driver</div></div>
     </div>
-    <button class="chat-close" onclick="closeChat()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+    <button class="chat-close" onclick="closeChat()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
-  <div class="chat-msgs" id="chat-msgs"></div>
-  <div class="chat-input-area">
-    <input class="chat-in" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()" />
-    <button class="chat-send" onclick="sendMsg()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+  <div class="chat-msgs" id="chat-msgs"><div class="empty" style="padding:12px;font-size:0.78rem">Say hi to your driver</div></div>
+  <div class="chat-input-wrap">
+    <input class="chat-in" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+    <button class="chat-send" onclick="sendMsg()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
   </div>
 </div>
 
@@ -423,51 +480,61 @@
   const RIDER_NAME = riderData?.name || "Rider";
 
   document.getElementById("nav-name").textContent = RIDER_NAME;
-  document.getElementById("greet-name").textContent = RIDER_NAME.split(" ")[0];
+  document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]}`;
 
   function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
   let activeRide = null, offers = {}, selectedStar = 0, completedRide = null, unreadCount = 0;
-  let riderLocation = null, pathPoints = [];
+  let riderLocation = { lat: -24.6541, lng: 25.9087 }, pathPoints = [];
+  let trackingExpanded = true, trackingFullscreen = false;
 
+  // Try get rider's real location
   window.addEventListener("load", () => {
+    loadHistory();
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      }, err => {
-        riderLocation = { lat: -24.6541, lng: 25.9087 };
-      });
+      navigator.geolocation.getCurrentPosition(
+        pos => { riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+        () => {}
+      );
     }
   });
 
+  // ── MAP CONTROLS ───────────────────────────────────────────────────────────
+  function toggleTrackingMap() {
+    if (trackingFullscreen) return;
+    trackingExpanded = !trackingExpanded;
+    const mod = document.getElementById("tracking-map-module");
+    mod.className = "map-module " + (trackingExpanded ? "expanded" : "collapsed");
+    document.getElementById("t-chevron-down").style.display = trackingExpanded ? "none" : "block";
+    document.getElementById("t-chevron-up").style.display = trackingExpanded ? "block" : "none";
+  }
+
+  function toggleTrackingFullscreen(e) {
+    e.stopPropagation();
+    const mod = document.getElementById("tracking-map-module");
+    trackingFullscreen = !trackingFullscreen;
+    if (trackingFullscreen) {
+      mod.classList.add("fullscreen");
+      document.getElementById("t-fs-expand").style.display = "none";
+      document.getElementById("t-fs-contract").style.display = "block";
+    } else {
+      mod.classList.remove("fullscreen");
+      mod.className = "map-module " + (trackingExpanded ? "expanded" : "collapsed");
+      document.getElementById("t-fs-expand").style.display = "block";
+      document.getElementById("t-fs-contract").style.display = "none";
+    }
+  }
+
+  // ── SOCKET ─────────────────────────────────────────────────────────────────
   const socket = io(BASE, { transports: ["websocket", "polling"] });
 
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
+    // Match server room name exactly
     socket.emit("join-role", { role: "rider", userId: RIDER_ID });
     loadHistory();
   });
   socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
-
-  async function createRide() {
-    const pickup = document.getElementById("pickup").value.trim();
-    const dropoff = document.getElementById("dropoff").value.trim();
-    const fare = parseFloat(document.getElementById("offered-fare").value);
-    if (!pickup || !dropoff || isNaN(fare) || fare < 15) { showToast("Provide valid pickup, dropoff & fare (Min P15)", "warn"); return; }
-    try {
-      const res = await fetch(`${BASE}/rides`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rider_id: RIDER_ID, pickup, dropoff, offered_fare: fare, status: "requested" })
-      });
-      const data = await res.json();
-      activeRide = data;
-      showPanel("waiting");
-      document.getElementById("w-pickup").textContent = pickup;
-      document.getElementById("w-dropoff").textContent = dropoff;
-      document.getElementById("w-fare").textContent = "P" + fare.toFixed(2);
-    } catch(e) { showToast("Failed to post request", "error"); }
-  }
 
   socket.on("driver-offer", (offer) => {
     offers[offer.driverId] = offer;
@@ -485,26 +552,27 @@
       document.getElementById("chat-driver-name-title").textContent = ride.driver_name || "Driver";
       showToast("Driver is on the way!");
     }
-    if (ride.status === "in_progress") { 
-      document.getElementById("driver-sub").innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Ride in progress`; 
+    if (ride.status === "in_progress") {
+      document.getElementById("driver-sub").innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Ride in progress`;
       document.getElementById("eta-badge").style.display = "none";
-      showToast("Your ride has started!"); 
+      showToast("Your ride has started!");
     }
-    if (ride.status === "completed") { 
-      completedRide = ride; 
-      updateProgress("completed"); 
+    if (ride.status === "completed") {
+      completedRide = ride;
+      updateProgress("completed");
       document.getElementById("chat-fab").classList.remove("visible");
-      setTimeout(() => { showRatingModal(ride); }, 1500); 
+      setTimeout(() => showRatingModal(ride), 1500);
     }
-    if (ride.status === "cancelled") { 
-      showToast("Ride cancelled", "error"); 
-      setTimeout(() => { resetAll(); loadHistory(); }, 2000); 
+    if (ride.status === "cancelled") {
+      showToast("Ride cancelled", "error");
+      setTimeout(() => { resetAll(); loadHistory(); }, 2000);
     }
   });
 
-  socket.on("driver-location", ({ lat, lng }) => { 
-    if (!activeRide) return; 
-    updateDriverPin(lat, lng); 
+  // KEY FIX: receive driver-location broadcast from server
+  socket.on("driver-location", ({ lat, lng }) => {
+    if (!activeRide) return;
+    updateDriverPin(lat, lng);
   });
 
   socket.on("new-message", (msg) => {
@@ -512,60 +580,88 @@
     appendMsg(msg);
     if (!document.getElementById("chat-popup").classList.contains("open")) {
       unreadCount++;
-      const badge = document.getElementById("chat-badge");
-      badge.textContent = unreadCount;
-      badge.classList.add("show");
+      const b = document.getElementById("chat-badge");
+      b.textContent = unreadCount; b.classList.add("show");
     }
   });
 
-  function showPanel(name) {
-    ["request","waiting","active"].forEach(p => document.getElementById("panel-" + p).classList.toggle("visible", p === name));
-  }
-
-  function updateProgress(status) {
-    const stateMap = { accepted: 1, in_progress: 2, completed: 3 };
-    const current = stateMap[status] || 0;
-    for (let i = 1; i <= 3; i++) {
-      const dot = document.getElementById(`p${i}`);
-      const lbl = document.getElementById(`pl${i}`);
-      if (i < current) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`pline${i}`).className = "prog-line done"; }
-      else if (i === current) { dot.className = "prog-dot active"; dot.textContent = i; lbl.className = "prog-label active"; }
-      else { dot.className = "prog-dot"; dot.textContent = i; lbl.className = "prog-label"; }
+  // ── RIDE CREATION ──────────────────────────────────────────────────────────
+  async function createRide() {
+    const pickup = document.getElementById("pickup").value.trim();
+    const dropoff = document.getElementById("dropoff").value.trim();
+    const fare = parseFloat(document.getElementById("offered-fare").value);
+    if (!pickup || !dropoff || isNaN(fare) || fare < 15) {
+      showToast("Enter pickup, dropoff and fare (min P15)", "warn"); return;
     }
+    try {
+      const res = await fetch(`${BASE}/rides`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rider_id: RIDER_ID, pickup, dropoff, offered_fare: fare, status: "requested" })
+      });
+      const data = await res.json();
+      activeRide = data;
+      showPanel("waiting");
+      document.getElementById("w-pickup").textContent = pickup;
+      document.getElementById("w-dropoff").textContent = dropoff;
+      document.getElementById("w-fare").textContent = "P" + fare.toFixed(2);
+      loadHistory();
+    } catch(e) { showToast("Failed to post ride", "error"); }
   }
 
+  // ── OFFER HANDLING ─────────────────────────────────────────────────────────
   function renderOffers() {
     const list = Object.values(offers);
     const section = document.getElementById("offers-section");
     const el = document.getElementById("offers-list");
     if (!list.length) { section.style.display = "none"; return; }
     section.style.display = "block";
-    const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 15;
+    const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P", "")) || 15;
     el.innerHTML = list.map(o => {
       const match = parseFloat(o.fare_offer) <= myFare;
-      const stars = o.avg_rating ? `<svg width="12" height="12" fill="#f59e0b" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg> ${parseFloat(o.avg_rating).toFixed(1)}` : "New driver";
-      return `<div class="offer-card"><div><div class="offer-name"><svg width="14" height="14" fill="none" stroke="#1C1917" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="22" height="13" rx="2" ry="2"/><path d="M7 21h10"/><path d="M12 16v5"/></svg> ${o.driver_name || "Driver"}</div><div class="offer-price">P${parseFloat(o.fare_offer).toFixed(2)}</div><div class="offer-tag">${match ? "✅ Matches your price" : "💬 Counter offer"}</div><div class="offer-rating">${stars}</div></div><div class="offer-actions"><button class="obtn acc" onclick="acceptOffer(${o.driverId},${o.fare_offer})">Accept</button><button class="obtn dec" onclick="declineOffer(${o.driverId})"><svg width="14" height="14" fill="none" stroke="#78716C" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>`;
+      const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+      const stars = o.avg_rating ? `${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides)` : "New driver";
+      const matchSvg = match ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Matches your price` : "Counter offer";
+      return `<div class="offer-card">
+        <div>
+          <div class="offer-name"><svg width="13" height="13" fill="none" stroke="#78716C" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>${o.driver_name || "Driver"}</div>
+          <div class="offer-price">P${parseFloat(o.fare_offer).toFixed(2)}</div>
+          <div class="offer-tag">${matchSvg}</div>
+          <div class="offer-rating">${stars}</div>
+        </div>
+        <div class="offer-actions">
+          <button class="obtn acc" onclick="acceptOffer(${o.driverId},${o.fare_offer})">Accept</button>
+          <button class="obtn dec" onclick="declineOffer(${o.driverId})"><svg width="12" height="12" fill="none" stroke="#78716C" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>`;
     }).join("");
   }
 
   async function acceptOffer(driverId, fare) {
     if (!activeRide) return;
     try {
-      const res = await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driverId, fare }) });
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId, fare })
+      });
       const ride = await res.json();
       activeRide = ride; offers = {};
-      showActiveRide(ride); showToast("Offer accepted! Driver is coming");
-    } catch(e) { showToast("Failed to accept offer", "error"); }
+      showActiveRide(ride);
+      showToast("Offer accepted! Driver is coming");
+    } catch(e) { showToast("Failed", "error"); }
   }
 
   async function declineOffer(driverId) {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ driverId }) });
+      await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverId })
+      });
       delete offers[driverId]; renderOffers(); showToast("Offer declined");
     } catch(e) {}
   }
 
+  // ── ACTIVE RIDE ────────────────────────────────────────────────────────────
   async function showActiveRide(ride) {
     showPanel("active");
     document.getElementById("a-pickup").textContent = ride.pickup;
@@ -582,112 +678,144 @@
       try {
         const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
         const data = await res.json();
-        document.getElementById("driver-stars").innerHTML = data && data.avg_rating > 0 ? `<svg width="12" height="12" fill="#f59e0b" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg> ${parseFloat(data.avg_rating).toFixed(1)} (${data.total_ratings} rides)` : "New driver";
+        const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+        document.getElementById("driver-stars").innerHTML = data && data.avg_rating > 0
+          ? `${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides`
+          : "New driver";
       } catch(e) {}
     }
   }
 
+  // ── DRIVER PIN & ETA ───────────────────────────────────────────────────────
   function updateDriverPin(lat, lng) {
     const pin = document.getElementById("driver-pin");
-    const map = document.getElementById("rider-map");
-    const etaBadge = document.getElementById("eta-badge");
-    if (!pin || !map) return;
+    const canvas = document.getElementById("tracking-canvas");
+    if (!pin || !canvas) return;
 
     pin.style.display = "block";
     document.getElementById("map-live-dot").classList.add("on");
-    document.getElementById("map-status-text").textContent = "Live driver tracking active";
+    document.getElementById("map-status-text").textContent = "Live tracking active";
 
-    if (!riderLocation) riderLocation = { lat: -24.6541, lng: 25.9087 };
+    const w = canvas.offsetWidth || 480;
+    const h = canvas.offsetHeight || 196;
+    const scaleX = 22000, scaleY = 25000;
+    let px = w / 2 + (lng - riderLocation.lng) * scaleX;
+    let py = h / 2 - (lat - riderLocation.lat) * scaleY;
+    px = Math.max(15, Math.min(w - 15, px));
+    py = Math.max(15, Math.min(h - 15, py));
 
-    // Optimized trace scaling vector calculation 
-    const scaleFactorX = 22000;
-    const scaleFactorY = 25000;
-    let pixelX = 240 + (lng - riderLocation.lng) * scaleFactorX;
-    let pixelY = 100 - (lat - riderLocation.lat) * scaleFactorY;
+    pin.style.left = px + "px";
+    pin.style.top = py + "px";
 
-    pixelX = Math.max(15, Math.min(465, pixelX));
-    pixelY = Math.max(15, Math.min(185, pixelY));
+    pathPoints.push({ x: px, y: py });
+    if (pathPoints.length > 60) pathPoints.shift();
+    if (pathPoints.length >= 2) {
+      let d = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+      for (let i = 1; i < pathPoints.length; i++) d += ` L ${pathPoints[i].x} ${pathPoints[i].y}`;
+      document.getElementById("rider-tracking-path").setAttribute("d", d);
+    }
 
-    pathPoints.push({ x: pixelX, y: pixelY });
-    renderVectorTrace();
-
-    pin.style.left = `${pixelX}px`;
-    pin.style.top = `${pixelY}px`;
-
+    // ETA calculation (haversine)
+    const R = 6371;
     const dLat = (lat - riderLocation.lat) * Math.PI / 180;
     const dLng = (lng - riderLocation.lng) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat * Math.PI / 180) * Math.cos(riderLocation.lat * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const distanceKm = 6371 * c; 
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat*Math.PI/180)*Math.cos(riderLocation.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+    const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const mins = Math.max(1, Math.round((distKm / 40) * 60 + 1));
 
-    let minutesETA = Math.round((distanceKm / 40) * 60 + 1.5);
-    if (minutesETA < 1 || activeRide?.status === "in_progress") minutesETA = 1;
-
-    etaBadge.textContent = `ETA: ${minutesETA} ${minutesETA === 1 ? 'min' : 'mins'}`;
-    etaBadge.style.display = activeRide?.status === "accepted" ? "block" : "none";
+    const etaBadge = document.getElementById("eta-badge");
+    if (activeRide?.status === "accepted") {
+      etaBadge.textContent = `ETA: ${mins} ${mins === 1 ? "min" : "mins"}`;
+      etaBadge.style.display = "block";
+    } else {
+      etaBadge.style.display = "none";
+    }
   }
 
-  function renderVectorTrace() {
-    if (pathPoints.length < 2) return;
-    let dString = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
-    for (let i = 1; i < pathPoints.length; i++) { dString += ` L ${pathPoints[i].x} ${pathPoints[i].y}`; }
-    document.getElementById("rider-tracking-path").setAttribute("d", dString);
+  // ── PANELS ─────────────────────────────────────────────────────────────────
+  function showPanel(name) {
+    ["request","waiting","active"].forEach(p =>
+      document.getElementById("panel-" + p).classList.toggle("visible", p === name)
+    );
   }
 
+  function updateProgress(status) {
+    const map = { accepted: 1, in_progress: 2, completed: 3 };
+    const cur = map[status] || 0;
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`p${i}`);
+      const lbl = document.getElementById(`pl${i}`);
+      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`pline${i}`).className = "prog-line done"; }
+      else if (i === cur) { dot.className = "prog-dot active"; dot.querySelector("span").textContent = i; lbl.className = "prog-label active"; }
+      else { dot.className = "prog-dot"; dot.querySelector("span").textContent = i; lbl.className = "prog-label"; }
+    }
+  }
+
+  // ── CANCEL ─────────────────────────────────────────────────────────────────
   async function cancelRequest() {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "cancelled" }) });
-      resetAll();
-    } catch(e) { showToast("Error cancelling", "error"); }
+      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" })
+      });
+    } catch(e) {}
+    resetAll(); loadHistory();
   }
 
   function cancelRide() { cancelRequest(); }
 
   function resetAll() {
     activeRide = null; offers = {}; pathPoints = [];
-    document.getElementById("pickup").value = ""; document.getElementById("dropoff").value = ""; document.getElementById("offered-fare").value = "";
+    document.getElementById("pickup").value = "";
+    document.getElementById("dropoff").value = "";
+    document.getElementById("offered-fare").value = "";
     document.getElementById("driver-pin").style.display = "none";
     document.getElementById("eta-badge").style.display = "none";
     document.getElementById("map-live-dot").classList.remove("on");
     document.getElementById("map-status-text").textContent = "Waiting for driver location...";
+    document.getElementById("rider-tracking-path").setAttribute("d", "");
+    document.getElementById("chat-fab").classList.remove("visible");
+    document.getElementById("chat-badge").classList.remove("show");
+    unreadCount = 0;
     showPanel("request");
   }
 
+  // ── RATING ─────────────────────────────────────────────────────────────────
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
-    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || 'your driver'}?`;
-    setStar(0);
+    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || "your driver"}?`;
+    selectedStar = 0;
+    document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
     document.getElementById("rating-overlay").classList.add("open");
   }
 
-  function setStar(count) {
-    selectedStar = count;
-    const stars = document.querySelectorAll('#stars-row .star-svg-btn');
-    stars.forEach((s, idx) => s.classList.toggle('active', idx < count));
-  }
-
-  function skipRating() {
-    document.getElementById("rating-overlay").classList.remove("open");
-    resetAll(); loadHistory();
-    showToast("Ride complete! 🎉");
+  function setStar(n) {
+    selectedStar = n;
+    document.querySelectorAll(".star-btn").forEach((s, i) => s.classList.toggle("active", i < n));
   }
 
   async function submitRating() {
     if (!completedRide || selectedStar === 0) { showToast("Please pick a star rating", "warn"); return; }
     try {
       await fetch(`${BASE}/rides/${completedRide.id}/rate-driver`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value, riderId: RIDER_ID })
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value })
       });
-      showToast("Thanks for rating! ⭐");
-    } catch(e) { showToast("Failed to submit rating", "error"); }
+      showToast("Thanks for rating!");
+    } catch(e) {}
     document.getElementById("rating-overlay").classList.remove("open");
     resetAll(); loadHistory();
   }
 
+  function skipRating() {
+    document.getElementById("rating-overlay").classList.remove("open");
+    resetAll(); loadHistory();
+    showToast("Ride complete!");
+  }
+
+  // ── CHAT ───────────────────────────────────────────────────────────────────
   function openChat() {
     document.getElementById("chat-overlay").classList.add("open");
     document.getElementById("chat-popup").classList.add("open");
@@ -705,59 +833,83 @@
     try {
       const res = await fetch(`${BASE}/rides/${rideId}/messages`);
       const msgs = await res.json();
-      const container = document.getElementById("chat-msgs");
-      container.innerHTML = "";
-      if (!msgs.length) {
-        container.innerHTML = '<div class="empty" style="padding:12px;font-size:0.78rem">Say hi to your driver!</div>';
-      } else {
-        msgs.forEach(appendMsg);
-      }
+      const el = document.getElementById("chat-msgs");
+      el.innerHTML = "";
+      if (!msgs.length) { el.innerHTML = '<div class="empty" style="padding:12px;font-size:0.78rem">Say hi to your driver</div>'; return; }
+      msgs.forEach(appendMsg);
     } catch(e) {}
   }
 
   function appendMsg(msg) {
-    const container = document.getElementById("chat-msgs");
-    const empty = container.querySelector('.empty');
+    const el = document.getElementById("chat-msgs");
+    const empty = el.querySelector(".empty");
     if (empty) empty.remove();
+    const isMe = msg.sender_role === "rider";
+    const time = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const div = document.createElement("div");
-    const isMe = msg.sender_role === 'rider';
-    div.className = `msg ${isMe ? 'me' : 'them'}`;
-    div.innerHTML = `<div>${msg.message}</div><div class="msg-time">${new Date(msg.created_at || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>`;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
+    div.className = `msg ${isMe ? "me" : "them"}`;
+    div.innerHTML = `<div>${msg.message}</div><div class="msg-time">${time}</div>`;
+    el.appendChild(div);
+    el.scrollTop = el.scrollHeight;
   }
 
+  // KEY FIX: use HTTP POST for messages, not socket.emit
   async function sendMsg() {
+    if (!activeRide) return;
     const input = document.getElementById("chat-in");
-    const text = input.value.trim();
-    if (!text || !activeRide) return;
-    const payload = { rideId: activeRide.id, message: text, sender_role: 'rider', sender_id: RIDER_ID };
-    socket.emit("send-message", payload);
-    appendMsg({ ...payload, created_at: new Date() });
+    const message = input.value.trim();
+    if (!message) return;
     input.value = "";
+    // Optimistic append
+    appendMsg({ sender_role: "rider", message, created_at: new Date() });
+    try {
+      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender_role: "rider", message })
+      });
+    } catch(e) { showToast("Message failed", "error"); }
   }
 
+  // ── HISTORY ────────────────────────────────────────────────────────────────
   async function loadHistory() {
     try {
       const res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`);
       const rides = await res.json();
       const el = document.getElementById("history");
-      el.innerHTML = "";
       if (!rides.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; }
-      const markerSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#A8A29E" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>`;
-      rides.forEach(r => {
-        const item = document.createElement("div");
-        item.className = "history-item";
-        item.innerHTML = `<div><div class="h-route">${markerSvg} ${r.pickup.substring(0,18)}... → ${r.dropoff.substring(0,18)}...</div><div class="h-meta">P${parseFloat(r.fare||0).toFixed(2)} · ${new Date(r.created_at).toLocaleDateString()}</div></div><span class="badge badge-${r.status}">${r.status.replace('_',' ')}</span>`;
-        el.appendChild(item);
-      });
-    } catch(e) {}
+      el.innerHTML = rides.slice(0, 8).map(r => `
+        <div class="history-item">
+          <div>
+            <div class="h-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="h-meta">P${parseFloat(r.fare||0).toFixed(2)} · ${new Date(r.created_at).toLocaleDateString()}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
+        </div>`).join("");
+    } catch(e) {
+      // Fallback: load from /rides if /riders/{id}/rides not available
+      try {
+        const res = await fetch(`${BASE}/rides`);
+        const rides = await res.json();
+        const mine = rides.filter(r => r.rider_id == RIDER_ID);
+        const el = document.getElementById("history");
+        if (!mine.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; }
+        el.innerHTML = mine.slice(0, 8).map(r => `
+          <div class="history-item">
+            <div>
+              <div class="h-route">${r.pickup} → ${r.dropoff}</div>
+              <div class="h-meta">P${parseFloat(r.fare||0).toFixed(2)}</div>
+            </div>
+            <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
+          </div>`).join("");
+      } catch(e2) {}
+    }
   }
 
-  function showToast(msg, type = "info") {
-    const el = document.getElementById("toast");
-    el.textContent = msg; el.className = `toast show ${type !== 'info' ? type : ''}`;
-    setTimeout(() => el.classList.remove("show"), 3500);
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " " + type : "");
+    setTimeout(() => t.className = "toast", 3500);
   }
 </script>
 </body>
