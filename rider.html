@@ -550,17 +550,18 @@
       showActiveRide(ride);
       document.getElementById("chat-fab").classList.add("visible");
       document.getElementById("chat-driver-name-title").textContent = ride.driver_name || "Driver";
-      showToast("Driver is on the way!");
+      showToast("Driver is on the way! 🚗");
     }
     if (ride.status === "in_progress") {
       document.getElementById("driver-sub").innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Ride in progress`;
       document.getElementById("eta-badge").style.display = "none";
-      showToast("Your ride has started!");
+      showToast("Your ride has started! 🚀");
     }
     if (ride.status === "completed") {
       completedRide = ride;
       updateProgress("completed");
       document.getElementById("chat-fab").classList.remove("visible");
+      showToast("Ride completed! P" + parseFloat(ride.fare || 0).toFixed(2) + " 🎉");
       setTimeout(() => showRatingModal(ride), 1500);
     }
     if (ride.status === "cancelled") {
@@ -596,7 +597,7 @@
     try {
       const res = await fetch(`${BASE}/rides`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rider_id: RIDER_ID, pickup, dropoff, offered_fare: fare, status: "requested" })
+        body: JSON.stringify({ riderId: RIDER_ID, pickup, dropoff, offered_fare: fare })
       });
       const data = await res.json();
       activeRide = data;
@@ -604,6 +605,7 @@
       document.getElementById("w-pickup").textContent = pickup;
       document.getElementById("w-dropoff").textContent = dropoff;
       document.getElementById("w-fare").textContent = "P" + fare.toFixed(2);
+      showToast("Ride posted! Waiting for offers...", "warn");
       loadHistory();
     } catch(e) { showToast("Failed to post ride", "error"); }
   }
