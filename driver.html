@@ -627,7 +627,17 @@
   socket.on("offer-declined", () => showToast("Rider declined your offer", "error"));
 
   socket.on("ride-updated", (ride) => {
-    if (activeRide && ride.id === activeRide.id) { activeRide = ride; updateDriverProgress(ride.status); loadRides(); }
+    if (activeRide && ride.id === activeRide.id) {
+      activeRide = ride;
+      updateDriverProgress(ride.status);
+      if (ride.status === "in_progress") showToast("Ride started! 🚀");
+      if (ride.status === "completed") {
+        completedRide = ride;
+        showToast("Ride completed!");
+        setTimeout(() => showRatingModal(ride), 1500);
+      }
+      loadRides();
+    }
   });
 
   socket.on("new-message", (msg) => {
@@ -793,13 +803,12 @@
     const message = input.value.trim();
     if (!message) return;
     input.value = "";
-    const payload = { rideId: activeRide.id, sender_role: "driver", message };
-    socket.emit("send-message", payload);
-    appendMsg({ ...payload, created_at: new Date() });
+    // Optimistic append immediately
+    appendMsg({ sender_role: "driver", message, created_at: new Date() });
     fetch(`${BASE}/rides/${activeRide.id}/messages`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).catch(() => {});
+      body: JSON.stringify({ sender_role: "driver", message })
+    }).catch(() => showToast("Message failed", "error"));
   }
 
   // ── RIDES LIST ─────────────────────────────────────────────────────────────
