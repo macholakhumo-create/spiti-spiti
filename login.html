@@ -24,13 +24,14 @@
     }
     body.ready { opacity: 1; }
 
-    .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; margin-bottom: 6px; color: #1C1917; }
+    .logo-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; color: #1C1917; }
     .logo span { color: #F97316; }
-    .tagline { font-size: 0.8rem; color: #A8A29E; margin-bottom: 36px; letter-spacing: 0.05em; }
+    .tagline { font-size: 0.78rem; color: #A8A29E; margin-bottom: 32px; letter-spacing: 0.06em; text-align: center; }
 
-    .role-select { display: flex; gap: 10px; margin-bottom: 28px; background: #EDE8E0; border-radius: 14px; padding: 6px; width: 100%; max-width: 400px; }
-    .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #A8A29E; transition: all 0.2s; }
-    .role-btn.active { background: #fff; color: #1C1917; box-shadow: 0 1px 4px rgba(28,25,23,0.08); }
+    .role-select { display: flex; gap: 8px; margin-bottom: 24px; background: #EDE8E0; border-radius: 14px; padding: 5px; width: 100%; max-width: 400px; }
+    .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; background: transparent; color: #78716C; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .role-btn.active { background: #fff; color: #1C1917; box-shadow: 0 1px 4px rgba(28,25,23,0.1); }
     .role-btn.active.rider { color: #F97316; }
     .role-btn.active.driver { color: #F97316; }
 
@@ -45,7 +46,7 @@
     .field { margin-bottom: 14px; }
     .field label { display: block; font-size: 0.72rem; color: #78716C; margin-bottom: 5px; font-weight: 500; }
     .field input { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 12px 14px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
-    .field input:focus { border-color: #F97316; }
+    .field input:focus { border-color: #F97316; background: #fff; }
 
     .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
@@ -57,8 +58,8 @@
     .pending-title { font-size: 0.85rem; font-weight: 600; color: #EA580C; margin-bottom: 4px; }
     .pending-sub { font-size: 0.73rem; color: #78716C; line-height: 1.5; }
 
-    .error-box { background: #fee2e2; border: 1px solid #fca5a533; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #dc2626; margin-bottom: 14px; display: none; }
-    .success-box { background: #f0fdf4; border: 1px solid #86efac33; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #16a34a; margin-bottom: 14px; display: none; }
+    .error-box { background: #fee2e2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #dc2626; margin-bottom: 14px; display: none; }
+    .success-box { background: #dcfce7; border: 1px solid #86efac; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #16a34a; margin-bottom: 14px; display: none; }
 
     .form-section { display: none; }
     .form-section.visible { display: block; }
@@ -67,12 +68,30 @@
 </head>
 <body>
 
-<div class="logo">Spiti-Spiti<span>.</span></div>
+<div class="logo-wrap">
+  <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+    <rect width="44" height="44" rx="10" fill="#FFF7ED"/>
+    <rect x="8" y="22" width="28" height="12" rx="4" fill="#F97316"/>
+    <path d="M12 22V18C12 15.8 13.8 14 16 14H28C30.2 14 32 15.8 32 18V22" stroke="#F97316" stroke-width="2" fill="none"/>
+    <circle cx="14" cy="34" r="4" fill="#1C1917"/>
+    <circle cx="30" cy="34" r="4" fill="#1C1917"/>
+    <circle cx="14" cy="34" r="1.8" fill="#F5F0EA"/>
+    <circle cx="30" cy="34" r="1.8" fill="#F5F0EA"/>
+    <rect x="18" y="26" width="8" height="2" rx="1" fill="#fff" opacity="0.6"/>
+  </svg>
+  <div class="logo">Spiti-Spiti<span>.</span></div>
+</div>
 <div class="tagline">RIDES · DELIVERIES · LOGISTICS</div>
 
 <div class="role-select">
-  <button class="role-btn rider active" onclick="setRole('rider')">🧑 Rider</button>
-  <button class="role-btn driver" onclick="setRole('driver')">🚗 Driver</button>
+  <button class="role-btn rider active" onclick="setRole('rider')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="2.5" fill="currentColor"/><path d="M2 12C2 9.2 4.2 7 7 7C9.8 7 12 9.2 12 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    Rider
+  </button>
+  <button class="role-btn driver" onclick="setRole('driver')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="12" height="6" rx="1.5" fill="currentColor"/><path d="M3 5V4C3 2.9 3.9 2 5 2H9C10.1 2 11 2.9 11 4V5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="3.5" cy="11" r="1.5" fill="currentColor"/><circle cx="10.5" cy="11" r="1.5" fill="currentColor"/></svg>
+    Driver
+  </button>
 </div>
 
 <div class="card">
@@ -88,15 +107,15 @@
     <div id="rider-error" class="error-box"></div>
     <div id="rider-success" class="success-box"></div>
     <div id="rider-login-form">
-      <div class="field"><label>Phone Number</label><input type="tel" id="rl-phone" placeholder="71234567" /></div>
-      <div class="field"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••" /></div>
+      <div class="field"><label>Phone Number</label><input type="tel" id="rl-phone" placeholder="71234567"/></div>
+      <div class="field"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••"/></div>
       <button class="btn btn-orange" onclick="riderLogin()">Login →</button>
     </div>
     <div id="rider-signup-form" style="display:none">
-      <div class="field"><label>Full Name</label><input type="text" id="rs-name" placeholder="John Doe" /></div>
-      <div class="field"><label>Phone Number</label><input type="tel" id="rs-phone" placeholder="71234567" /></div>
-      <div class="field"><label>ID Number</label><input type="text" id="rs-id" placeholder="123456789" /><div class="hint">Your national ID number</div></div>
-      <div class="field"><label>Password</label><input type="password" id="rs-pass" placeholder="Min 6 characters" /></div>
+      <div class="field"><label>Full Name</label><input type="text" id="rs-name" placeholder="John Doe"/></div>
+      <div class="field"><label>Phone Number</label><input type="tel" id="rs-phone" placeholder="71234567"/></div>
+      <div class="field"><label>ID Number</label><input type="text" id="rs-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
+      <div class="field"><label>Password</label><input type="password" id="rs-pass" placeholder="Min 6 characters"/></div>
       <button class="btn btn-orange" onclick="riderSignup()">Create Account →</button>
     </div>
   </div>
@@ -112,17 +131,17 @@
     <div id="driver-error" class="error-box"></div>
     <div id="driver-success" class="success-box"></div>
     <div id="driver-login-form">
-      <div class="field"><label>Phone Number</label><input type="tel" id="dl-phone" placeholder="71234567" /></div>
-      <div class="field"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••" /></div>
+      <div class="field"><label>Phone Number</label><input type="tel" id="dl-phone" placeholder="71234567"/></div>
+      <div class="field"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••"/></div>
       <button class="btn btn-dark" onclick="driverLogin()">Login →</button>
     </div>
     <div id="driver-signup-form" style="display:none">
-      <div class="field"><label>Full Name</label><input type="text" id="ds-name" placeholder="John Doe" /></div>
-      <div class="field"><label>Phone Number</label><input type="tel" id="ds-phone" placeholder="71234567" /></div>
-      <div class="field"><label>ID Number</label><input type="text" id="ds-id" placeholder="123456789" /><div class="hint">Your national ID number</div></div>
-      <div class="field"><label>Driver's License Number</label><input type="text" id="ds-license" placeholder="e.g. DL-12345" /><div class="hint">Must match your official license</div></div>
-      <div class="field"><label>Password</label><input type="password" id="ds-pass" placeholder="Min 6 characters" /></div>
-      <button class="btn btn-dark" onclick="driverSignup()">Register →</button>
+      <div class="field"><label>Full Name</label><input type="text" id="ds-name" placeholder="John Doe"/></div>
+      <div class="field"><label>Phone Number</label><input type="tel" id="ds-phone" placeholder="71234567"/></div>
+      <div class="field"><label>ID Number</label><input type="text" id="ds-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
+      <div class="field"><label>Driver's License Number</label><input type="text" id="ds-license" placeholder="e.g. DL-12345"/><div class="hint">Must match your official license</div></div>
+      <div class="field"><label>Password</label><input type="password" id="ds-pass" placeholder="Min 6 characters"/></div>
+      <button class="btn btn-dark" onclick="driverSignup()">Register as Driver →</button>
       <div class="pending-box" id="pending-box" style="display:none">
         <div class="pending-icon">⏳</div>
         <div class="pending-title">Application Submitted!</div>
