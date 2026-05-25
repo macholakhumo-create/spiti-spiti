@@ -6,159 +6,238 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Spiti Driver">
+  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Driver</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F0EA; color: #1C1917; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
-    
-    nav { background: #fff; border-bottom: 1px solid #E5DDD0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 100; }
-    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; }
-    .brand span { color: #10B981; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F0EA; color: #1C1917; min-height: 100vh; }
+
+    nav { background: #fff; border-bottom: 1px solid #E5DDD0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; display: flex; align-items: center; gap: 6px; }
+    .brand span { color: #F97316; }
     .nav-right { display: flex; align-items: center; gap: 12px; }
     .nav-user { font-size: 0.75rem; color: #78716C; display: flex; align-items: center; gap: 4px; }
     .nav-user strong { color: #1C1917; }
-    .logout-btn { background: none; border: 1px solid #E5DDD0; color: #78716C; font-family: inherit; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+    .logout-btn { background: none; border: 1px solid #E5DDD0; color: #78716C; font-family: inherit; font-size: 0.7rem; padding: 5px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
-    .logout-btn:hover svg { stroke: #ef4444; }
     .conn-dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
     .conn-dot svg { fill: #D4CCBF; transition: all 0.3s; }
-    .conn-dot.live svg { fill: #10B981; filter: drop-shadow(0 0 4px #10B98188); }
+    .conn-dot.live svg { fill: #22c55e; filter: drop-shadow(0 0 4px #22c55e88); }
 
-    /* STATE WORKSPACE TOGGLE PIPELINES */
-    .dashboard-layout { display: flex; flex-direction: column; flex: 1; max-width: 480px; width: 100%; margin: 0 auto; position: relative; }
-    .scrollable-content { padding: 16px; display: flex; flex-direction: column; gap: 14px; flex: 1; overflow-y: auto; transition: opacity 0.25s ease; }
-    .scrollable-content.map-maximized { display: none; }
+    .container { max-width: 520px; margin: 0 auto; padding: 16px 16px 120px; }
 
-    .greeting-block { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 6px; }
-    .greeting { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; display: flex; align-items: center; gap: 6px; }
-    .greeting-sub { font-size: 0.8rem; color: #78716C; margin-top: 1px; }
-    
-    /* RADIAL SWITCH COMPONENT */
-    .duty-switch-card { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #E5DDD0; padding: 14px 18px; border-radius: 16px; }
-    .duty-info { display: flex; flex-direction: column; }
-    .duty-label { font-size: 0.85rem; font-weight: 700; }
-    .duty-status-txt { font-size: 0.72rem; color: #78716C; margin-top: 2px; }
-    .switch-bg { width: 50px; height: 28px; background: #EDE8E0; border-radius: 14px; padding: 3px; cursor: pointer; transition: background 0.3s; position: relative; }
-    .switch-bg.on { background: #10B981; }
-    .switch-handle { width: 22px; height: 22px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transform: translateX(0); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; }
-    .switch-bg.on .switch-handle { transform: translateX(22px); }
-    .switch-handle svg { width: 12px; height: 12px; fill: none; stroke: #A8A29E; stroke-width: 2.5; transition: stroke 0.3s; }
-    .switch-bg.on .switch-handle svg { stroke: #10B981; }
+    /* MAP MODULE — expandable/collapsible */
+    .map-module { border: 1px solid #E5DDD0; background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 14px; position: relative; transition: height 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .map-module.collapsed { height: 52px; }
+    .map-module.expanded { height: 280px; }
+    .map-module.fullscreen { position: fixed; top: 57px; left: 0; right: 0; bottom: 0; z-index: 500; border-radius: 0; border: none; height: auto !important; max-width: 100%; }
 
-    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; position: relative; margin-bottom: 4px; }
-    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #10B981; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
-    
-    /* ADJUSTABLE INTERACTIVE MAP MODULE */
-    .map-module { border: 1px solid #E5DDD0; background: #fff; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; margin-bottom: 14px; }
-    .map-module.minimized { height: 220px; }
-    .map-module.maximized { position: fixed; top: 65px; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; z-index: 500; border-radius: 0; border: none; height: calc(100vh - 65px); }
-    
-    #driver-map-canvas { width: 100%; height: 100%; background: #EDE8E0; position: relative; overflow: hidden; flex: 1; }
-    
-    .map-control-rack { position: absolute; bottom: 14px; right: 14px; display: flex; flex-direction: column; gap: 8px; z-index: 600; }
-    .map-ctrl-btn { width: 38px; height: 38px; border-radius: 50%; background: #fff; border: 1px solid #E5DDD0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(28,25,23,0.08); transition: transform 0.2s, background 0.2s; }
-    .map-ctrl-btn:hover { background: #F5F0EA; transform: scale(1.05); }
-    .map-ctrl-btn svg { width: 18px; height: 18px; fill: none; stroke: #1C1917; stroke-width: 2; }
+    .map-header { display: flex; align-items: center; justify-content: space-between; padding: 0 14px; height: 52px; background: #fff; flex-shrink: 0; cursor: pointer; user-select: none; border-bottom: 1px solid #E5DDD0; }
+    .map-header-left { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; }
+    .map-header-right { display: flex; align-items: center; gap: 6px; }
+    .map-ctrl { width: 30px; height: 30px; border-radius: 8px; background: #F5F0EA; border: 1px solid #E5DDD0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .map-ctrl svg { width: 14px; height: 14px; stroke: #78716C; fill: none; stroke-width: 2; }
+    .map-ctrl:hover { background: #EDE8E0; }
 
-    .map-telemetry-overlay { position: absolute; top: 12px; left: 12px; right: 12px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; backdrop-filter: blur(8px); padding: 8px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; font-weight: 600; color: #1C1917; pointer-events: none; }
-    .map-telemetry-left { display: flex; align-items: center; gap: 6px; }
-    .telemetry-pulse { width: 6px; height: 6px; border-radius: 50%; background: #10B981; animation: blink 1.5s infinite; }
+    .map-canvas { position: absolute; top: 52px; left: 0; right: 0; bottom: 0; background: #EDE8E0; overflow: hidden; }
+    .map-module.collapsed .map-canvas { display: none; }
+    .map-canvas svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+
+    .map-overlay-bar { position: absolute; top: 8px; left: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.68rem; font-weight: 600; pointer-events: none; z-index: 10; }
+    .map-overlay-left { display: flex; align-items: center; gap: 6px; color: #1C1917; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #D4CCBF; flex-shrink: 0; }
+    .live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .eta-pill { background: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; display: none; }
 
-    /* VECTOR GEOMETRY TRACKING SPEC */
-    .rider-pin { position: absolute; transform: translate(-50%, -50%); z-index: 20; transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1), top 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-    .rider-pin-pulse { position: absolute; top: -8px; left: -8px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #10B98144; animation: pulseRing 2s infinite; }
-    .rider-pin-core { width: 14px; height: 14px; border-radius: 50%; background: #10B981; border: 3px solid #fff; box-shadow: 0 0 10px #10B98188; }
-    @keyframes pulseRing { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
-    @keyframes pathDash { to { stroke-dashoffset: -1000; } }
+    /* DRIVER PIN on map */
+    .d-pin { position: absolute; transform: translate(-50%,-50%); z-index: 20; transition: left 0.8s cubic-bezier(0.4,0,0.2,1), top 0.8s cubic-bezier(0.4,0,0.2,1); display: none; }
+    .d-pin-ring { position: absolute; top: -8px; left: -8px; width: 28px; height: 28px; border-radius: 50%; border: 2px solid #F9731644; animation: pinPulse 2s infinite; }
+    .d-pin-core { width: 12px; height: 12px; border-radius: 50%; background: #F97316; border: 2.5px solid #fff; box-shadow: 0 0 8px #F9731688; }
+    @keyframes pinPulse { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2.2);opacity:0} }
 
-    /* ACTIVE RIDE CARD SPECIFICS */
-    .route-display { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-    .route-row { display: flex; align-items: center; gap: 10px; }
+    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F97316; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+    .card-label svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
+
+    .greeting { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
+    .greeting-sub { font-size: 0.8rem; color: #78716C; margin-bottom: 16px; }
+
+    /* DUTY SWITCH */
+    .duty-row { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #E5DDD0; border-radius: 14px; padding: 14px 18px; margin-bottom: 14px; }
+    .duty-label { font-size: 0.85rem; font-weight: 600; color: #1C1917; }
+    .duty-sub { font-size: 0.68rem; color: #78716C; margin-top: 2px; }
+    .sw { width: 50px; height: 26px; background: #E5DDD0; border-radius: 26px; padding: 3px; cursor: pointer; transition: background 0.3s; position: relative; flex-shrink: 0; }
+    .sw.on { background: #F97316; }
+    .sw-knob { width: 20px; height: 20px; background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transform: translateX(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .sw.on .sw-knob { transform: translateX(24px); }
+
+    /* STATS */
+    .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+    .stat { background: #fff; border: 1px solid #E5DDD0; border-radius: 12px; padding: 12px 10px; text-align: center; }
+    .stat-num { font-size: 1.3rem; font-weight: 700; color: #F97316; }
+    .stat-num.gold { color: #f59e0b; }
+    .stat-lbl { font-size: 0.6rem; color: #A8A29E; margin-top: 2px; }
+
+    /* INCOMING REQUEST */
+    .incoming { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
+    .incoming.visible { display: block; animation: ringpulse 2s infinite; }
+    @keyframes ringpulse { 0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,0.2)} 50%{box-shadow:0 0 0 14px rgba(249,115,22,0)} }
+    .inc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .inc-icon { width: 38px; height: 38px; border-radius: 50%; background: #FED7AA; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .inc-icon svg { width: 20px; height: 20px; stroke: #EA580C; fill: none; stroke-width: 2; }
+    .inc-title { font-size: 0.9rem; font-weight: 700; color: #1C1917; }
+    .inc-sub { font-size: 0.68rem; color: #EA580C; margin-top: 2px; }
+
+    .route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .route-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .route-dot.from { background: #EDE8E0; }
-    .route-dot.to { background: #D1FAE5; }
-    .route-lbl { font-size: 0.62rem; color: #A8A29E; margin-bottom: 1px; }
-    .route-val { font-size: 0.83rem; color: #1C1917; }
+    .route-dot.from svg { stroke: #78716C; }
+    .route-dot.to { background: #FFF7ED; }
+    .route-dot.to svg { stroke: #F97316; }
+    .route-dot svg { width: 14px; height: 14px; fill: none; stroke-width: 2.5; }
+    .route-lbl { font-size: 0.6rem; color: #A8A29E; margin-bottom: 1px; }
+    .route-val { font-size: 0.83rem; color: #1C1917; font-weight: 500; }
 
-    .fare-display { background: #F5F0EA; border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .fare-block { text-align: left; }
-    .fare-num { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.04em; color: #10B981; }
-    .fare-lbl { font-size: 0.65rem; color: #78716C; margin-top: 1px; }
-    
-    .counter-input-row { display: flex; gap: 8px; margin-top: 10px; width: 100%; }
-    .counter-in { flex: 1; background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 0.85rem; outline: none; color: #1C1917; }
-    .counter-in:focus { border-color: #10B981; }
+    .price-row { background: #F5F0EA; border-radius: 10px; padding: 10px 13px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+    .price-lbl { font-size: 0.65rem; color: #78716C; }
+    .price-val { font-size: 1.3rem; font-weight: 700; color: #F97316; }
 
-    .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn:last-child { margin-bottom: 0; }
-    .btn-primary { background: #10B981; color: #fff; }
-    .btn-danger { background: #ef4444; color: #fff; }
-    .btn-ghost { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
-    .btn:hover { opacity: 0.9; }
+    .offer-row { margin-bottom: 12px; }
+    .offer-row label { font-size: 0.65rem; color: #78716C; display: block; margin-bottom: 5px; }
+    .offer-input { width: 100%; background: #fff; border: 1px solid #FED7AA; border-radius: 10px; padding: 10px 13px; color: #1C1917; font-family: inherit; font-size: 1rem; font-weight: 600; outline: none; }
+    .offer-input:focus { border-color: #F97316; }
 
-    .rider-profile-bar { background: #F5F0EA; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .rider-av { width: 40px; height: 40px; border-radius: 50%; background: #10B981; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #fff; }
-    .rider-name { font-size: 0.85rem; font-weight: 600; color: #1C1917; }
-    .rider-sub { font-size: 0.68rem; color: #78716C; margin-top: 2px; }
+    .btn-row { display: flex; gap: 7px; }
+    .btn-sm { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .btn-sm svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+    .btn-sm:hover { opacity: 0.88; }
+    .btn-acc { background: #F97316; color: #fff; }
+    .btn-ctr { background: #1C1917; color: #fff; }
+    .btn-dec { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
 
-    /* FLOATING ACTION OVERLAYS (CHAT SYSTEM) */
-    .chat-fab { position: fixed; bottom: 24px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #10B981; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(16,185,129,0.4); z-index: 800; transition: transform 0.2s; }
-    .chat-fab:active { transform: scale(0.95); }
+    /* ACTIVE RIDE */
+    .active-card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
+    .active-card.visible { display: block; }
+
+    .progress-bar { display: flex; align-items: flex-start; margin-bottom: 16px; padding: 0 4px; }
+    .prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #EDE8E0; border: 2px solid #E5DDD0; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #A8A29E; transition: all 0.4s; }
+    .prog-dot.active { background: #FFF7ED; border-color: #F97316; color: #F97316; box-shadow: 0 0 12px #F9731644; }
+    .prog-dot.done { background: #F97316; border-color: #F97316; }
+    .prog-dot.done svg { display: block; }
+    .prog-dot svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 3; stroke-linecap: round; display: none; }
+    .prog-dot span { display: block; }
+    .prog-dot.done span { display: none; }
+    .prog-line { flex: 1; height: 2px; background: #E5DDD0; margin-top: 14px; transition: background 0.4s; }
+    .prog-line.done { background: #F97316; }
+    .prog-label { font-size: 0.58rem; color: #A8A29E; margin-top: 5px; text-align: center; font-weight: 500; }
+    .prog-label.active { color: #F97316; }
+    .prog-label.done { color: #F97316; }
+
+    .fare-box { background: #FFF7ED; border-radius: 10px; padding: 12px; text-align: center; margin: 12px 0; }
+    .fare-num { font-size: 1.7rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
+    .fare-lbl { font-size: 0.62rem; color: #78716C; margin-top: 2px; }
+
+    .action-row { display: flex; gap: 8px; margin-top: 12px; }
+    .act-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid #E5DDD0; background: #F5F0EA; color: #78716C; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .act-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+    .act-btn.start:hover { border-color: #F97316; color: #F97316; background: #FFF7ED; }
+    .act-btn.done:hover { border-color: #22c55e; color: #22c55e; background: #f0fdf4; }
+    .act-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* RIDES LIST */
+    .ride-item { background: #F5F0EA; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
+    .ride-route { font-size: 0.8rem; color: #1C1917; font-weight: 500; }
+    .ride-meta { font-size: 0.63rem; color: #A8A29E; margin-top: 2px; }
+    .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+    .badge-requested { background: #EDE8E0; color: #78716C; }
+    .badge-accepted { background: #dcfce7; color: #16a34a; }
+    .badge-in_progress { background: #FFF7ED; color: #EA580C; }
+    .badge-completed { background: #ede9fe; color: #7c3aed; }
+    .badge-cancelled { background: #fee2e2; color: #dc2626; }
+    .empty { text-align: center; color: #A8A29E; font-size: 0.8rem; padding: 18px; }
+
+    /* CHAT FAB */
+    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #1C1917; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(28,25,23,0.3); z-index: 1000; -webkit-transform: translateZ(0); transform: translateZ(0); will-change: transform; }
     .chat-fab.visible { display: flex; }
-    .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 0.65rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
+    .chat-fab:active { transform: scale(0.95) translateZ(0); }
+    .chat-fab svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 0.62rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
     .chat-fab-badge.show { display: flex; }
 
-    .chat-popup-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 850; display: none; }
-    .chat-popup-overlay.open { display: block; }
-    .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 0; z-index: 860; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; }
-    .chat-popup.open { transform: translateY(0); }
-    .chat-popup-handle { width: 40px; height: 4px; background: #E5DDD0; border-radius: 2px; margin: 12px auto 0; }
-    .chat-popup-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 12px; border-bottom: 1px solid #E5DDD0; }
-    .chat-popup-title { display: flex; align-items: center; gap: 10px; }
-    .chat-popup-title-text { font-size: 0.85rem; font-weight: 700; color: #1C1917; }
-    .chat-popup-title-sub { font-size: 0.68rem; color: #78716C; margin-top: 1px; }
+    .chat-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 1001; display: none; -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .chat-overlay.open { display: block; }
+    .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 1002; transform: translateY(100%) translateZ(0); -webkit-transform: translateY(100%) translateZ(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; will-change: transform; }
+    .chat-popup.open { transform: translateY(0) translateZ(0); -webkit-transform: translateY(0) translateZ(0); }
+    .chat-handle { width: 40px; height: 4px; background: #E5DDD0; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
+    .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 12px; border-bottom: 1px solid #E5DDD0; flex-shrink: 0; }
+    .chat-head-left { display: flex; align-items: center; gap: 10px; }
+    .chat-head-icon { width: 34px; height: 34px; border-radius: 9px; background: #FFF7ED; display: flex; align-items: center; justify-content: center; }
+    .chat-head-icon svg { width: 18px; height: 18px; stroke: #F97316; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .chat-title { font-size: 0.85rem; font-weight: 700; color: #1C1917; }
+    .chat-sub { font-size: 0.68rem; color: #78716C; margin-top: 1px; }
     .chat-close { background: #EDE8E0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .chat-msgs { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; min-height: 200px; max-height: 45vh; background: #FAF8F5; }
-    .msg { max-width: 78%; padding: 9px 13px; border-radius: 16px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; position: relative; }
-    .msg.me { background: #10B981; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .chat-close svg { width: 12px; height: 12px; stroke: #78716C; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .chat-msgs { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; min-height: 180px; max-height: 45vh; }
+    .chat-msgs::-webkit-scrollbar { width: 2px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: #E5DDD0; }
+    .msg { max-width: 78%; padding: 9px 13px; border-radius: 16px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
+    .msg.me { background: #F97316; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg.them { background: #EDE8E0; color: #1C1917; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .msg-time { font-size: 0.58rem; opacity: 0.65; margin-top: 3px; text-align: right; }
-    .chat-input-area { padding: 12px 16px 24px; border-top: 1px solid #E5DDD0; display: flex; gap: 8px; background: #fff; }
+    .msg-time { font-size: 0.56rem; opacity: 0.55; margin-top: 3px; }
+    .chat-input-wrap { padding: 10px 14px 28px; border-top: 1px solid #E5DDD0; display: flex; gap: 8px; background: #fff; flex-shrink: 0; }
     .chat-in { flex: 1; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 22px; padding: 10px 16px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; }
-    .chat-in:focus { border-color: #10B981; background: #fff; }
-    .chat-send { background: #10B981; border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
-    .chat-send:hover { background: #059669; }
+    .chat-in:focus { border-color: #F97316; }
+    .chat-send { background: #1C1917; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .chat-send svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
 
-    .history-item { background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
-    .h-route { font-size: 0.8rem; color: #1C1917; display: flex; align-items: center; gap: 5px; max-width: 70%; }
-    .h-route svg { width: 12px; height: 12px; flex-shrink: 0; fill: none; stroke: #A8A29E; stroke-width: 2.5; }
-    .h-text-wrapper { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-    .h-meta { font-size: 0.65rem; color: #A8A29E; margin-top: 4px; }
-    .badge { padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-    .badge-completed { background: #E0F2FE; color: #0369A1; }
-    .badge-cancelled { background: #FEE2E2; color: #DC2626; }
-    .empty { text-align: center; color: #A8A29E; font-size: 0.8rem; padding: 24px; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1200; max-width: 88vw; text-align: center; }
+    /* RATING */
+    .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .rating-overlay.open { display: flex; }
+    .rating-modal { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
+    @keyframes popIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+    .rating-avatar { width: 64px; height: 64px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+    .rating-avatar svg { width: 30px; height: 30px; stroke: #fff; fill: none; stroke-width: 2; }
+    .rating-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; }
+    .rating-sub { font-size: 0.78rem; color: #78716C; margin-bottom: 20px; }
+    .fare-completed { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px; }
+    .fare-completed-amount { font-size: 2.2rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
+    .fare-completed-label { font-size: 0.7rem; color: #EA580C; margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .fare-completed-label svg { width: 13px; height: 13px; stroke: #22c55e; fill: none; stroke-width: 3; stroke-linecap: round; }
+    .stars-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; }
+    .star-btn { width: 34px; height: 34px; cursor: pointer; }
+    .star-btn svg { width: 100%; height: 100%; fill: #E5DDD0; transition: fill 0.15s, transform 0.15s; }
+    .star-btn.active svg { fill: #f59e0b; transform: scale(1.12); }
+    .rating-comment { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 10px 12px; color: #1C1917; font-family: inherit; font-size: 0.82rem; outline: none; resize: none; margin-bottom: 16px; }
+    .rating-comment:focus { border-color: #F97316; }
+    .rating-btn-row { display: flex; gap: 10px; }
+    .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; }
+    .rating-btn.submit { background: #F97316; color: #fff; }
+    .rating-btn.skip { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
+
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateZ(0); background: #1C1917; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1300; max-width: 88vw; text-align: center; white-space: nowrap; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
-    .toast.warn { background: #F59E0B; }
+    .toast.warn { background: #F97316; }
   </style>
 </head>
 <body>
 
 <nav>
-  <div class="brand">Spiti Driver<span>.</span></div>
+  <div class="brand">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="1" y="7" width="16" height="7" rx="2" fill="#F97316"/>
+      <path d="M3 7V5C3 3.3 4.3 2 6 2H12C13.7 2 15 3.3 15 5V7" stroke="#F97316" stroke-width="1.5" fill="none"/>
+      <circle cx="5" cy="14" r="2" fill="#1C1917"/><circle cx="13" cy="14" r="2" fill="#1C1917"/>
+      <circle cx="5" cy="14" r="1" fill="#F5F0EA"/><circle cx="13" cy="14" r="1" fill="#F5F0EA"/>
+    </svg>
+    Spiti-Spiti<span>.</span>
+  </div>
   <div class="nav-right">
-    <div class="conn-dot" id="dot">
-      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
-    </div>
-    <div class="nav-user">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Hi, <strong id="nav-name">Driver</strong>
-    </div>
+    <div class="conn-dot" id="dot"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg></div>
+    <div class="nav-user"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Hi, <strong id="nav-name">Driver</strong></div>
     <button class="logout-btn" onclick="logout()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Logout
@@ -166,305 +245,389 @@
   </div>
 </nav>
 
-<div class="dashboard-layout">
-  
-  <div class="map-module minimized" id="map-wrapper">
-    <div id="driver-map-canvas">
-      <svg id="vector-grid-svg" width="100%" height="100%" viewBox="0 0 480 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
-        <rect width="100%" height="100%" fill="#EDE8E0"/>
-        <g stroke="#D4CCBF" stroke-linecap="round">
-          <line x1="-100" y1="60" x2="600" y2="60" stroke-width="16"/>
-          <line x1="-100" y1="140" x2="600" y2="140" stroke-width="12"/>
-          <line x1="140" y1="-100" x2="140" y2="300" stroke-width="14"/>
-          <line x1="340" y1="-100" x2="340" y2="300" stroke-width="10"/>
-        </g>
-        <path id="driver-telemetry-trail" d="" stroke="#10B981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="1 1" style="animation: pathDash 30s linear infinite;" />
-      </svg>
-      
-      <div id="rider-pin" class="rider-pin" style="display:none;">
-        <div class="rider-pin-pulse"></div>
-        <div class="rider-pin-core"></div>
-      </div>
+<div class="container">
+  <div class="greeting" id="greeting">Driver Dashboard</div>
+  <div class="greeting-sub">Manage your rides in real time</div>
 
-      <div class="map-telemetry-overlay">
-        <div class="map-telemetry-left">
-          <div class="telemetry-pulse"></div>
-          <span id="map-telemetry-txt">Tracking Status: Idle</span>
+  <!-- EXPANDABLE MAP -->
+  <div class="map-module collapsed" id="map-module">
+    <div class="map-header" onclick="toggleMap()">
+      <div class="map-header-left">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
+        Your Location
+      </div>
+      <div class="map-header-right">
+        <div class="map-ctrl" id="map-fs-btn" onclick="toggleFullscreen(event)" title="Fullscreen">
+          <svg id="fs-expand" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <svg id="fs-contract" viewBox="0 0 24 24" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="10" y1="14" x2="3" y2="21"/></svg>
         </div>
-        <span id="map-eta-label" style="display:none; color:#10B981;">ETA: -- mins</span>
+        <div class="map-ctrl" id="map-toggle-btn" title="Collapse">
+          <svg id="chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg id="chevron-up" viewBox="0 0 24 24" style="display:none"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
       </div>
-
-      <div class="map-control-rack">
-        <button class="map-ctrl-btn" id="map-toggle-size-btn" onclick="toggleMapExpansion()" title="Toggle Map Size">
-          <svg id="svg-expand" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-          <svg id="svg-contract" viewBox="0 0 24 24" style="display:none;"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="10" y1="14" x2="3" y2="21"/></svg>
-        </button>
+    </div>
+    <div class="map-canvas" id="map-canvas">
+      <svg viewBox="0 0 480 228" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="480" height="228" fill="#EDE8E0"/>
+        <g stroke="#D4CCBF" stroke-linecap="round">
+          <line x1="0" y1="60" x2="480" y2="60" stroke-width="16"/>
+          <line x1="0" y1="140" x2="480" y2="140" stroke-width="12"/>
+          <line x1="140" y1="0" x2="140" y2="228" stroke-width="14"/>
+          <line x1="320" y1="0" x2="320" y2="228" stroke-width="10"/>
+        </g>
+        <rect x="20" y="10" width="80" height="40" rx="3" fill="#fff"/>
+        <rect x="160" y="8" width="100" height="44" rx="3" fill="#fff"/>
+        <rect x="340" y="68" width="70" height="36" rx="3" fill="#fff"/>
+        <rect x="20" y="155" width="80" height="38" rx="3" fill="#fff"/>
+        <rect x="180" y="160" width="90" height="35" rx="3" fill="#fff"/>
+        <g font-family="-apple-system,sans-serif" font-size="7" fill="#1C191730" font-weight="600">
+          <text x="22" y="55">MAIN MALL RD</text>
+          <text x="148" y="132">CBD AVENUE</text>
+          <text x="148" y="22" transform="rotate(90,148,22)">KHAMA CRES</text>
+          <text x="322" y="18" transform="rotate(90,322,18)">AIRPORT RD</text>
+        </g>
+        <path id="driver-trail" d="" stroke="#F97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+      </svg>
+      <div class="d-pin" id="d-pin">
+        <div class="d-pin-ring"></div>
+        <div class="d-pin-core"></div>
+      </div>
+      <div class="map-overlay-bar">
+        <div class="map-overlay-left">
+          <div class="live-dot" id="live-dot"></div>
+          <span id="map-status-txt">Location not sharing</span>
+        </div>
+        <span class="eta-pill" id="eta-pill"></span>
       </div>
     </div>
   </div>
 
-  <div class="scrollable-content" id="dashboard-feed">
-    
-    <div class="greeting-block">
-      <div>
-        <div class="greeting">Hello Captain!</div>
-        <div class="greeting-sub" id="driver-rating-sub">Loading profile stats...</div>
+  <div class="duty-row">
+    <div>
+      <div class="duty-label">Available for Rides</div>
+      <div class="duty-sub" id="duty-sub">You are offline</div>
+    </div>
+    <div class="sw" id="duty-sw" onclick="toggleDuty()"><div class="sw-knob"></div></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Done</div></div>
+    <div class="stat"><div class="stat-num" id="s-earn">P0</div><div class="stat-lbl">Earned</div></div>
+    <div class="stat"><div class="stat-num gold" id="s-rating">—</div><div class="stat-lbl">Rating</div></div>
+  </div>
+
+  <!-- INCOMING -->
+  <div class="incoming" id="inc-card">
+    <div class="inc-head">
+      <div class="inc-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div><div class="inc-title">New Ride Request</div><div class="inc-sub">Rider looking for a driver</div></div>
+    </div>
+    <div class="route-row">
+      <div class="route-dot from"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div><div class="route-lbl">Pickup</div><div class="route-val" id="inc-pickup">—</div></div>
+    </div>
+    <div class="route-row">
+      <div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+      <div><div class="route-lbl">Dropoff</div><div class="route-val" id="inc-dropoff">—</div></div>
+    </div>
+    <div class="price-row">
+      <div><div class="price-lbl">Rider's offered price</div><div class="price-val" id="inc-fare">P0.00</div></div>
+      <div style="font-size:0.65rem;color:#EA580C;font-weight:600">Min P15</div>
+    </div>
+    <div class="offer-row">
+      <label>Your price (edit to counter):</label>
+      <input class="offer-input" id="my-fare" type="number" min="15"/>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sm btn-acc" onclick="sendOffer(false)">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accept
+      </button>
+      <button class="btn-sm btn-ctr" onclick="sendOffer(true)">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Counter
+      </button>
+      <button class="btn-sm btn-dec" onclick="declineIncoming()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ACTIVE RIDE -->
+  <div class="active-card" id="active-card">
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Current Ride
+    </div>
+    <div class="progress-bar">
+      <div class="prog-step">
+        <div class="prog-dot done" id="dp1"><span>1</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="prog-label done" id="dpl1">Accepted</div>
+      </div>
+      <div class="prog-line" id="dpline1"></div>
+      <div class="prog-step">
+        <div class="prog-dot" id="dp2"><span>2</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="prog-label" id="dpl2">Started</div>
+      </div>
+      <div class="prog-line" id="dpline2"></div>
+      <div class="prog-step">
+        <div class="prog-dot" id="dp3"><span>3</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="prog-label" id="dpl3">Done</div>
       </div>
     </div>
-
-    <div class="duty-switch-card">
-      <div class="duty-info">
-        <div class="duty-label">Go Online</div>
-        <div class="duty-status-txt" id="duty-txt">You are currently offline</div>
-      </div>
-      <div class="switch-bg" id="duty-toggle" onclick="toggleDuty()">
-        <div class="switch-handle">
-          <svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
-        </div>
-      </div>
+    <div class="route-row">
+      <div class="route-dot from"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div><div class="route-lbl">Pickup</div><div class="route-val" id="act-pickup">—</div></div>
     </div>
-
-    <div id="lobby-view" style="display:none;">
-      <div class="card">
-        <div class="card-label">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
-          Active Request Feed
-        </div>
-        <div id="offers-feed-target">
-          <div class="empty">Waiting for requests in your area...</div>
-        </div>
-      </div>
+    <div class="route-row">
+      <div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+      <div><div class="route-lbl">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div>
     </div>
-
-    <div id="active-job-view" style="display:none;">
-      <div class="card">
-        <div class="card-label" id="job-status-tag">Job In Progress</div>
-        
-        <div class="rider-profile-bar">
-          <div class="rider-av" id="r-av">R</div>
-          <div>
-            <div class="rider-name" id="r-name">Passenger</div>
-            <div class="rider-sub">Client Account</div>
-          </div>
-        </div>
-
-        <div class="route-display">
-          <div class="route-row">
-            <div class="route-dot from">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
-            </div>
-            <div><div class="route-lbl">Pickup Location</div><div class="route-val" id="job-pickup">—</div></div>
-          </div>
-          <div class="route-row">
-            <div class="route-dot to">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-            </div>
-            <div><div class="route-lbl">Dropoff Location</div><div class="route-val" id="job-dropoff">—</div></div>
-          </div>
-        </div>
-
-        <div class="fare-display">
-          <div class="fare-block">
-            <div class="fare-num" id="job-fare">P0.00</div>
-            <div class="fare-lbl">Guaranteed Payout</div>
-          </div>
-        </div>
-
-        <div id="job-actions-rack"></div>
-      </div>
+    <div class="fare-box">
+      <div class="fare-num" id="act-fare">P0.00</div>
+      <div class="fare-lbl">Agreed Fare</div>
     </div>
-
-    <div class="card">
-      <div class="card-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        Historical Log
-      </div>
-      <div id="history-target"><div class="empty">No completed jobs parsed</div></div>
+    <div class="action-row">
+      <button class="act-btn start" id="btn-start-ride" onclick="updateStatus('in_progress')">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Ride
+      </button>
+      <button class="act-btn done" id="btn-complete-ride" onclick="updateStatus('completed')">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Complete
+      </button>
     </div>
+  </div>
 
+  <!-- ALL RIDES -->
+  <div class="card">
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      All Rides
+    </div>
+    <div id="rides-list"><div class="empty">No rides yet</div></div>
   </div>
 </div>
 
-<button class="chat-fab" id="chat-fab" onclick="openChat()">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <div class="chat-fab-badge" id="chat-badge">0</div>
-</button>
-<div class="chat-popup-overlay" id="chat-overlay" onclick="closeChat()"></div>
-<div class="chat-popup" id="chat-popup">
-  <div class="chat-popup-handle"></div>
-  <div class="chat-popup-header">
-    <div class="chat-popup-title">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <div>
-        <div class="chat-popup-title-text">Client Chat Link</div>
-        <div class="chat-popup-title-sub" id="chat-rider-subtitle">Active Client</div>
+<!-- RATING MODAL -->
+<div class="rating-overlay" id="rating-overlay">
+  <div class="rating-modal">
+    <div class="fare-completed">
+      <div class="fare-completed-amount" id="rating-fare">P0.00</div>
+      <div class="fare-completed-label">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Ride Completed
       </div>
     </div>
-    <button class="chat-close" onclick="closeChat()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="chat-msgs" id="chat-msgs"></div>
-  <div class="chat-input-area">
-    <input class="chat-in" id="chat-in" placeholder="Type message..." onkeydown="if(event.key==='Enter')sendMsg()" />
-    <button class="chat-send" onclick="sendMsg()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+    <div class="rating-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <div class="rating-title">Rate your rider</div>
+    <div class="rating-sub">How was this passenger?</div>
+    <div class="stars-row">
+      <div class="star-btn" onclick="setStar(1)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(2)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(3)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(4)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+      <div class="star-btn" onclick="setStar(5)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+    </div>
+    <textarea class="rating-comment" id="rating-comment" placeholder="Leave a comment (optional)" rows="3"></textarea>
+    <div class="rating-btn-row">
+      <button class="rating-btn skip" onclick="skipRating()">Skip</button>
+      <button class="rating-btn submit" onclick="submitRating()">Submit</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- CHAT FAB -->
+<button class="chat-fab" id="chat-fab" onclick="openChat()">
+  <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <div class="chat-fab-badge" id="chat-badge">0</div>
+</button>
+<div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
+<div class="chat-popup" id="chat-popup">
+  <div class="chat-handle"></div>
+  <div class="chat-head">
+    <div class="chat-head-left">
+      <div class="chat-head-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><div class="chat-title">Chat with Rider</div><div class="chat-sub" id="chat-rider-name">Active ride</div></div>
+    </div>
+    <button class="chat-close" onclick="closeChat()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs"><div class="empty" style="padding:12px;font-size:0.78rem">No messages yet</div></div>
+  <div class="chat-input-wrap">
+    <input class="chat-in" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+    <button class="chat-send" onclick="sendMsg()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
+
 <script>
   const BASE = "https://spiti-spiti-production.up.railway.app";
   const driverData = JSON.parse(localStorage.getItem("spiti_driver") || "null");
   if (!driverData) window.location.href = "login.html";
-  
   const DRIVER_ID = driverData?.id || 1;
-  document.getElementById("nav-name").textContent = driverData?.name || "Driver";
+  const DRIVER_NAME = driverData?.name || "Driver";
+
+  document.getElementById("nav-name").textContent = DRIVER_NAME;
+  document.getElementById("greeting").textContent = `Hey ${DRIVER_NAME.split(" ")[0]}`;
 
   function logout() { localStorage.removeItem("spiti_driver"); window.location.href = "login.html"; }
 
-  let isOnline = false, activeRide = null, unreadCount = 0, geoInterval = null;
-  let simulatedPoints = [];
+  let pending = null, activeRide = null, locInterval = null, selectedStar = 0, completedRide = null, unreadCount = 0;
+  let trailPoints = [], mapExpanded = false, mapFullscreen = false;
 
+  // ── MAP CONTROLS ───────────────────────────────────────────────────────────
+  function toggleMap() {
+    const mod = document.getElementById("map-module");
+    const chevD = document.getElementById("chevron-down");
+    const chevU = document.getElementById("chevron-up");
+    if (mapFullscreen) return;
+    mapExpanded = !mapExpanded;
+    mod.className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
+    chevD.style.display = mapExpanded ? "none" : "block";
+    chevU.style.display = mapExpanded ? "block" : "none";
+  }
+
+  function toggleFullscreen(e) {
+    e.stopPropagation();
+    const mod = document.getElementById("map-module");
+    const fsE = document.getElementById("fs-expand");
+    const fsC = document.getElementById("fs-contract");
+    mapFullscreen = !mapFullscreen;
+    if (mapFullscreen) {
+      mod.classList.add("fullscreen");
+      fsE.style.display = "none"; fsC.style.display = "block";
+    } else {
+      mod.classList.remove("fullscreen");
+      mod.className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
+      fsE.style.display = "block"; fsC.style.display = "none";
+    }
+  }
+
+  // ── LOCATION SHARING ───────────────────────────────────────────────────────
+  function startLoc() {
+    if (!navigator.geolocation) return showToast("Location not supported", "error");
+    if (!mapExpanded && !mapFullscreen) toggleMap();
+    document.getElementById("live-dot").classList.add("on");
+    document.getElementById("map-status-txt").textContent = "Sharing location...";
+    sendLoc();
+    locInterval = setInterval(sendLoc, 5000);
+    showToast("Location sharing started");
+  }
+
+  function stopLoc() {
+    clearInterval(locInterval); locInterval = null;
+    document.getElementById("live-dot").classList.remove("on");
+    document.getElementById("map-status-txt").textContent = "Location not sharing";
+    showToast("Location sharing stopped");
+  }
+
+  function sendLoc() {
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude: lat, longitude: lng } }) => {
+        updateDriverPin(lat, lng);
+        document.getElementById("map-status-txt").textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        // Emit to server so rider can receive it
+        socket.emit("driver-location", { driverId: DRIVER_ID, lat, lng });
+        try {
+          await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
+            method: "PATCH", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lat, lng })
+          });
+        } catch(e) {}
+      },
+      (err) => {
+        const msgs = { 1:"Permission denied. Allow location in settings.", 2:"Location unavailable.", 3:"Location timed out." };
+        showToast(msgs[err.code] || "Location error", "error");
+        stopLoc();
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
+    );
+  }
+
+  function updateDriverPin(lat, lng) {
+    const pin = document.getElementById("d-pin");
+    const canvas = document.getElementById("map-canvas");
+    if (!pin || !canvas) return;
+    const w = canvas.offsetWidth || 480;
+    const h = canvas.offsetHeight || 228;
+    const base = { lat: -24.6541, lng: 25.9087 };
+    const scaleX = 22000, scaleY = 25000;
+    let px = w / 2 + (lng - base.lng) * scaleX;
+    let py = h / 2 - (lat - base.lat) * scaleY;
+    px = Math.max(15, Math.min(w - 15, px));
+    py = Math.max(15, Math.min(h - 15, py));
+    pin.style.display = "block";
+    pin.style.left = px + "px";
+    pin.style.top = py + "px";
+    trailPoints.push({ x: px, y: py });
+    if (trailPoints.length > 50) trailPoints.shift();
+    if (trailPoints.length >= 2) {
+      let d = `M ${trailPoints[0].x} ${trailPoints[0].y}`;
+      for (let i = 1; i < trailPoints.length; i++) d += ` L ${trailPoints[i].x} ${trailPoints[i].y}`;
+      document.getElementById("driver-trail").setAttribute("d", d);
+    }
+  }
+
+  // ── DUTY TOGGLE ────────────────────────────────────────────────────────────
+  async function toggleDuty() {
+    const sw = document.getElementById("duty-sw");
+    const isOn = !sw.classList.contains("on");
+    sw.classList.toggle("on", isOn);
+    document.getElementById("duty-sub").textContent = isOn ? "You are online" : "You are offline";
+    if (isOn) startLoc(); else stopLoc();
+    try {
+      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ available: isOn })
+      });
+      showToast(isOn ? "Online" : "Offline");
+    } catch(e) {}
+  }
+
+  // ── SOCKET ─────────────────────────────────────────────────────────────────
   const socket = io(BASE, { transports: ["websocket", "polling"] });
 
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
-    socket.emit("join-role", { role: "driver", userId: DRIVER_ID });
-    loadProfileStats();
-    loadHistory();
-    syncActiveState();
+    // Use "drivers" role — matches what the server expects
+    socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
+    loadRides();
+    loadMyRating();
   });
   socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
 
-  // MAP SCREEN MANAGEMENT
-  function toggleMapExpansion() {
-    const wrapper = document.getElementById("map-wrapper");
-    const feed = document.getElementById("dashboard-feed");
-    const svgExpand = document.getElementById("svg-expand");
-    const svgContract = document.getElementById("svg-contract");
-    
-    if (wrapper.classList.contains("minimized")) {
-      wrapper.className = "map-module maximized";
-      feed.classList.add("map-maximized");
-      svgExpand.style.display = "none";
-      svgContract.style.display = "block";
-    } else {
-      wrapper.className = "map-module minimized";
-      feed.classList.remove("map-maximized");
-      svgExpand.style.display = "block";
-      svgContract.style.display = "none";
-    }
-  }
-
-  async function loadProfileStats() {
-    try {
-      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/rating`);
-      const data = await res.json();
-      if (data && data.avg_rating > 0) {
-        document.getElementById("driver-rating-sub").innerHTML = `⭐ ${parseFloat(data.avg_rating).toFixed(1)} Rating · ${data.total_ratings} Jobs Completed`;
-      } else {
-        document.getElementById("driver-rating-sub").textContent = "New Driver · Premium Status";
-      }
-    } catch(e) {}
-  }
-
-  function toggleDuty() {
-    isOnline = !isOnline;
-    const btn = document.getElementById("duty-toggle");
-    const txt = document.getElementById("duty-txt");
-    btn.classList.toggle("on", isOnline);
-    txt.textContent = isOnline ? "You are online and searching" : "You are currently offline";
-    document.getElementById("lobby-view").style.display = (isOnline && !activeRide) ? "block" : "none";
-    
-    if (isOnline) {
-      startTelemetryStreaming();
-    } else {
-      stopTelemetryStreaming();
-    }
-  }
-
-  function startTelemetryStreaming() {
-    if (geoInterval) clearInterval(geoInterval);
-    document.getElementById("map-telemetry-txt").textContent = "Live Telemetry Active";
-    
-    // Simulate real-time movement across Gaborone layout vectors
-    let baseLat = -24.6541, baseLng = 25.9087;
-    geoInterval = setInterval(() => {
-      baseLat += (Math.random() - 0.5) * 0.001;
-      baseLng += (Math.random() - 0.5) * 0.001;
-      
-      socket.emit("driver-location", { driverId: DRIVER_ID, lat: baseLat, lng: baseLng });
-      
-      // Plot telemetry coordinate matrices directly on viewport
-      const wrapper = document.getElementById("driver-map-canvas");
-      if (wrapper) {
-        const pin = document.getElementById("rider-pin");
-        pin.style.display = "block";
-        let pxX = 240 + (baseLng - 25.9087) * 25000;
-        let pxY = 100 - (baseLat - -24.6541) * 25000;
-        pxX = Math.max(20, Math.min(460, pxX));
-        pxY = Math.max(20, Math.min(180, pxY));
-        
-        pin.style.left = `${pxX}px`;
-        pin.style.top = `${pxY}px`;
-
-        simulatedPoints.push({ x: pxX, y: pxY });
-        if (simulatedPoints.length > 40) simulatedPoints.shift();
-        
-        if (simulatedPoints.length >= 2) {
-          let dStr = `M ${simulatedPoints[0].x} ${simulatedPoints[0].y}`;
-          for(let i=1; i<simulatedPoints.length; i++) dStr += ` L ${simulatedPoints[i].x} ${simulatedPoints[i].y}`;
-          document.getElementById("driver-telemetry-trail").setAttribute("d", dStr);
-        }
-
-        // Auto calculate local proximity matrix metrics
-        if (activeRide) {
-          const badge = document.getElementById("map-eta-label");
-          badge.style.display = "block";
-          let computedMinutes = Math.max(1, Math.round(5 - (simulatedPoints.length / 10)));
-          if (activeRide.status === "in_progress") computedMinutes = Math.max(1, computedMinutes - 2);
-          badge.textContent = `ETA: ${computedMinutes} mins`;
-        }
-      }
-    }, 4000);
-  }
-
-  function stopTelemetryStreaming() {
-    if (geoInterval) clearInterval(geoInterval);
-    document.getElementById("map-telemetry-txt").textContent = "Tracking Status: Idle";
-    document.getElementById("map-eta-label").style.display = "none";
-    document.getElementById("rider-pin").style.display = "none";
-    document.getElementById("driver-telemetry-trail").setAttribute("d", "");
-    simulatedPoints = [];
-  }
-
-  async function syncActiveState() {
-    try {
-      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/active-ride`);
-      if (res.status === 200) {
-        const ride = await res.json();
-        renderActiveRideState(ride);
-      }
-    } catch(e) {}
-  }
-
-  socket.on("ride-requested", (ride) => {
-    if (!isOnline || activeRide) return;
-    showToast("New matching request received!");
-    appendLobbyOffer(ride);
+  socket.on("new-ride", (ride) => {
+    if (activeRide) return;
+    pending = ride;
+    document.getElementById("inc-pickup").textContent = ride.pickup;
+    document.getElementById("inc-dropoff").textContent = ride.dropoff;
+    document.getElementById("inc-fare").textContent = "P" + parseFloat(ride.offered_fare || 15).toFixed(2);
+    document.getElementById("my-fare").value = ride.offered_fare || 15;
+    document.getElementById("inc-card").classList.add("visible");
+    showToast("New ride request");
   });
 
+  socket.on("offer-accepted", (ride) => {
+    activeRide = ride;
+    document.getElementById("inc-card").classList.remove("visible");
+    document.getElementById("active-card").classList.add("visible");
+    document.getElementById("act-pickup").textContent = ride.pickup;
+    document.getElementById("act-dropoff").textContent = ride.dropoff;
+    document.getElementById("act-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+    document.getElementById("chat-fab").classList.add("visible");
+    document.getElementById("chat-rider-name").textContent = "Rider #" + ride.rider_id;
+    updateDriverProgress("accepted");
+    socket.emit("join-ride", { rideId: ride.id });
+    loadMsgs(ride.id);
+    showToast("Rider accepted! Head to pickup");
+    loadRides();
+  });
+
+  socket.on("offer-declined", () => showToast("Rider declined your offer", "error"));
+
   socket.on("ride-updated", (ride) => {
-    if (activeRide && ride.id === activeRide.id) {
-      activeRide = ride;
-      if (ride.status === "cancelled") {
-        showToast("Client cancelled request", "error");
-        clearActiveRideInterface();
-      }
-    }
+    if (activeRide && ride.id === activeRide.id) { activeRide = ride; updateDriverProgress(ride.status); loadRides(); }
   });
 
   socket.on("new-message", (msg) => {
@@ -477,172 +640,122 @@
     }
   });
 
-  async function appendLobbyOffer(ride) {
-    const root = document.getElementById("offers-feed-target");
-    const emp = root.querySelector('.empty');
-    if (emp) emp.remove();
-    
-    const card = document.createElement("div");
-    card.id = `lobby-offer-${ride.id}`;
-    card.style = "background:#FFF7ED; border:1px solid #FED7AA; padding:14px; border-radius:12px; margin-bottom:8px;";
-    card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <div>
-          <div style="font-size:0.8rem; font-weight:600;">Client Request</div>
-          <div style="font-size:0.6rem; color:#78716C;">Route Context Match</div>
-        </div>
-        <div style="font-size:1.3rem; font-weight:700; color:#10B981;">P${parseFloat(ride.offered_fare).toFixed(2)}</div>
-      </div>
-      <div style="font-size:0.75rem; color:#1C1917; margin-bottom:12px;">
-        📍 <strong>From:</strong> ${ride.pickup}<br>
-        🏁 <strong>To:</strong> ${ride.dropoff}
-      </div>
-      <div style="display:flex; gap:6px;">
-        <button class="btn btn-primary" style="flex:1; margin:0;" onclick="acceptLobbyJob(${ride.id}, ${ride.offered_fare})">Accept Instantly</button>
-        <button class="btn btn-ghost" style="flex:1; margin:0;" onclick="showCounterUI(${ride.id})">Counter Offer</button>
-      </div>
-      <div id="counter-box-${ride.id}" style="display:none;" class="counter-input-row">
-        <input type="number" class="counter-in" id="c-input-${ride.id}" placeholder="Enter BWP amount">
-        <button class="btn btn-primary" style="margin:0; padding:0 14px;" onclick="sendCounterPrice(${ride.id})">Send</button>
-      </div>
-    `;
-    root.appendChild(card);
-  }
-
-  function showCounterUI(id) {
-    document.getElementById(`counter-box-${id}`).style.display = "flex";
-  }
-
-  function sendCounterPrice(id) {
-    const v = parseFloat(document.getElementById(`c-input-${id}`).value);
-    if (isNaN(v) || v <= 0) return;
-    socket.emit("driver-offer", { rideId: id, driverId: DRIVER_ID, driver_name: (driverData?.name || "Driver"), fare_offer: v });
-    showToast("Counter offer sent to passenger");
-    document.getElementById(`lobby-offer-${id}`).remove();
-    checkLobbyCount();
-  }
-
-  function checkLobbyCount() {
-    const root = document.getElementById("offers-feed-target");
-    if(root.children.length === 0) {
-      root.innerHTML = `<div class="empty">Waiting for requests in your area...</div>`;
-    }
-  }
-
-  async function acceptLobbyJob(id, fare) {
+  // ── OFFER ACTIONS ──────────────────────────────────────────────────────────
+  async function sendOffer(isCounter) {
+    if (!pending) return;
+    const fare = Math.max(15, parseFloat(document.getElementById("my-fare").value) || 15);
     try {
-      const res = await fetch(`${BASE}/rides/${id}/accept-offer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ driverId: DRIVER_ID, fare })
+      await fetch(`${BASE}/rides/${pending.id}/offer`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fare_offer: fare, driverId: DRIVER_ID, driver_name: DRIVER_NAME })
       });
-      if (res.ok) {
-        const data = await res.json();
-        renderActiveRideState(data);
-      } else { showToast("Job taken or expired", "error"); }
-    } catch(e) {}
+      document.getElementById("inc-card").classList.remove("visible");
+      showToast(isCounter ? `Counter P${fare.toFixed(2)} sent` : "Offer sent! Waiting for rider...");
+    } catch(e) { showToast("Failed", "error"); }
   }
 
-  function renderActiveRideState(ride) {
-    activeRide = ride;
-    document.getElementById("lobby-view").style.display = "none";
-    document.getElementById("active-job-view").style.display = "block";
-    
-    document.getElementById("job-pickup").textContent = ride.pickup;
-    document.getElementById("job-dropoff").textContent = ride.dropoff;
-    document.getElementById("job-fare").textContent = "P" + parseFloat(ride.fare || ride.offered_fare).toFixed(2);
-    document.getElementById("r-name").textContent = ride.rider_name || "Passenger";
-    document.getElementById("r-av").textContent = (ride.rider_name || "R").charAt(0).toUpperCase();
-
-    const rack = document.getElementById("job-actions-rack");
-    rack.innerHTML = "";
-
-    if (ride.status === "accepted") {
-      document.getElementById("job-status-tag").textContent = "Heading to Pickup";
-      rack.innerHTML = `<button class="btn btn-primary" onclick="updateRideStatus('in_progress')">Client On Board - Start Ride</button>`;
-      document.getElementById("chat-fab").classList.add("visible");
-      socket.emit("join-ride", { rideId: ride.id });
-      loadMsgs(ride.id);
-    } else if (ride.status === "in_progress") {
-      document.getElementById("job-status-tag").textContent = "Ride In Progress";
-      rack.innerHTML = `<button class="btn btn-primary" onclick="updateRideStatus('completed')">Arrived at Destination - Complete</button>`;
-      document.getElementById("chat-fab").classList.add("visible");
-      socket.emit("join-ride", { rideId: ride.id });
-    }
-    
-    if (!geoInterval) startTelemetryStreaming();
+  function declineIncoming() {
+    pending = null;
+    document.getElementById("inc-card").classList.remove("visible");
+    showToast("Declined");
   }
 
-  async function updateRideStatus(status) {
+  // ── RIDE STATUS ────────────────────────────────────────────────────────────
+  async function updateStatus(status) {
     if (!activeRide) return;
     try {
       const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (status === "completed") {
-          showToast("Job finalized successfully! 🎉");
-          clearActiveRideInterface();
-          loadHistory();
-        } else {
-          renderActiveRideState(data);
-        }
+      const ride = await res.json();
+      activeRide = ride;
+      updateDriverProgress(status);
+      if (status === "in_progress") {
+        showToast("Ride started!");
+        document.getElementById("btn-start-ride").disabled = true;
+        document.getElementById("eta-pill").style.display = "none";
       }
-    } catch(e) { showToast("Failed to transform execution state matrix", "error"); }
+      if (status === "completed") {
+        completedRide = ride;
+        showToast("Ride completed!");
+        setTimeout(() => showRatingModal(ride), 1500);
+      }
+      loadRides();
+    } catch(e) { showToast("Failed", "error"); }
   }
 
-  function clearActiveRideInterface() {
-    activeRide = null;
-    document.getElementById("active-job-view").style.display = "none";
-    document.getElementById("chat-fab").classList.remove("visible");
-    closeChat();
-    if (isOnline) {
-      document.getElementById("lobby-view").style.display = "block";
-    } else {
-      stopTelemetryStreaming();
+  function updateDriverProgress(status) {
+    const map = { accepted: 1, in_progress: 2, completed: 3 };
+    const cur = map[status] || 0;
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`dp${i}`);
+      const lbl = document.getElementById(`dpl${i}`);
+      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`dpline${i}`).className = "prog-line done"; }
+      else if (i === cur) { dot.className = "prog-dot active"; lbl.className = "prog-label active"; }
+      else { dot.className = "prog-dot"; lbl.className = "prog-label"; }
     }
   }
 
-  async function loadHistory() {
+  // ── RATING ─────────────────────────────────────────────────────────────────
+  function showRatingModal(ride) {
+    document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
+    selectedStar = 0;
+    document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
+    document.getElementById("rating-comment").value = "";
+    document.getElementById("rating-overlay").classList.add("open");
+  }
+
+  function setStar(n) {
+    selectedStar = n;
+    document.querySelectorAll(".star-btn").forEach((s, i) => s.classList.toggle("active", i < n));
+  }
+
+  async function submitRating() {
+    if (!completedRide) return;
+    if (selectedStar === 0) return showToast("Please select a rating", "warn");
+    const comment = document.getElementById("rating-comment").value.trim();
     try {
-      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/history`);
+      await fetch(`${BASE}/rides/${completedRide.id}/rate-rider`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: selectedStar, comment })
+      });
+      showToast("Rating submitted!");
+    } catch(e) {}
+    closeRatingAndReset();
+  }
+
+  function skipRating() { closeRatingAndReset(); }
+
+  function closeRatingAndReset() {
+    document.getElementById("rating-overlay").classList.remove("open");
+    completedRide = null;
+    document.getElementById("active-card").classList.remove("visible");
+    document.getElementById("chat-msgs").innerHTML = '<div class="empty" style="padding:12px;font-size:0.78rem">No messages yet</div>';
+    document.getElementById("btn-start-ride").disabled = false;
+    document.getElementById("chat-fab").classList.remove("visible");
+    document.getElementById("chat-badge").classList.remove("show");
+    unreadCount = 0;
+    closeChat();
+    activeRide = null;
+    loadRides(); loadMyRating();
+  }
+
+  async function loadMyRating() {
+    try {
+      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/rating`);
       const data = await res.json();
-      const container = document.getElementById("history-target");
-      if (data && data.length > 0) {
-        container.innerHTML = "";
-        data.forEach(item => {
-          const statusBadge = item.status === 'completed' ? '<span class="badge badge-completed">Done</span>' : '<span class="badge badge-cancelled">Dropped</span>';
-          const node = document.createElement("div");
-          node.className = "history-item";
-          node.innerHTML = `
-            <div class="h-route">
-              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              <div class="h-text-wrapper">
-                <strong>${item.pickup}</strong> to <strong>${item.dropoff}</strong>
-                <div class="h-meta">Fare Settlement: P${parseFloat(item.fare).toFixed(2)}</div>
-              </div>
-            </div>
-            ${statusBadge}
-          `;
-          container.appendChild(node);
-        });
-      } else {
-        container.innerHTML = `<div class="empty">No completed jobs parsed</div>`;
-      }
+      if (data && data.avg_rating > 0) document.getElementById("s-rating").textContent = parseFloat(data.avg_rating).toFixed(1);
     } catch(e) {}
   }
 
-  // CHAT LAYER EXECUTION
+  // ── CHAT ───────────────────────────────────────────────────────────────────
   function openChat() {
     document.getElementById("chat-overlay").classList.add("open");
     document.getElementById("chat-popup").classList.add("open");
-    document.getElementById("chat-badge").classList.remove("show");
     unreadCount = 0;
-    const box = document.getElementById("chat-msgs");
-    box.scrollTop = box.scrollHeight;
+    document.getElementById("chat-badge").classList.remove("show");
+    setTimeout(() => { const m = document.getElementById("chat-msgs"); m.scrollTop = m.scrollHeight; }, 350);
   }
 
   function closeChat() {
@@ -653,49 +766,68 @@
   async function loadMsgs(rideId) {
     try {
       const res = await fetch(`${BASE}/rides/${rideId}/messages`);
-      const messages = await res.json();
-      document.getElementById("chat-msgs").innerHTML = "";
-      messages.forEach(appendMsg);
+      const msgs = await res.json();
+      const el = document.getElementById("chat-msgs");
+      el.innerHTML = "";
+      if (!msgs.length) { el.innerHTML = '<div class="empty" style="padding:12px;font-size:0.78rem">No messages yet</div>'; return; }
+      msgs.forEach(appendMsg);
     } catch(e) {}
   }
 
   function appendMsg(msg) {
-    const box = document.getElementById("chat-msgs");
-    const isMe = msg.sender_role === "driver" || msg.senderId === DRIVER_ID;
-    const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    
+    const el = document.getElementById("chat-msgs");
+    const empty = el.querySelector(".empty");
+    if (empty) empty.remove();
+    const isMe = msg.sender_role === "driver";
+    const time = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const div = document.createElement("div");
-    div.className = `msg ${isMe ? 'me' : 'them'}`;
-    div.innerHTML = `
-      <div>${msg.message_text || msg.message}</div>
-      <div class="msg-time">${timeStr}</div>
-    `;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+    div.className = `msg ${isMe ? "me" : "them"}`;
+    div.innerHTML = `<div>${msg.message || msg.message_text}</div><div class="msg-time">${time}</div>`;
+    el.appendChild(div);
+    el.scrollTop = el.scrollHeight;
   }
 
   function sendMsg() {
+    if (!activeRide) return;
     const input = document.getElementById("chat-in");
-    const val = input.value.trim();
-    if (!val || !activeRide) return;
-
-    const payload = {
-      rideId: activeRide.id,
-      senderId: DRIVER_ID,
-      sender_role: "driver",
-      message: val
-    };
-
-    socket.emit("send-message", payload);
-    appendMsg({ sender_role: "driver", message_text: val });
+    const message = input.value.trim();
+    if (!message) return;
     input.value = "";
+    const payload = { rideId: activeRide.id, sender_role: "driver", message };
+    socket.emit("send-message", payload);
+    appendMsg({ ...payload, created_at: new Date() });
+    fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
   }
 
-  function showToast(txt, type = "") {
-    const el = document.getElementById("toast");
-    el.className = `toast ${type} show`;
-    el.textContent = txt;
-    setTimeout(() => el.classList.remove("show"), 3500);
+  // ── RIDES LIST ─────────────────────────────────────────────────────────────
+  async function loadRides() {
+    try {
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const mine = rides.filter(r => r.driver_id == DRIVER_ID);
+      document.getElementById("rides-list").innerHTML = mine.length ? mine.map(r => `
+        <div class="ride-item">
+          <div>
+            <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="ride-meta">#${r.id}${r.fare ? " · P" + parseFloat(r.fare).toFixed(2) : r.offered_fare ? " · Offered P" + parseFloat(r.offered_fare).toFixed(2) : ""}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace(/_/g, " ")}</span>
+        </div>`).join("") : '<div class="empty">No rides yet</div>';
+      document.getElementById("s-total").textContent = mine.length;
+      document.getElementById("s-done").textContent = mine.filter(r => r.status === "completed").length;
+      const earn = mine.filter(r => r.status === "completed").reduce((s, r) => s + parseFloat(r.fare || 0), 0);
+      document.getElementById("s-earn").textContent = "P" + earn.toFixed(2);
+    } catch(e) {}
+  }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " " + type : "");
+    setTimeout(() => t.className = "toast", 3500);
   }
 </script>
 </body>
