@@ -78,7 +78,6 @@
     .fare-num.green { color: #22c55e; }
     .fare-lbl { font-size: 0.65rem; color: #78716C; margin-top: 2px; }
 
-    /* OFFERS */
     .offers-section { margin-bottom: 12px; display: none; }
     .offers-head { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
     .offers-head svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
@@ -98,7 +97,6 @@
     .obtn.dec { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; width: 32px; height: 32px; padding: 0; }
     .obtn:hover { opacity: 0.85; }
 
-    /* DRIVER CARD */
     .driver-card { background: #F5F0EA; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .driver-av { width: 40px; height: 40px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0; }
     .driver-name { font-size: 0.85rem; font-weight: 600; color: #1C1917; }
@@ -107,13 +105,13 @@
     .driver-stars { font-size: 0.72rem; color: #78716C; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
     .driver-stars svg { width: 11px; height: 11px; fill: #f59e0b; }
 
-    /* MAP — expandable */
+    /* GOOGLE MAP MODULE */
     .map-module { border: 1px solid #E5DDD0; background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 10px; position: relative; transition: height 0.35s cubic-bezier(0.4,0,0.2,1); }
     .map-module.collapsed { height: 44px; }
-    .map-module.expanded { height: 240px; }
+    .map-module.expanded { height: 260px; }
     .map-module.fullscreen { position: fixed; top: 57px; left: 0; right: 0; bottom: 0; z-index: 600; border-radius: 0; border: none; height: auto !important; max-width: 100%; }
 
-    .map-header { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; height: 44px; cursor: pointer; user-select: none; background: #fff; }
+    .map-header { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; height: 44px; cursor: pointer; user-select: none; background: #fff; border-bottom: 1px solid #E5DDD0; position: relative; z-index: 2; }
     .map-header-left { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 700; color: #78716C; letter-spacing: 0.05em; text-transform: uppercase; }
     .map-header-left svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
     .map-header-right { display: flex; align-items: center; gap: 5px; }
@@ -121,35 +119,28 @@
     .map-ctrl-sm svg { width: 12px; height: 12px; stroke: #78716C; fill: none; stroke-width: 2; }
     .map-ctrl-sm:hover { background: #EDE8E0; }
 
-    .map-canvas { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; background: #EDE8E0; overflow: hidden; }
-    .map-module.collapsed .map-canvas { display: none; }
-    .map-canvas svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+    /* The real Google Map fills from below the header */
+    #tracking-gmap { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; }
+    .map-module.collapsed #tracking-gmap { display: none; }
 
-    .map-overlay-bar { position: absolute; top: 8px; left: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; border-radius: 8px; padding: 5px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.68rem; pointer-events: none; z-index: 10; }
+    /* ETA overlay bar ON TOP of map */
+    .map-overlay-bar { position: absolute; top: 52px; left: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; border-radius: 8px; padding: 5px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.68rem; pointer-events: none; z-index: 10; }
     .map-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #D4CCBF; flex-shrink: 0; }
     .map-live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .eta-badge { background: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; display: none; }
 
-    .driver-pin { position: absolute; transform: translate(-50%,-50%); z-index: 20; transition: left 0.8s cubic-bezier(0.4,0,0.2,1), top 0.8s cubic-bezier(0.4,0,0.2,1); display: none; }
-    .driver-pin-ring { position: absolute; top: -8px; left: -8px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #F9731444; animation: pinPulse 2s infinite; }
-    .driver-pin-dot { width: 14px; height: 14px; border-radius: 50%; background: #F97316; border: 3px solid #fff; box-shadow: 0 0 10px #F9731688; }
-    @keyframes pinPulse { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2);opacity:0} }
-
-    .map-status-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; color: #78716C; margin-bottom: 10px; padding: 0 2px; }
-
-    /* CHAT FAB */
-    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #F97316; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(249,115,22,0.4); z-index: 800; -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #F97316; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(249,115,22,0.4); z-index: 800; transform: translateZ(0); }
     .chat-fab.visible { display: flex; }
     .chat-fab:active { transform: scale(0.95) translateZ(0); }
     .chat-fab svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
     .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #1C1917; color: #fff; font-size: 0.62rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
     .chat-fab-badge.show { display: flex; }
 
-    .chat-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 850; display: none; -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .chat-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 850; display: none; }
     .chat-overlay.open { display: block; }
-    .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 860; transform: translateY(100%) translateZ(0); -webkit-transform: translateY(100%) translateZ(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; will-change: transform; }
-    .chat-popup.open { transform: translateY(0) translateZ(0); -webkit-transform: translateY(0) translateZ(0); }
+    .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 860; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; }
+    .chat-popup.open { transform: translateY(0); }
     .chat-handle { width: 40px; height: 4px; background: #E5DDD0; border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
     .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 12px; border-bottom: 1px solid #E5DDD0; flex-shrink: 0; }
     .chat-head-left { display: flex; align-items: center; gap: 10px; }
@@ -160,8 +151,6 @@
     .chat-close { background: #EDE8E0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .chat-close svg { width: 12px; height: 12px; stroke: #78716C; fill: none; stroke-width: 2.5; stroke-linecap: round; }
     .chat-msgs { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; min-height: 180px; max-height: 45vh; }
-    .chat-msgs::-webkit-scrollbar { width: 2px; }
-    .chat-msgs::-webkit-scrollbar-thumb { background: #E5DDD0; }
     .msg { max-width: 78%; padding: 9px 13px; border-radius: 16px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
     .msg.me { background: #F97316; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg.them { background: #EDE8E0; color: #1C1917; align-self: flex-start; border-bottom-left-radius: 4px; }
@@ -172,8 +161,7 @@
     .chat-send { background: #F97316; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .chat-send svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
 
-    /* RATING */
-    .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); }
+    .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
     .rating-overlay.open { display: flex; }
     .rating-modal { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
     @keyframes popIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
@@ -196,7 +184,6 @@
     .rating-btn.submit { background: #F97316; color: #fff; }
     .rating-btn.skip { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
 
-    /* HISTORY */
     .history-item { background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
     .h-route { font-size: 0.8rem; color: #1C1917; font-weight: 500; }
     .h-meta { font-size: 0.65rem; color: #A8A29E; margin-top: 3px; }
@@ -347,7 +334,7 @@
         </div>
       </div>
 
-      <!-- EXPANDABLE TRACKING MAP -->
+      <!-- GOOGLE MAP TRACKING MODULE -->
       <div class="map-module expanded" id="tracking-map-module">
         <div class="map-header" onclick="toggleTrackingMap()">
           <div class="map-header-left">
@@ -360,48 +347,20 @@
               <svg id="t-fs-contract" viewBox="0 0 24 24" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="10" y1="14" x2="3" y2="21"/></svg>
             </div>
             <div class="map-ctrl-sm" id="tracking-chevron-wrap">
-              <svg id="t-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-              <svg id="t-chevron-up" viewBox="0 0 24 24" style="display:none"><polyline points="18 15 12 9 6 15"/></svg>
+              <svg id="t-chevron-down" viewBox="0 0 24 24" style="display:none"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg id="t-chevron-up" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
             </div>
           </div>
         </div>
-        <div class="map-canvas" id="tracking-canvas">
-          <svg viewBox="0 0 480 196" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <rect width="480" height="196" fill="#EDE8E0"/>
-            <g stroke="#D4CCBF" stroke-linecap="round">
-              <line x1="0" y1="60" x2="480" y2="60" stroke-width="16"/>
-              <line x1="0" y1="140" x2="480" y2="140" stroke-width="12"/>
-              <line x1="140" y1="0" x2="140" y2="196" stroke-width="14"/>
-              <line x1="320" y1="0" x2="320" y2="196" stroke-width="10"/>
-            </g>
-            <rect x="20" y="10" width="80" height="40" rx="3" fill="#fff"/>
-            <rect x="160" y="8" width="100" height="44" rx="3" fill="#fff"/>
-            <rect x="340" y="68" width="70" height="36" rx="3" fill="#fff"/>
-            <rect x="20" y="155" width="80" height="36" rx="3" fill="#fff"/>
-            <rect x="180" y="160" width="90" height="33" rx="3" fill="#fff"/>
-            <g font-family="-apple-system,sans-serif" font-size="7" fill="#1C191730" font-weight="600">
-              <text x="22" y="55">MAIN MALL RD</text>
-              <text x="148" y="132">CBD AVENUE</text>
-              <text x="148" y="22" transform="rotate(90,148,22)">KHAMA CRES</text>
-              <text x="322" y="18" transform="rotate(90,322,18)">AIRPORT RD</text>
-            </g>
-            <!-- Rider's position marker (fixed centre) -->
-            <circle cx="240" cy="98" r="7" fill="#fff" stroke="#1C1917" stroke-width="2"/>
-            <circle cx="240" cy="98" r="3" fill="#1C1917"/>
-            <!-- Driver trail path -->
-            <path id="rider-tracking-path" d="" stroke="#F97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
-          </svg>
-          <div class="driver-pin" id="driver-pin">
-            <div class="driver-pin-ring"></div>
-            <div class="driver-pin-dot"></div>
+        <!-- Real Google Map -->
+        <div id="tracking-gmap"></div>
+        <!-- ETA overlay on top of map -->
+        <div class="map-overlay-bar">
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.68rem;color:#1C1917;font-weight:600">
+            <div class="map-live-dot" id="map-live-dot"></div>
+            <span id="map-status-text">Waiting for driver location...</span>
           </div>
-          <div class="map-overlay-bar">
-            <div style="display:flex;align-items:center;gap:6px;font-size:0.68rem;color:#1C1917;font-weight:600">
-              <div class="map-live-dot" id="map-live-dot"></div>
-              <span id="map-status-text">Waiting for driver location...</span>
-            </div>
-            <span class="eta-badge" id="eta-badge"></span>
-          </div>
+          <span class="eta-badge" id="eta-badge"></span>
         </div>
       </div>
 
@@ -472,7 +431,9 @@
   </div>
 </div>
 
+<!-- Google Maps API -->
 <script>
+  const GMAPS_KEY = "AIzaSyC0tqvQPPWHh3gL1ExnRo-Lzh0QNGVcYHk";
   const BASE = "https://spiti-spiti-production.up.railway.app";
   const riderData = JSON.parse(localStorage.getItem("spiti_rider") || "null");
   if (!riderData) window.location.href = "login.html";
@@ -485,21 +446,152 @@
   function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
   let activeRide = null, offers = {}, selectedStar = 0, completedRide = null, unreadCount = 0;
-  let riderLocation = { lat: -24.6541, lng: 25.9087 }, pathPoints = [];
+  let riderLocation = { lat: -24.6541, lng: 25.9087 };
   let trackingExpanded = true, trackingFullscreen = false;
 
-  // Try get rider's real location
+  // Google Maps objects
+  let gmap = null, driverMarker = null, riderMarker = null, routePolyline = null, directionsRenderer = null;
+
+  // ── GOOGLE MAPS INIT ──────────────────────────────────────────────────────
+  function initTrackingMap() {
+    const mapDiv = document.getElementById("tracking-gmap");
+    gmap = new google.maps.Map(mapDiv, {
+      center: riderLocation,
+      zoom: 14,
+      disableDefaultUI: true,
+      zoomControl: true,
+      styles: [
+        { featureType: "poi", stylers: [{ visibility: "off" }] },
+        { featureType: "transit", stylers: [{ visibility: "off" }] },
+        { elementType: "geometry", stylers: [{ color: "#f5f0ea" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#1C1917" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+        { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#E5DDD0" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9e4f0" }] }
+      ]
+    });
+
+    // Rider's own position marker (blue dot style)
+    riderMarker = new google.maps.Marker({
+      position: riderLocation,
+      map: gmap,
+      title: "You",
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 9,
+        fillColor: "#1C1917",
+        fillOpacity: 1,
+        strokeColor: "#fff",
+        strokeWeight: 3
+      },
+      zIndex: 10
+    });
+
+    // Route polyline (orange, shown when driver location known)
+    routePolyline = new google.maps.Polyline({
+      map: gmap,
+      strokeColor: "#F97316",
+      strokeOpacity: 0.85,
+      strokeWeight: 4,
+      geodesic: true
+    });
+  }
+
+  function updateDriverOnMap(lat, lng) {
+    if (!gmap) return;
+
+    document.getElementById("map-live-dot").classList.add("on");
+    document.getElementById("map-status-text").textContent = "Live tracking active";
+
+    const driverPos = { lat, lng };
+
+    if (!driverMarker) {
+      // Car icon for driver
+      driverMarker = new google.maps.Marker({
+        position: driverPos,
+        map: gmap,
+        title: "Driver",
+        icon: {
+          url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+              <circle cx="20" cy="20" r="18" fill="#F97316" stroke="#fff" stroke-width="3"/>
+              <text x="20" y="26" text-anchor="middle" font-size="18" fill="white">🚗</text>
+            </svg>`),
+          scaledSize: new google.maps.Size(40, 40),
+          anchor: new google.maps.Point(20, 20)
+        },
+        zIndex: 20,
+        animation: google.maps.Animation.DROP
+      });
+    } else {
+      // Smooth move
+      animateMarker(driverMarker, driverPos);
+    }
+
+    // Update route line: driver → rider
+    routePolyline.setPath([driverPos, riderLocation]);
+
+    // Pan map to show both driver and rider
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(driverPos);
+    bounds.extend(riderLocation);
+    gmap.fitBounds(bounds, { top: 60, bottom: 20, left: 20, right: 20 });
+
+    // ETA via haversine
+    const R = 6371;
+    const dLat = (lat - riderLocation.lat) * Math.PI / 180;
+    const dLng = (lng - riderLocation.lng) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat * Math.PI/180) * Math.cos(riderLocation.lat * Math.PI/180) * Math.sin(dLng/2)**2;
+    const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const mins = Math.max(1, Math.round((distKm / 30) * 60));
+
+    const etaBadge = document.getElementById("eta-badge");
+    if (activeRide?.status === "accepted") {
+      etaBadge.textContent = `ETA: ${mins} min${mins !== 1 ? "s" : ""}`;
+      etaBadge.style.display = "block";
+    } else {
+      etaBadge.style.display = "none";
+    }
+  }
+
+  // Smooth marker animation
+  function animateMarker(marker, newPos) {
+    const start = marker.getPosition();
+    const frames = 20;
+    let frame = 0;
+    const timer = setInterval(() => {
+      frame++;
+      const lat = start.lat() + (newPos.lat - start.lat()) * (frame / frames);
+      const lng = start.lng() + (newPos.lng - start.lng()) * (frame / frames);
+      marker.setPosition({ lat, lng });
+      if (frame >= frames) clearInterval(timer);
+    }, 40);
+  }
+
+  // Load Google Maps script dynamically
   window.addEventListener("load", () => {
     loadHistory();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        pos => { riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+        pos => {
+          riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          if (gmap && riderMarker) {
+            gmap.setCenter(riderLocation);
+            riderMarker.setPosition(riderLocation);
+          }
+        },
         () => {}
       );
     }
+    // Load Google Maps
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initTrackingMap&libraries=geometry`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
   });
 
-  // ── MAP CONTROLS ───────────────────────────────────────────────────────────
+  // ── MAP CONTROLS ──────────────────────────────────────────────────────────
   function toggleTrackingMap() {
     if (trackingFullscreen) return;
     trackingExpanded = !trackingExpanded;
@@ -507,6 +599,9 @@
     mod.className = "map-module " + (trackingExpanded ? "expanded" : "collapsed");
     document.getElementById("t-chevron-down").style.display = trackingExpanded ? "none" : "block";
     document.getElementById("t-chevron-up").style.display = trackingExpanded ? "block" : "none";
+    if (trackingExpanded && gmap) {
+      setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
+    }
   }
 
   function toggleTrackingFullscreen(e) {
@@ -523,14 +618,14 @@
       document.getElementById("t-fs-expand").style.display = "block";
       document.getElementById("t-fs-contract").style.display = "none";
     }
+    if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
   }
 
-  // ── SOCKET ─────────────────────────────────────────────────────────────────
+  // ── SOCKET ────────────────────────────────────────────────────────────────
   const socket = io(BASE, { transports: ["websocket", "polling"] });
 
   socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
-    // Match server room name exactly
     socket.emit("join-role", { role: "rider", userId: RIDER_ID });
     loadHistory();
   });
@@ -570,10 +665,9 @@
     }
   });
 
-  // KEY FIX: receive driver-location broadcast from server
   socket.on("driver-location", ({ lat, lng }) => {
     if (!activeRide) return;
-    updateDriverPin(lat, lng);
+    updateDriverOnMap(lat, lng);
   });
 
   socket.on("new-message", (msg) => {
@@ -586,7 +680,7 @@
     }
   });
 
-  // ── RIDE CREATION ──────────────────────────────────────────────────────────
+  // ── RIDE CREATION ─────────────────────────────────────────────────────────
   async function createRide() {
     const pickup = document.getElementById("pickup").value.trim();
     const dropoff = document.getElementById("dropoff").value.trim();
@@ -610,7 +704,7 @@
     } catch(e) { showToast("Failed to post ride", "error"); }
   }
 
-  // ── OFFER HANDLING ─────────────────────────────────────────────────────────
+  // ── OFFER HANDLING ────────────────────────────────────────────────────────
   function renderOffers() {
     const list = Object.values(offers);
     const section = document.getElementById("offers-section");
@@ -663,7 +757,7 @@
     } catch(e) {}
   }
 
-  // ── ACTIVE RIDE ────────────────────────────────────────────────────────────
+  // ── ACTIVE RIDE ───────────────────────────────────────────────────────────
   async function showActiveRide(ride) {
     showPanel("active");
     document.getElementById("a-pickup").textContent = ride.pickup;
@@ -674,8 +768,16 @@
     updateProgress(ride.status);
     socket.emit("join-ride", { rideId: ride.id });
     loadMsgs(ride.id);
-    pathPoints = [];
-    document.getElementById("rider-tracking-path").setAttribute("d", "");
+    // Reset map state
+    if (driverMarker) { driverMarker.setMap(null); driverMarker = null; }
+    if (routePolyline) routePolyline.setPath([]);
+    document.getElementById("map-live-dot").classList.remove("on");
+    document.getElementById("map-status-text").textContent = "Waiting for driver location...";
+    document.getElementById("eta-badge").style.display = "none";
+    if (gmap) {
+      gmap.setCenter(riderLocation);
+      gmap.setZoom(14);
+    }
     if (ride.driver_id) {
       try {
         const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
@@ -688,57 +790,14 @@
     }
   }
 
-  // ── DRIVER PIN & ETA ───────────────────────────────────────────────────────
-  function updateDriverPin(lat, lng) {
-    const pin = document.getElementById("driver-pin");
-    const canvas = document.getElementById("tracking-canvas");
-    if (!pin || !canvas) return;
-
-    pin.style.display = "block";
-    document.getElementById("map-live-dot").classList.add("on");
-    document.getElementById("map-status-text").textContent = "Live tracking active";
-
-    const w = canvas.offsetWidth || 480;
-    const h = canvas.offsetHeight || 196;
-    const scaleX = 22000, scaleY = 25000;
-    let px = w / 2 + (lng - riderLocation.lng) * scaleX;
-    let py = h / 2 - (lat - riderLocation.lat) * scaleY;
-    px = Math.max(15, Math.min(w - 15, px));
-    py = Math.max(15, Math.min(h - 15, py));
-
-    pin.style.left = px + "px";
-    pin.style.top = py + "px";
-
-    pathPoints.push({ x: px, y: py });
-    if (pathPoints.length > 60) pathPoints.shift();
-    if (pathPoints.length >= 2) {
-      let d = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
-      for (let i = 1; i < pathPoints.length; i++) d += ` L ${pathPoints[i].x} ${pathPoints[i].y}`;
-      document.getElementById("rider-tracking-path").setAttribute("d", d);
-    }
-
-    // ETA calculation (haversine)
-    const R = 6371;
-    const dLat = (lat - riderLocation.lat) * Math.PI / 180;
-    const dLng = (lng - riderLocation.lng) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat*Math.PI/180)*Math.cos(riderLocation.lat*Math.PI/180)*Math.sin(dLng/2)**2;
-    const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const mins = Math.max(1, Math.round((distKm / 40) * 60 + 1));
-
-    const etaBadge = document.getElementById("eta-badge");
-    if (activeRide?.status === "accepted") {
-      etaBadge.textContent = `ETA: ${mins} ${mins === 1 ? "min" : "mins"}`;
-      etaBadge.style.display = "block";
-    } else {
-      etaBadge.style.display = "none";
-    }
-  }
-
-  // ── PANELS ─────────────────────────────────────────────────────────────────
+  // ── PANELS ────────────────────────────────────────────────────────────────
   function showPanel(name) {
     ["request","waiting","active"].forEach(p =>
       document.getElementById("panel-" + p).classList.toggle("visible", p === name)
     );
+    if (name === "active" && gmap) {
+      setTimeout(() => google.maps.event.trigger(gmap, "resize"), 400);
+    }
   }
 
   function updateProgress(status) {
@@ -753,7 +812,7 @@
     }
   }
 
-  // ── CANCEL ─────────────────────────────────────────────────────────────────
+  // ── CANCEL ────────────────────────────────────────────────────────────────
   async function cancelRequest() {
     if (!activeRide) return;
     try {
@@ -768,22 +827,22 @@
   function cancelRide() { cancelRequest(); }
 
   function resetAll() {
-    activeRide = null; offers = {}; pathPoints = [];
+    activeRide = null; offers = {};
     document.getElementById("pickup").value = "";
     document.getElementById("dropoff").value = "";
     document.getElementById("offered-fare").value = "";
-    document.getElementById("driver-pin").style.display = "none";
     document.getElementById("eta-badge").style.display = "none";
     document.getElementById("map-live-dot").classList.remove("on");
     document.getElementById("map-status-text").textContent = "Waiting for driver location...";
-    document.getElementById("rider-tracking-path").setAttribute("d", "");
     document.getElementById("chat-fab").classList.remove("visible");
     document.getElementById("chat-badge").classList.remove("show");
     unreadCount = 0;
+    if (driverMarker) { driverMarker.setMap(null); driverMarker = null; }
+    if (routePolyline) routePolyline.setPath([]);
     showPanel("request");
   }
 
-  // ── RATING ─────────────────────────────────────────────────────────────────
+  // ── RATING ────────────────────────────────────────────────────────────────
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
     document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || "your driver"}?`;
@@ -817,7 +876,7 @@
     showToast("Ride complete!");
   }
 
-  // ── CHAT ───────────────────────────────────────────────────────────────────
+  // ── CHAT ──────────────────────────────────────────────────────────────────
   function openChat() {
     document.getElementById("chat-overlay").classList.add("open");
     document.getElementById("chat-popup").classList.add("open");
@@ -855,14 +914,12 @@
     el.scrollTop = el.scrollHeight;
   }
 
-  // KEY FIX: use HTTP POST for messages, not socket.emit
   async function sendMsg() {
     if (!activeRide) return;
     const input = document.getElementById("chat-in");
     const message = input.value.trim();
     if (!message) return;
     input.value = "";
-    // Optimistic append
     appendMsg({ sender_role: "rider", message, created_at: new Date() });
     try {
       await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
@@ -872,7 +929,7 @@
     } catch(e) { showToast("Message failed", "error"); }
   }
 
-  // ── HISTORY ────────────────────────────────────────────────────────────────
+  // ── HISTORY ───────────────────────────────────────────────────────────────
   async function loadHistory() {
     try {
       const res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`);
@@ -888,7 +945,6 @@
           <span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span>
         </div>`).join("");
     } catch(e) {
-      // Fallback: load from /rides if /riders/{id}/rides not available
       try {
         const res = await fetch(`${BASE}/rides`);
         const rides = await res.json();
