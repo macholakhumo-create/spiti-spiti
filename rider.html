@@ -78,6 +78,7 @@
     .fare-num.green { color: #22c55e; }
     .fare-lbl { font-size: 0.65rem; color: #78716C; margin-top: 2px; }
 
+    /* OFFERS */
     .offers-section { margin-bottom: 12px; display: none; }
     .offers-head { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
     .offers-head svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
@@ -97,6 +98,7 @@
     .obtn.dec { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; width: 32px; height: 32px; padding: 0; }
     .obtn:hover { opacity: 0.85; }
 
+    /* DRIVER CARD */
     .driver-card { background: #F5F0EA; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .driver-av { width: 40px; height: 40px; border-radius: 50%; background: #F97316; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0; }
     .driver-name { font-size: 0.85rem; font-weight: 600; color: #1C1917; }
@@ -105,13 +107,32 @@
     .driver-stars { font-size: 0.72rem; color: #78716C; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
     .driver-stars svg { width: 11px; height: 11px; fill: #f59e0b; }
 
-    /* GOOGLE MAP MODULE */
-    .map-module { border: 1px solid #E5DDD0; background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 10px; position: relative; transition: height 0.35s cubic-bezier(0.4,0,0.2,1); }
+    /* ── GOOGLE MAP MODULE ── */
+    .map-module {
+      border: 1px solid #E5DDD0;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      position: relative;
+      transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
     .map-module.collapsed { height: 44px; }
-    .map-module.expanded { height: 260px; }
-    .map-module.fullscreen { position: fixed; top: 57px; left: 0; right: 0; bottom: 0; z-index: 600; border-radius: 0; border: none; height: auto !important; max-width: 100%; }
-
-    .map-header { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; height: 44px; cursor: pointer; user-select: none; background: #fff; border-bottom: 1px solid #E5DDD0; position: relative; z-index: 2; }
+    .map-module.expanded { height: 300px; }
+    .map-module.fullscreen {
+      position: fixed;
+      top: 57px; left: 0; right: 0; bottom: 0;
+      z-index: 600;
+      border-radius: 0;
+      border: none;
+      height: auto !important;
+      max-width: 100%;
+    }
+    .map-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; height: 44px; cursor: pointer; user-select: none;
+      background: #fff; position: relative; z-index: 10;
+    }
     .map-header-left { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 700; color: #78716C; letter-spacing: 0.05em; text-transform: uppercase; }
     .map-header-left svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
     .map-header-right { display: flex; align-items: center; gap: 5px; }
@@ -119,18 +140,50 @@
     .map-ctrl-sm svg { width: 12px; height: 12px; stroke: #78716C; fill: none; stroke-width: 2; }
     .map-ctrl-sm:hover { background: #EDE8E0; }
 
-    /* The real Google Map fills from below the header */
-    #tracking-gmap { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; }
-    .map-module.collapsed #tracking-gmap { display: none; }
+    /* The actual Google Map div fills the area below the header */
+    #gmap { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; background: #EDE8E0; }
+    .map-module.collapsed #gmap { display: none; }
 
-    /* ETA overlay bar ON TOP of map */
-    .map-overlay-bar { position: absolute; top: 52px; left: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; border-radius: 8px; padding: 5px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.68rem; pointer-events: none; z-index: 10; }
+    /* Overlay bar on top of the map */
+    .map-overlay-bar {
+      position: absolute; top: 52px; left: 8px; right: 8px;
+      background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0;
+      border-radius: 8px; padding: 5px 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.68rem; pointer-events: none; z-index: 20;
+    }
     .map-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #D4CCBF; flex-shrink: 0; }
     .map-live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .eta-badge { background: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; display: none; }
 
-    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #F97316; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(249,115,22,0.4); z-index: 800; transform: translateZ(0); }
+    /* VEHICLE DETAILS PANEL */
+    .vehicle-panel {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.97);
+      border-top: 1px solid #E5DDD0;
+      padding: 10px 14px 12px;
+      z-index: 15;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .vehicle-panel.visible { display: block; }
+    .vehicle-panel-title { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #A8A29E; margin-bottom: 6px; }
+    .vehicle-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .vehicle-item { background: #F5F0EA; border-radius: 8px; padding: 6px 8px; }
+    .vehicle-item-label { font-size: 0.55rem; color: #A8A29E; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .vehicle-item-val { font-size: 0.78rem; font-weight: 700; color: #1C1917; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vehicle-item-val.orange { color: #F97316; }
+    .vehicle-eta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .vehicle-eta-big { font-size: 1.1rem; font-weight: 800; color: #F97316; letter-spacing: -0.03em; }
+    .vehicle-eta-label { font-size: 0.65rem; color: #78716C; }
+    .vehicle-dist { font-size: 0.68rem; color: #A8A29E; display: flex; align-items: center; gap: 3px; }
+    .vehicle-dist svg { width: 11px; height: 11px; stroke: #A8A29E; fill: none; stroke-width: 2; }
+
+    /* CHAT FAB */
+    .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #F97316; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(249,115,22,0.4); z-index: 800; -webkit-transform: translateZ(0); transform: translateZ(0); }
     .chat-fab.visible { display: flex; }
     .chat-fab:active { transform: scale(0.95) translateZ(0); }
     .chat-fab svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
@@ -161,6 +214,7 @@
     .chat-send { background: #F97316; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .chat-send svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
 
+    /* RATING */
     .rating-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.7); z-index: 900; display: none; align-items: center; justify-content: center; padding: 20px; }
     .rating-overlay.open { display: flex; }
     .rating-modal { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 360px; text-align: center; animation: popIn 0.3s ease; }
@@ -184,6 +238,7 @@
     .rating-btn.submit { background: #F97316; color: #fff; }
     .rating-btn.skip { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
 
+    /* HISTORY */
     .history-item { background: #fff; border: 1px solid #E5DDD0; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
     .h-route { font-size: 0.8rem; color: #1C1917; font-weight: 500; }
     .h-meta { font-size: 0.65rem; color: #A8A29E; margin-top: 3px; }
@@ -352,15 +407,45 @@
             </div>
           </div>
         </div>
-        <!-- Real Google Map -->
-        <div id="tracking-gmap"></div>
-        <!-- ETA overlay on top of map -->
+        <!-- REAL GOOGLE MAP -->
+        <div id="gmap"></div>
+
+        <!-- Live status overlay bar (above the map) -->
         <div class="map-overlay-bar">
           <div style="display:flex;align-items:center;gap:6px;font-size:0.68rem;color:#1C1917;font-weight:600">
             <div class="map-live-dot" id="map-live-dot"></div>
             <span id="map-status-text">Waiting for driver location...</span>
           </div>
           <span class="eta-badge" id="eta-badge"></span>
+        </div>
+
+        <!-- Vehicle Details Panel pinned to bottom of map -->
+        <div class="vehicle-panel" id="vehicle-panel">
+          <div class="vehicle-eta-row">
+            <div>
+              <div class="vehicle-eta-big" id="vp-eta">—</div>
+              <div class="vehicle-eta-label">ETA to pickup</div>
+            </div>
+            <div class="vehicle-dist">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
+              <span id="vp-dist">— km away</span>
+            </div>
+          </div>
+          <div class="vehicle-panel-title">Vehicle Details</div>
+          <div class="vehicle-grid">
+            <div class="vehicle-item">
+              <div class="vehicle-item-label">Driver</div>
+              <div class="vehicle-item-val" id="vp-driver">—</div>
+            </div>
+            <div class="vehicle-item">
+              <div class="vehicle-item-label">Plate</div>
+              <div class="vehicle-item-val orange" id="vp-plate">—</div>
+            </div>
+            <div class="vehicle-item">
+              <div class="vehicle-item-label">Vehicle</div>
+              <div class="vehicle-item-val" id="vp-vehicle">—</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -433,6 +518,7 @@
 
 <!-- Google Maps API -->
 <script>
+  // ── CONFIG ─────────────────────────────────────────────────────────────────
   const GMAPS_KEY = "AIzaSyC0tqvQPPWHh3gL1ExnRo-Lzh0QNGVcYHk";
   const BASE = "https://spiti-spiti-production.up.railway.app";
   const riderData = JSON.parse(localStorage.getItem("spiti_rider") || "null");
@@ -441,157 +527,98 @@
   const RIDER_NAME = riderData?.name || "Rider";
 
   document.getElementById("nav-name").textContent = RIDER_NAME;
-  document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]}`;
+  document.getElementById("greeting").textContent = Hey ${RIDER_NAME.split(" ")[0]};
 
   function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
+  // ── STATE ──────────────────────────────────────────────────────────────────
   let activeRide = null, offers = {}, selectedStar = 0, completedRide = null, unreadCount = 0;
   let riderLocation = { lat: -24.6541, lng: 25.9087 };
   let trackingExpanded = true, trackingFullscreen = false;
 
-  // Google Maps objects
-  let gmap = null, driverMarker = null, riderMarker = null, routePolyline = null, directionsRenderer = null;
+  // Google Maps state
+  let gmap = null, driverMarker = null, riderMarker = null;
+  let routeLine = null, directionsRenderer = null, directionsService = null;
+  let mapsReady = false;
+  let lastDriverLat = null, lastDriverLng = null;
+  let currentVehicleInfo = null;
 
-  // ── GOOGLE MAPS INIT ──────────────────────────────────────────────────────
-  function initTrackingMap() {
-    const mapDiv = document.getElementById("tracking-gmap");
+  // ── GEOLOCATION ────────────────────────────────────────────────────────────
+  window.addEventListener("load", () => {
+    loadHistory();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => { riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+        () => {}
+      );
+    }
+  });
+
+  // ── GOOGLE MAPS INIT ───────────────────────────────────────────────────────
+  function initGoogleMap() {
+    mapsReady = true;
+    const mapDiv = document.getElementById("gmap");
     gmap = new google.maps.Map(mapDiv, {
       center: riderLocation,
-      zoom: 14,
+      zoom: 15,
       disableDefaultUI: true,
       zoomControl: true,
+      gestureHandling: "greedy",
       styles: [
-        { featureType: "poi", stylers: [{ visibility: "off" }] },
-        { featureType: "transit", stylers: [{ visibility: "off" }] },
-        { elementType: "geometry", stylers: [{ color: "#f5f0ea" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#1C1917" }] },
-        { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
-        { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#E5DDD0" }] },
-        { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9e4f0" }] }
+        { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+        { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
+        { featureType: "water", stylers: [{ color: "#c9d8e8" }] },
+        { featureType: "landscape", stylers: [{ color: "#f5f0ea" }] },
+        { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+        { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+        { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#f8f4ef" }] },
+        { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#78716c" }] },
+        { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ color: "#78716c" }] },
+        { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#e8f0e0" }] }
       ]
     });
 
-    // Rider's own position marker (blue dot style)
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+      suppressMarkers: true,
+      polylineOptions: {
+        strokeColor: "#F97316",
+        strokeWeight: 4,
+        strokeOpacity: 0.85
+      }
+    });
+    directionsRenderer.setMap(gmap);
+
+    // Rider marker (fixed blue dot)
     riderMarker = new google.maps.Marker({
       position: riderLocation,
       map: gmap,
-      title: "You",
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 9,
         fillColor: "#1C1917",
         fillOpacity: 1,
-        strokeColor: "#fff",
+        strokeColor: "#ffffff",
         strokeWeight: 3
       },
+      title: "You",
       zIndex: 10
     });
 
-    // Route polyline (orange, shown when driver location known)
-    routePolyline = new google.maps.Polyline({
-      map: gmap,
-      strokeColor: "#F97316",
-      strokeOpacity: 0.85,
-      strokeWeight: 4,
-      geodesic: true
-    });
-  }
-
-  function updateDriverOnMap(lat, lng) {
-    if (!gmap) return;
-
-    document.getElementById("map-live-dot").classList.add("on");
-    document.getElementById("map-status-text").textContent = "Live tracking active";
-
-    const driverPos = { lat, lng };
-
-    if (!driverMarker) {
-      // Car icon for driver
-      driverMarker = new google.maps.Marker({
-        position: driverPos,
-        map: gmap,
-        title: "Driver",
-        icon: {
-          url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="18" fill="#F97316" stroke="#fff" stroke-width="3"/>
-              <text x="20" y="26" text-anchor="middle" font-size="18" fill="white">🚗</text>
-            </svg>`),
-          scaledSize: new google.maps.Size(40, 40),
-          anchor: new google.maps.Point(20, 20)
-        },
-        zIndex: 20,
-        animation: google.maps.Animation.DROP
-      });
-    } else {
-      // Smooth move
-      animateMarker(driverMarker, driverPos);
-    }
-
-    // Update route line: driver → rider
-    routePolyline.setPath([driverPos, riderLocation]);
-
-    // Pan map to show both driver and rider
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend(driverPos);
-    bounds.extend(riderLocation);
-    gmap.fitBounds(bounds, { top: 60, bottom: 20, left: 20, right: 20 });
-
-    // ETA via haversine
-    const R = 6371;
-    const dLat = (lat - riderLocation.lat) * Math.PI / 180;
-    const dLng = (lng - riderLocation.lng) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat * Math.PI/180) * Math.cos(riderLocation.lat * Math.PI/180) * Math.sin(dLng/2)**2;
-    const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const mins = Math.max(1, Math.round((distKm / 30) * 60));
-
-    const etaBadge = document.getElementById("eta-badge");
-    if (activeRide?.status === "accepted") {
-      etaBadge.textContent = `ETA: ${mins} min${mins !== 1 ? "s" : ""}`;
-      etaBadge.style.display = "block";
-    } else {
-      etaBadge.style.display = "none";
-    }
-  }
-
-  // Smooth marker animation
-  function animateMarker(marker, newPos) {
-    const start = marker.getPosition();
-    const frames = 20;
-    let frame = 0;
-    const timer = setInterval(() => {
-      frame++;
-      const lat = start.lat() + (newPos.lat - start.lat()) * (frame / frames);
-      const lng = start.lng() + (newPos.lng - start.lng()) * (frame / frames);
-      marker.setPosition({ lat, lng });
-      if (frame >= frames) clearInterval(timer);
-    }, 40);
+    // Info window for rider
+    const riderInfo = new google.maps.InfoWindow({ content: '<div style="font-size:11px;font-weight:700;color:#1C1917">📍 You</div>' });
+    riderMarker.addListener("click", () => riderInfo.open(gmap, riderMarker));
   }
 
   // Load Google Maps script dynamically
-  window.addEventListener("load", () => {
-    loadHistory();
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          if (gmap && riderMarker) {
-            gmap.setCenter(riderLocation);
-            riderMarker.setPosition(riderLocation);
-          }
-        },
-        () => {}
-      );
-    }
-    // Load Google Maps
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initTrackingMap&libraries=geometry`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-  });
+  (function loadGMaps() {
+    const s = document.createElement("script");
+    s.src = https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap;
+    s.async = true; s.defer = true;
+    document.head.appendChild(s);
+  })();
 
-  // ── MAP CONTROLS ──────────────────────────────────────────────────────────
+  // ── MAP CONTROLS ───────────────────────────────────────────────────────────
   function toggleTrackingMap() {
     if (trackingFullscreen) return;
     trackingExpanded = !trackingExpanded;
@@ -621,7 +648,7 @@
     if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
   }
 
-  // ── SOCKET ────────────────────────────────────────────────────────────────
+  // ── SOCKET ─────────────────────────────────────────────────────────────────
   const socket = io(BASE, { transports: ["websocket", "polling"] });
 
   socket.on("connect", () => {
@@ -634,7 +661,7 @@
   socket.on("driver-offer", (offer) => {
     offers[offer.driverId] = offer;
     renderOffers();
-    showToast(`New offer: P${parseFloat(offer.fare_offer).toFixed(2)}`, "warn");
+    showToast(New offer: P${parseFloat(offer.fare_offer).toFixed(2)}, "warn");
   });
 
   socket.on("ride-updated", (ride) => {
@@ -648,7 +675,7 @@
       showToast("Driver is on the way! 🚗");
     }
     if (ride.status === "in_progress") {
-      document.getElementById("driver-sub").innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Ride in progress`;
+      document.getElementById("driver-sub").innerHTML = <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg> Ride in progress;
       document.getElementById("eta-badge").style.display = "none";
       showToast("Your ride has started! 🚀");
     }
@@ -680,7 +707,167 @@
     }
   });
 
-  // ── RIDE CREATION ─────────────────────────────────────────────────────────
+  // ── GOOGLE MAPS DRIVER UPDATE ──────────────────────────────────────────────
+  function updateDriverOnMap(lat, lng) {
+    if (!mapsReady || !gmap) return;
+
+    lastDriverLat = lat; lastDriverLng = lng;
+    const driverPos = { lat, lng };
+
+    // Update live dot & status text
+    document.getElementById("map-live-dot").classList.add("on");
+    document.getElementById("map-status-text").textContent = "Live tracking active";
+
+    // Create or move driver marker (car icon)
+    if (!driverMarker) {
+      driverMarker = new google.maps.Marker({
+        position: driverPos,
+        map: gmap,
+        icon: {
+          url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="18" fill="#F97316" opacity="0.15"/>
+              <circle cx="18" cy="18" r="13" fill="#F97316"/>
+              <g transform="translate(9,10)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="16" height="9" rx="2"/>
+                <path d="M3 4V3C3 1.9 3.9 1 5 1H13C14.1 1 15 1.9 15 3V4"/>
+                <circle cx="5" cy="13" r="2"/><circle cx="13" cy="13" r="2"/>
+              </g>
+            </svg>
+          `),
+          scaledSize: new google.maps.Size(36, 36),
+          anchor: new google.maps.Point(18, 18)
+        },
+        title: "Your Driver",
+        zIndex: 20,
+        animation: google.maps.Animation.DROP
+      });
+      // Driver info window
+      const driverInfoContent = <div style="font-size:11px;font-weight:700;color:#F97316">🚗 Your Driver</div><div style="font-size:10px;color:#78716C">${activeRide?.driver_name || 'Driver'}</div>;
+      const driverInfoWindow = new google.maps.InfoWindow({ content: driverInfoContent });
+      driverMarker.addListener("click", () => driverInfoWindow.open(gmap, driverMarker));
+    } else {
+      // Smooth animated move
+      animateMarker(driverMarker, driverMarker.getPosition(), new google.maps.LatLng(lat, lng), 800);
+    }
+
+    // Draw route from driver to rider using Directions API
+    drawRoute(driverPos, riderLocation);
+
+    // Calculate and display ETA using Directions API
+    calculateETA(driverPos, riderLocation);
+
+    // Fit map to show both driver and rider
+    const bounds = new google.maps.LatLngBounds();
+    bounds.extend(driverPos);
+    bounds.extend(riderLocation);
+    gmap.fitBounds(bounds, { top: 60, right: 20, bottom: 120, left: 20 });
+  }
+
+  // Smooth marker animation
+  function animateMarker(marker, startPos, endPos, duration) {
+    const startLat = startPos.lat(), startLng = startPos.lng();
+    const endLat = endPos.lat(), endLng = endPos.lng();
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // ease in-out
+      marker.setPosition({
+        lat: startLat + (endLat - startLat) * ease,
+        lng: startLng + (endLng - startLng) * ease
+      });
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Draw driving route with Directions API
+  function drawRoute(origin, destination) {
+    if (!directionsService || !directionsRenderer) return;
+    directionsService.route({
+      origin,
+      destination,
+      travelMode: google.maps.TravelMode.DRIVING
+    }, (result, status) => {
+      if (status === "OK") {
+        directionsRenderer.setDirections(result);
+      } else {
+        // Fallback: straight line
+        if (routeLine) routeLine.setMap(null);
+        routeLine = new google.maps.Polyline({
+          path: [origin, destination],
+          geodesic: true,
+          strokeColor: "#F97316",
+          strokeOpacity: 0.7,
+          strokeWeight: 3,
+          map: gmap
+        });
+      }
+    });
+  }
+
+  // Calculate real ETA using Directions API
+  function calculateETA(origin, destination) {
+    if (!directionsService) {
+      // Fallback haversine
+      const R = 6371;
+      const dLat = (origin.lat - destination.lat) * Math.PI / 180;
+      const dLng = (origin.lng - destination.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2)*2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(destination.lat*Math.PI/180)*Math.sin(dLng/2)*2;
+      const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const mins = Math.max(1, Math.round((distKm / 40) * 60));
+      updateETADisplay(mins, distKm);
+      return;
+    }
+    directionsService.route({
+      origin,
+      destination,
+      travelMode: google.maps.TravelMode.DRIVING
+    }, (result, status) => {
+      if (status === "OK") {
+        const leg = result.routes[0].legs[0];
+        const durationText = leg.duration.text; // e.g. "5 mins"
+        const distText = leg.distance.text; // e.g. "2.3 km"
+        const mins = Math.ceil(leg.duration.value / 60);
+        const distKm = (leg.distance.value / 1000).toFixed(1);
+
+        // Update ETA badge
+        const etaBadge = document.getElementById("eta-badge");
+        if (activeRide?.status === "accepted") {
+          etaBadge.textContent = ETA: ${durationText};
+          etaBadge.style.display = "block";
+        } else {
+          etaBadge.style.display = "none";
+        }
+
+        // Update vehicle panel ETA
+        document.getElementById("vp-eta").textContent = durationText;
+        document.getElementById("vp-dist").textContent = distText + " away";
+      } else {
+        // Haversine fallback
+        const R = 6371;
+        const dLat = (origin.lat - destination.lat) * Math.PI / 180;
+        const dLng = (origin.lng - destination.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2)*2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(destination.lat*Math.PI/180)*Math.sin(dLng/2)*2;
+        const distKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        updateETADisplay(Math.max(1, Math.round((distKm/40)*60)), distKm);
+      }
+    });
+  }
+
+  function updateETADisplay(mins, distKm) {
+    const etaBadge = document.getElementById("eta-badge");
+    if (activeRide?.status === "accepted") {
+      etaBadge.textContent = ETA: ${mins} ${mins === 1 ? "min" : "mins"};
+      etaBadge.style.display = "block";
+    } else {
+      etaBadge.style.display = "none";
+    }
+    document.getElementById("vp-eta").textContent = ${mins} ${mins === 1 ? "min" : "mins"};
+    document.getElementById("vp-dist").textContent = distKm.toFixed(1) + " km away";
+  }
+
+  // ── RIDE CREATION ──────────────────────────────────────────────────────────
   async function createRide() {
     const pickup = document.getElementById("pickup").value.trim();
     const dropoff = document.getElementById("dropoff").value.trim();
@@ -689,7 +876,7 @@
       showToast("Enter pickup, dropoff and fare (min P15)", "warn"); return;
     }
     try {
-      const res = await fetch(`${BASE}/rides`, {
+      const res = await fetch(${BASE}/rides, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ riderId: RIDER_ID, pickup, dropoff, offered_fare: fare })
       });
@@ -704,7 +891,7 @@
     } catch(e) { showToast("Failed to post ride", "error"); }
   }
 
-  // ── OFFER HANDLING ────────────────────────────────────────────────────────
+  // ── OFFER HANDLING ─────────────────────────────────────────────────────────
   function renderOffers() {
     const list = Object.values(offers);
     const section = document.getElementById("offers-section");
@@ -714,9 +901,9 @@
     const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P", "")) || 15;
     el.innerHTML = list.map(o => {
       const match = parseFloat(o.fare_offer) <= myFare;
-      const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-      const stars = o.avg_rating ? `${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides)` : "New driver";
-      const matchSvg = match ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Matches your price` : "Counter offer";
+      const starSvg = <svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>;
+      const stars = o.avg_rating ? ${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides) : "New driver";
+      const matchSvg = match ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Matches your price : "Counter offer";
       return `<div class="offer-card">
         <div>
           <div class="offer-name"><svg width="13" height="13" fill="none" stroke="#78716C" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>${o.driver_name || "Driver"}</div>
@@ -735,7 +922,7 @@
   async function acceptOffer(driverId, fare) {
     if (!activeRide) return;
     try {
-      const res = await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
+      const res = await fetch(${BASE}/rides/${activeRide.id}/accept-offer, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId, fare })
       });
@@ -749,7 +936,7 @@
   async function declineOffer(driverId) {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
+      await fetch(${BASE}/rides/${activeRide.id}/decline-offer, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId })
       });
@@ -757,66 +944,73 @@
     } catch(e) {}
   }
 
-  // ── ACTIVE RIDE ───────────────────────────────────────────────────────────
+  // ── ACTIVE RIDE ────────────────────────────────────────────────────────────
   async function showActiveRide(ride) {
     showPanel("active");
     document.getElementById("a-pickup").textContent = ride.pickup;
     document.getElementById("a-dropoff").textContent = ride.dropoff;
     document.getElementById("a-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
-    document.getElementById("driver-av").textContent = (ride.driver_name || "D").charAt(0).toUpperCase();
+    const driverInitial = (ride.driver_name || "D").charAt(0).toUpperCase();
+    document.getElementById("driver-av").textContent = driverInitial;
     document.getElementById("driver-name").textContent = ride.driver_name || "Driver";
     updateProgress(ride.status);
     socket.emit("join-ride", { rideId: ride.id });
     loadMsgs(ride.id);
-    // Reset map state
-    if (driverMarker) { driverMarker.setMap(null); driverMarker = null; }
-    if (routePolyline) routePolyline.setPath([]);
-    document.getElementById("map-live-dot").classList.remove("on");
-    document.getElementById("map-status-text").textContent = "Waiting for driver location...";
-    document.getElementById("eta-badge").style.display = "none";
-    if (gmap) {
+
+    // Populate vehicle panel
+    document.getElementById("vp-driver").textContent = ride.driver_name || "—";
+    document.getElementById("vp-plate").textContent = ride.plate_number || ride.vehicle_plate || "—";
+    document.getElementById("vp-vehicle").textContent = ride.vehicle_model || ride.vehicle || "—";
+    document.getElementById("vehicle-panel").classList.add("visible");
+
+    // Center map on rider while waiting
+    if (mapsReady && gmap) {
       gmap.setCenter(riderLocation);
-      gmap.setZoom(14);
+      gmap.setZoom(15);
+      if (riderMarker) riderMarker.setPosition(riderLocation);
     }
+
     if (ride.driver_id) {
       try {
-        const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
+        const res = await fetch(${BASE}/drivers/${ride.driver_id}/rating);
         const data = await res.json();
-        const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+        const starSvg = <svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>;
         document.getElementById("driver-stars").innerHTML = data && data.avg_rating > 0
-          ? `${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides`
+          ? ${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides
           : "New driver";
+        // Also try to get vehicle info from driver endpoint
+        if (data.plate_number || data.vehicle_model) {
+          document.getElementById("vp-plate").textContent = data.plate_number || "—";
+          document.getElementById("vp-vehicle").textContent = data.vehicle_model || "—";
+        }
       } catch(e) {}
     }
   }
 
-  // ── PANELS ────────────────────────────────────────────────────────────────
+  // ── PANELS ─────────────────────────────────────────────────────────────────
   function showPanel(name) {
     ["request","waiting","active"].forEach(p =>
       document.getElementById("panel-" + p).classList.toggle("visible", p === name)
     );
-    if (name === "active" && gmap) {
-      setTimeout(() => google.maps.event.trigger(gmap, "resize"), 400);
-    }
   }
 
   function updateProgress(status) {
     const map = { accepted: 1, in_progress: 2, completed: 3 };
     const cur = map[status] || 0;
     for (let i = 1; i <= 3; i++) {
-      const dot = document.getElementById(`p${i}`);
-      const lbl = document.getElementById(`pl${i}`);
-      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`pline${i}`).className = "prog-line done"; }
+      const dot = document.getElementById(p${i});
+      const lbl = document.getElementById(pl${i});
+      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(pline${i}).className = "prog-line done"; }
       else if (i === cur) { dot.className = "prog-dot active"; dot.querySelector("span").textContent = i; lbl.className = "prog-label active"; }
       else { dot.className = "prog-dot"; dot.querySelector("span").textContent = i; lbl.className = "prog-label"; }
     }
   }
 
-  // ── CANCEL ────────────────────────────────────────────────────────────────
+  // ── CANCEL ─────────────────────────────────────────────────────────────────
   async function cancelRequest() {
     if (!activeRide) return;
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
+      await fetch(${BASE}/rides/${activeRide.id}/status, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "cancelled" })
       });
@@ -836,16 +1030,20 @@
     document.getElementById("map-status-text").textContent = "Waiting for driver location...";
     document.getElementById("chat-fab").classList.remove("visible");
     document.getElementById("chat-badge").classList.remove("show");
+    document.getElementById("vehicle-panel").classList.remove("visible");
     unreadCount = 0;
+    // Clean up map
     if (driverMarker) { driverMarker.setMap(null); driverMarker = null; }
-    if (routePolyline) routePolyline.setPath([]);
+    if (routeLine) { routeLine.setMap(null); routeLine = null; }
+    if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
+    lastDriverLat = null; lastDriverLng = null;
     showPanel("request");
   }
 
-  // ── RATING ────────────────────────────────────────────────────────────────
+  // ── RATING ─────────────────────────────────────────────────────────────────
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
-    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || "your driver"}?`;
+    document.getElementById("rating-driver-name").textContent = How was your ride with ${ride.driver_name || "your driver"}?;
     selectedStar = 0;
     document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
@@ -860,7 +1058,7 @@
   async function submitRating() {
     if (!completedRide || selectedStar === 0) { showToast("Please pick a star rating", "warn"); return; }
     try {
-      await fetch(`${BASE}/rides/${completedRide.id}/rate-driver`, {
+      await fetch(${BASE}/rides/${completedRide.id}/rate-driver, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value })
       });
@@ -876,7 +1074,7 @@
     showToast("Ride complete!");
   }
 
-  // ── CHAT ──────────────────────────────────────────────────────────────────
+  // ── CHAT ───────────────────────────────────────────────────────────────────
   function openChat() {
     document.getElementById("chat-overlay").classList.add("open");
     document.getElementById("chat-popup").classList.add("open");
@@ -892,7 +1090,7 @@
 
   async function loadMsgs(rideId) {
     try {
-      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const res = await fetch(${BASE}/rides/${rideId}/messages);
       const msgs = await res.json();
       const el = document.getElementById("chat-msgs");
       el.innerHTML = "";
@@ -908,8 +1106,8 @@
     const isMe = msg.sender_role === "rider";
     const time = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const div = document.createElement("div");
-    div.className = `msg ${isMe ? "me" : "them"}`;
-    div.innerHTML = `<div>${msg.message}</div><div class="msg-time">${time}</div>`;
+    div.className = msg ${isMe ? "me" : "them"};
+    div.innerHTML = <div>${msg.message}</div><div class="msg-time">${time}</div>;
     el.appendChild(div);
     el.scrollTop = el.scrollHeight;
   }
@@ -922,17 +1120,17 @@
     input.value = "";
     appendMsg({ sender_role: "rider", message, created_at: new Date() });
     try {
-      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
+      await fetch(${BASE}/rides/${activeRide.id}/messages, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sender_role: "rider", message })
       });
     } catch(e) { showToast("Message failed", "error"); }
   }
 
-  // ── HISTORY ───────────────────────────────────────────────────────────────
+  // ── HISTORY ────────────────────────────────────────────────────────────────
   async function loadHistory() {
     try {
-      const res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`);
+      const res = await fetch(${BASE}/riders/${RIDER_ID}/rides);
       const rides = await res.json();
       const el = document.getElementById("history");
       if (!rides.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; }
@@ -946,7 +1144,7 @@
         </div>`).join("");
     } catch(e) {
       try {
-        const res = await fetch(`${BASE}/rides`);
+        const res = await fetch(${BASE}/rides);
         const rides = await res.json();
         const mine = rides.filter(r => r.rider_id == RIDER_ID);
         const el = document.getElementById("history");
