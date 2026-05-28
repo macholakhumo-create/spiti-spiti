@@ -553,12 +553,18 @@
   // Load Google Maps dynamically
   (function loadGMaps() {
     const s = document.createElement("script");
-    s.src = https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap;
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap`;
     s.async = true; s.defer = true;
     document.head.appendChild(s);
   })();
 
   // ── MAP CONTROLS ───────────────────────────────────────────────────────────
+  function triggerMapResize() {
+    if (!gmap) { setTimeout(triggerMapResize, 300); return; }
+    google.maps.event.trigger(gmap, "resize");
+    if (driverSelfMarker) gmap.setCenter(driverSelfMarker.getPosition());
+  }
+
   function toggleMap() {
     if (mapFullscreen) return;
     mapExpanded = !mapExpanded;
@@ -566,7 +572,7 @@
     mod.className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
     document.getElementById("chevron-down").style.display = mapExpanded ? "none" : "block";
     document.getElementById("chevron-up").style.display = mapExpanded ? "block" : "none";
-    if (mapExpanded && gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
+    if (mapExpanded) setTimeout(triggerMapResize, 350);
   }
 
   function toggleFullscreen(e) {
@@ -582,7 +588,7 @@
       mod.className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
       fsE.style.display = "block"; fsC.style.display = "none";
     }
-    if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
+    if (gmap) setTimeout(triggerMapResize, 350);
   }
 
   // ── LOCATION SHARING ───────────────────────────────────────────────────────
