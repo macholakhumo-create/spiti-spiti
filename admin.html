@@ -392,9 +392,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // Auth check — must be first
+  // Auth check — must be first, throw stops all further execution
   const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
-  if (!adminData) { window.location.href = "login.html"; }
+  if (!adminData) { window.location.replace("login.html"); throw new Error("Not authenticated"); }
 
   const BASE = "https://spiti-spiti-production.up.railway.app";
   let allRides = [], allDrivers = [], allVehicles = [], allDeliveries = [];
