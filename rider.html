@@ -613,12 +613,18 @@
   // Load Google Maps script dynamically
   (function loadGMaps() {
     const s = document.createElement("script");
-    s.src = https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap;
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap`;
     s.async = true; s.defer = true;
     document.head.appendChild(s);
   })();
 
   // ── MAP CONTROLS ───────────────────────────────────────────────────────────
+  function triggerMapResize() {
+    if (!gmap) { setTimeout(triggerMapResize, 300); return; }
+    google.maps.event.trigger(gmap, "resize");
+    gmap.setCenter(riderLocation);
+  }
+
   function toggleTrackingMap() {
     if (trackingFullscreen) return;
     trackingExpanded = !trackingExpanded;
@@ -626,9 +632,7 @@
     mod.className = "map-module " + (trackingExpanded ? "expanded" : "collapsed");
     document.getElementById("t-chevron-down").style.display = trackingExpanded ? "none" : "block";
     document.getElementById("t-chevron-up").style.display = trackingExpanded ? "block" : "none";
-    if (trackingExpanded && gmap) {
-      setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
-    }
+    if (trackingExpanded) setTimeout(triggerMapResize, 350);
   }
 
   function toggleTrackingFullscreen(e) {
@@ -645,7 +649,7 @@
       document.getElementById("t-fs-expand").style.display = "block";
       document.getElementById("t-fs-contract").style.display = "none";
     }
-    if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
+    if (gmap) setTimeout(triggerMapResize, 350);
   }
 
   // ── SOCKET ─────────────────────────────────────────────────────────────────
@@ -992,6 +996,7 @@
     ["request","waiting","active"].forEach(p =>
       document.getElementById("panel-" + p).classList.toggle("visible", p === name)
     );
+    if (name === "active") setTimeout(triggerMapResize, 350);
   }
 
   function updateProgress(status) {
