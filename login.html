@@ -63,6 +63,11 @@
     .form-section { display: none; }
     .form-section.visible { display: block; }
     .hint { font-size: 0.68rem; color: #A8A29E; margin-top: 4px; }
+
+    .admin-login-box { display: none; background: #1C1917; border: 1px solid #444; border-radius: 12px; padding: 18px; margin-top: 16px; }
+    .admin-login-box.visible { display: block; }
+    .admin-login-box .field input { background: #333; border-color: #555; color: #fff; }
+    .admin-tap-hint { font-size: 0.62rem; color: #A8A29E; text-align: center; margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -156,11 +161,10 @@
   const rider = localStorage.getItem("spiti_rider");
   const driver = localStorage.getItem("spiti_driver");
   const admin = localStorage.getItem("spiti_admin");
-  document.body.classList.add("ready");
   if (rider) { window.location.href = "rider.html"; }
   else if (driver) { window.location.href = "driver.html"; }
   else if (admin) { window.location.href = "admin.html"; }
-  
+  else { document.body.classList.add("ready"); }
 
   function setRole(role) {
     currentRole = role;
@@ -265,6 +269,55 @@
       ["ds-name","ds-phone","ds-id","ds-license","ds-pass"].forEach(id => document.getElementById(id).value = "");
     } catch(e) { showError("driver", "Connection failed. Try again."); }
   }
+
+  // ── ADMIN LOGIN ──────────────────────────────────────────
+  let logoTaps = 0, logoTimer = null;
+  function onLogoTap() {
+    logoTaps++;
+    clearTimeout(logoTimer);
+    logoTimer = setTimeout(() => { logoTaps = 0; }, 2000);
+    if (logoTaps >= 5) {
+      logoTaps = 0;
+      document.getElementById("admin-login-box").classList.toggle("visible");
+    }
+  }
+
+  async function adminLogin() {
+    const username = document.getElementById("admin-username").value.trim();
+    const password = document.getElementById("admin-password").value;
+    const errEl = document.getElementById("admin-error");
+    errEl.style.display = "none";
+    if (!username || !password) { errEl.textContent = "Enter username and password"; errEl.style.display = "block"; return; }
+    try {
+      const res = await fetch(`${BASE}/auth/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.error || "Invalid credentials"; errEl.style.display = "block"; return; }
+      localStorage.setItem("spiti_admin", JSON.stringify({ name: data.name, role: "admin" }));
+      window.location.href = "admin.html";
+    } catch(e) {
+      errEl.textContent = "Cannot reach server. Check your connection.";
+      errEl.style.display = "block";
+    }
+  }
 </script>
+
+<!-- Hidden Admin Login (tap logo 5x) -->
+<div class="admin-login-box" id="admin-login-box">
+  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f59e0b;margin-bottom:12px">Admin Access</div>
+  <div class="field" style="margin-bottom:10px">
+    <label style="font-size:0.7rem;color:#A8A29E">Username</label>
+    <input type="text" id="admin-username" placeholder="Admin username" autocomplete="off"/>
+  </div>
+  <div class="field" style="margin-bottom:12px">
+    <label style="font-size:0.7rem;color:#A8A29E">Password</label>
+    <input type="password" id="admin-password" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()"/>
+  </div>
+  <button onclick="adminLogin()" style="width:100%;padding:10px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem">Login as Admin</button>
+  <div id="admin-error" style="color:#ef4444;font-size:0.72rem;margin-top:8px;display:none"></div>
+</div>
 </body>
 </html>
