@@ -112,9 +112,45 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .grid-2 { grid-template-columns: 1fr; }
     }
+
+    /* ── ADMIN LOGIN OVERLAY ── */
+    .login-overlay { position: fixed; inset: 0; background: #0a0a0f; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    .login-overlay.hidden { display: none; }
+    .login-box { background: #111118; border: 1px solid #2a2a3a; border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 380px; }
+    .login-logo { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.04em; color: #e8e8f0; margin-bottom: 6px; }
+    .login-logo span { color: #f59e0b; }
+    .login-tagline { font-size: 0.78rem; color: #444; margin-bottom: 32px; }
+    .login-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #f59e0b; margin-bottom: 20px; }
+    .login-field { margin-bottom: 14px; }
+    .login-field label { display: block; font-size: 0.7rem; color: #555; margin-bottom: 5px; }
+    .login-field input { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px; padding: 11px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    .login-field input:focus { border-color: #f59e0b; }
+    .login-btn { width: 100%; padding: 12px; background: #f59e0b; color: #000; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity 0.2s; }
+    .login-btn:hover { opacity: 0.88; }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-error { color: #ef4444; font-size: 0.72rem; margin-top: 10px; min-height: 18px; text-align: center; }
   </style>
 </head>
 <body>
+
+
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">Spiti-Spiti<span>.</span></div>
+    <div class="login-tagline">Admin Dashboard</div>
+    <div class="login-title">Sign In</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="adm-username" placeholder="Enter username" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('adm-password').focus()"/>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="adm-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <button class="login-btn" id="adm-login-btn" onclick="doAdminLogin()">Sign In →</button>
+    <div class="login-error" id="adm-error"></div>
+  </div>
+</div>
 
 <div class="sidebar">
   <div class="sidebar-brand">Spiti-Spiti<span>.</span></div>
@@ -392,33 +428,79 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // Auth check — must be first, throw stops all further execution
-  const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
-  if (!adminData) { window.location.replace("login.html"); throw new Error("Not authenticated"); }
-
   const BASE = "https://spiti-spiti-production.up.railway.app";
   let allRides = [], allDrivers = [], allVehicles = [], allDeliveries = [];
 
-  function logout() {
-    localStorage.removeItem("spiti_admin");
-    window.location.href = "login.html";
+  // ── ADMIN LOGIN ──────────────────────────────────────────
+  async function doAdminLogin() {
+    const username = document.getElementById("adm-username").value.trim();
+    const password = document.getElementById("adm-password").value;
+    const errEl = document.getElementById("adm-error");
+    const btn = document.getElementById("adm-login-btn");
+    errEl.textContent = "";
+    if (!username || !password) { errEl.textContent = "Please enter username and password"; return; }
+    btn.textContent = "Signing in..."; btn.disabled = true;
+    try {
+      const res = await fetch(`${BASE}/auth/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { errEl.textContent = data.error || "Invalid credentials"; btn.textContent = "Sign In →"; btn.disabled = false; return; }
+      localStorage.setItem("spiti_admin", JSON.stringify({ name: data.name, role: "admin" }));
+      document.getElementById("login-overlay").classList.add("hidden");
+      initAdmin();
+    } catch(e) {
+      errEl.textContent = "Cannot reach server. Check connection.";
+      btn.textContent = "Sign In →"; btn.disabled = false;
+    }
   }
 
-  const socket = io(BASE);
-  socket.on("connect", () => {
-    document.getElementById("dot").classList.add("live");
-    document.getElementById("conn-label").textContent = "Live";
-    socket.emit("join-role", { role: "admin", userId: 0 });
+  function initAdmin() {
+    connectSocket();
     loadAll();
-  });
-  socket.on("disconnect", () => {
-    document.getElementById("dot").classList.remove("live");
-    document.getElementById("conn-label").textContent = "Offline";
-  });
-  socket.on("new-ride",         () => { loadAll(); showToast("New ride request!", "warn"); });
-  socket.on("ride-updated",     () => { loadAll(); });
-  socket.on("new-delivery",     () => { loadAll(); showToast("New delivery request!", "warn"); });
-  socket.on("delivery-updated", () => { loadAll(); });
+  }
+
+  // Check if already logged in
+  const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
+  if (adminData) {
+    document.getElementById("login-overlay").classList.add("hidden");
+    // initAdmin called after socket setup below
+  }
+
+  function logout() {
+    localStorage.removeItem("spiti_admin");
+    document.getElementById("adm-username").value = "";
+    document.getElementById("adm-password").value = "";
+    document.getElementById("adm-error").textContent = "";
+    document.getElementById("adm-login-btn").textContent = "Sign In →";
+    document.getElementById("adm-login-btn").disabled = false;
+    document.getElementById("login-overlay").classList.remove("hidden");
+  }
+
+  let socket;
+  function connectSocket() {
+    if (socket) return;
+    socket = io(BASE);
+    socket.on("connect", () => {
+      document.getElementById("dot").classList.add("live");
+      document.getElementById("conn-label").textContent = "Live";
+      socket.emit("join-role", { role: "admin", userId: 0 });
+      loadAll();
+    });
+    socket.on("disconnect", () => {
+      document.getElementById("dot").classList.remove("live");
+      document.getElementById("conn-label").textContent = "Offline";
+    });
+    socket.on("new-ride",         () => { loadAll(); showToast("New ride request!", "warn"); });
+    socket.on("ride-updated",     () => { loadAll(); });
+    socket.on("new-delivery",     () => { loadAll(); showToast("New delivery request!", "warn"); });
+    socket.on("delivery-updated", () => { loadAll(); });
+  }
+
+  // Auto-init if already logged in
+  if (adminData) { connectSocket(); }
 
   function showPage(name, el) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
