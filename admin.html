@@ -539,7 +539,7 @@
 
   function openReassign(rideId) {
     document.getElementById("reassign-ride-id").value = rideId;
-    document.getElementById("reassign-driver-select").innerHTML = allDrivers.map(d => `<option value="${d.id}">${d.name}</option>`).join("");
+    document.getElementById("reassign-driver-select").innerHTML = `allDrivers.map(d => `<option value="${d.id}">${d.name}</option>`).join("")`;
     openModal("reassign-modal");
   }
 
