@@ -527,7 +527,7 @@
   const RIDER_NAME = riderData?.name || "Rider";
 
   document.getElementById("nav-name").textContent = RIDER_NAME;
-  document.getElementById("greeting").textContent = Hey ${RIDER_NAME.split(" ")[0]};
+  document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]}`;
 
   function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
@@ -632,7 +632,9 @@
     mod.className = "map-module " + (trackingExpanded ? "expanded" : "collapsed");
     document.getElementById("t-chevron-down").style.display = trackingExpanded ? "none" : "block";
     document.getElementById("t-chevron-up").style.display = trackingExpanded ? "block" : "none";
-    if (trackingExpanded) setTimeout(triggerMapResize, 350);
+    if (trackingExpanded && gmap) {
+      setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
+    }
   }
 
   function toggleTrackingFullscreen(e) {
@@ -649,7 +651,7 @@
       document.getElementById("t-fs-expand").style.display = "block";
       document.getElementById("t-fs-contract").style.display = "none";
     }
-    if (gmap) setTimeout(triggerMapResize, 350);
+    if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
   }
 
   // ── SOCKET ─────────────────────────────────────────────────────────────────
@@ -665,7 +667,7 @@
   socket.on("driver-offer", (offer) => {
     offers[offer.driverId] = offer;
     renderOffers();
-    showToast(New offer: P${parseFloat(offer.fare_offer).toFixed(2)}, "warn");
+    showToast(`New offer: P${parseFloat(offer.fare_offer).toFixed(2)}`, "warn");
   });
 
   socket.on("ride-updated", (ride) => {
@@ -747,7 +749,7 @@
         animation: google.maps.Animation.DROP
       });
       // Driver info window
-      const driverInfoContent = <div style="font-size:11px;font-weight:700;color:#F97316">🚗 Your Driver</div><div style="font-size:10px;color:#78716C">${activeRide?.driver_name || 'Driver'}</div>;
+      const driverInfoContent = `<div style='font-size:11px;font-weight:700;color:#F97316'>🚗 Your Driver</div><div style='font-size:10px;color:#78716C'>${activeRide?.driver_name || 'Driver'}</div>`;
       const driverInfoWindow = new google.maps.InfoWindow({ content: driverInfoContent });
       driverMarker.addListener("click", () => driverInfoWindow.open(gmap, driverMarker));
     } else {
@@ -838,7 +840,7 @@
         // Update ETA badge
         const etaBadge = document.getElementById("eta-badge");
         if (activeRide?.status === "accepted") {
-          etaBadge.textContent = ETA: ${durationText};
+          etaBadge.textContent = `ETA: ${durationText}`;
           etaBadge.style.display = "block";
         } else {
           etaBadge.style.display = "none";
@@ -862,12 +864,12 @@
   function updateETADisplay(mins, distKm) {
     const etaBadge = document.getElementById("eta-badge");
     if (activeRide?.status === "accepted") {
-      etaBadge.textContent = ETA: ${mins} ${mins === 1 ? "min" : "mins"};
+      etaBadge.textContent = `ETA: ${mins} ${mins === 1 ? "min" : "mins"}`;
       etaBadge.style.display = "block";
     } else {
       etaBadge.style.display = "none";
     }
-    document.getElementById("vp-eta").textContent = ${mins} ${mins === 1 ? "min" : "mins"};
+    document.getElementById("vp-eta").textContent = `${mins} ${mins === 1 ? "min" : "mins"}`;
     document.getElementById("vp-dist").textContent = distKm.toFixed(1) + " km away";
   }
 
@@ -880,7 +882,7 @@
       showToast("Enter pickup, dropoff and fare (min P15)", "warn"); return;
     }
     try {
-      const res = await fetch(${BASE}/rides, {
+      const res = await fetch(`${BASE}/rides`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ riderId: RIDER_ID, pickup, dropoff, offered_fare: fare })
       });
@@ -905,9 +907,9 @@
     const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P", "")) || 15;
     el.innerHTML = list.map(o => {
       const match = parseFloat(o.fare_offer) <= myFare;
-      const starSvg = <svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>;
-      const stars = o.avg_rating ? ${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides) : "New driver";
-      const matchSvg = match ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Matches your price : "Counter offer";
+      const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+      const stars = o.avg_rating ? `${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides)` : "New driver";
+      const matchSvg = match ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Matches your price` : "Counter offer";
       return `<div class="offer-card">
         <div>
           <div class="offer-name"><svg width="13" height="13" fill="none" stroke="#78716C" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>${o.driver_name || "Driver"}</div>
@@ -926,7 +928,7 @@
   async function acceptOffer(driverId, fare) {
     if (!activeRide) return;
     try {
-      const res = await fetch(${BASE}/rides/${activeRide.id}/accept-offer, {
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/accept-offer`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId, fare })
       });
@@ -940,7 +942,7 @@
   async function declineOffer(driverId) {
     if (!activeRide) return;
     try {
-      await fetch(${BASE}/rides/${activeRide.id}/decline-offer, {
+      await fetch(`${BASE}/rides/${activeRide.id}/decline-offer`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ driverId })
       });
@@ -976,11 +978,11 @@
 
     if (ride.driver_id) {
       try {
-        const res = await fetch(${BASE}/drivers/${ride.driver_id}/rating);
+        const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
         const data = await res.json();
-        const starSvg = <svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>;
+        const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
         document.getElementById("driver-stars").innerHTML = data && data.avg_rating > 0
-          ? ${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides
+          ? `${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides`
           : "New driver";
         // Also try to get vehicle info from driver endpoint
         if (data.plate_number || data.vehicle_model) {
@@ -1003,9 +1005,9 @@
     const map = { accepted: 1, in_progress: 2, completed: 3 };
     const cur = map[status] || 0;
     for (let i = 1; i <= 3; i++) {
-      const dot = document.getElementById(p${i});
-      const lbl = document.getElementById(pl${i});
-      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(pline${i}).className = "prog-line done"; }
+      const dot = document.getElementById(`p${i}`);
+      const lbl = document.getElementById(`pl${i}`);
+      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`pline${i}`).className = "prog-line done"; }
       else if (i === cur) { dot.className = "prog-dot active"; dot.querySelector("span").textContent = i; lbl.className = "prog-label active"; }
       else { dot.className = "prog-dot"; dot.querySelector("span").textContent = i; lbl.className = "prog-label"; }
     }
@@ -1015,7 +1017,7 @@
   async function cancelRequest() {
     if (!activeRide) return;
     try {
-      await fetch(${BASE}/rides/${activeRide.id}/status, {
+      await fetch(`${BASE}/rides/${activeRide.id}/status`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "cancelled" })
       });
@@ -1048,7 +1050,7 @@
   // ── RATING ─────────────────────────────────────────────────────────────────
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
-    document.getElementById("rating-driver-name").textContent = How was your ride with ${ride.driver_name || "your driver"}?;
+    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || "your driver"}?`;
     selectedStar = 0;
     document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
@@ -1063,7 +1065,7 @@
   async function submitRating() {
     if (!completedRide || selectedStar === 0) { showToast("Please pick a star rating", "warn"); return; }
     try {
-      await fetch(${BASE}/rides/${completedRide.id}/rate-driver, {
+      await fetch(`${BASE}/rides/${completedRide.id}/rate-driver`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value })
       });
@@ -1095,7 +1097,7 @@
 
   async function loadMsgs(rideId) {
     try {
-      const res = await fetch(${BASE}/rides/${rideId}/messages);
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
       const msgs = await res.json();
       const el = document.getElementById("chat-msgs");
       el.innerHTML = "";
@@ -1111,8 +1113,8 @@
     const isMe = msg.sender_role === "rider";
     const time = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const div = document.createElement("div");
-    div.className = msg ${isMe ? "me" : "them"};
-    div.innerHTML = <div>${msg.message}</div><div class="msg-time">${time}</div>;
+    div.className = `msg ${isMe ? "me" : "them"}`;
+    div.innerHTML = `<div>${msg.message}</div><div class="msg-time">${time}</div>`;
     el.appendChild(div);
     el.scrollTop = el.scrollHeight;
   }
@@ -1125,7 +1127,7 @@
     input.value = "";
     appendMsg({ sender_role: "rider", message, created_at: new Date() });
     try {
-      await fetch(${BASE}/rides/${activeRide.id}/messages, {
+      await fetch(`${BASE}/rides/${activeRide.id}/messages`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sender_role: "rider", message })
       });
@@ -1135,7 +1137,7 @@
   // ── HISTORY ────────────────────────────────────────────────────────────────
   async function loadHistory() {
     try {
-      const res = await fetch(${BASE}/riders/${RIDER_ID}/rides);
+      const res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`);
       const rides = await res.json();
       const el = document.getElementById("history");
       if (!rides.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; }
@@ -1149,7 +1151,7 @@
         </div>`).join("");
     } catch(e) {
       try {
-        const res = await fetch(${BASE}/rides);
+        const res = await fetch(`${BASE}/rides`);
         const rides = await res.json();
         const mine = rides.filter(r => r.rider_id == RIDER_ID);
         const el = document.getElementById("history");
