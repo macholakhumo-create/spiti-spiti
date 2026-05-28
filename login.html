@@ -6,7 +6,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Spiti-Spiti</title>
+  <title>Spiti-Spiti — Portal Login</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -26,40 +26,39 @@
 
     .logo-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; color: #1C1917; }
-    .logo span { color: #F97316; }
-    .tagline { font-size: 0.78rem; color: #A8A29E; margin-bottom: 32px; letter-spacing: 0.06em; text-align: center; }
+    .logo span { color: #10B981; }
+    .tagline { font-size: 0.78rem; color: #78716C; margin-bottom: 32px; letter-spacing: 0.06em; text-align: center; font-weight: 600; }
 
-    .role-select { display: flex; gap: 8px; margin-bottom: 24px; background: #EDE8E0; border-radius: 14px; padding: 5px; width: 100%; max-width: 400px; }
+    .role-select { display: flex; gap: 8px; margin-bottom: 24px; background: #EDE8E0; border-radius: 14px; padding: 5px; width: 100%; max-width: 400px; border: 1px solid #E5DDD0; }
     .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; background: transparent; color: #78716C; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .role-btn.active { background: #fff; color: #1C1917; box-shadow: 0 1px 4px rgba(28,25,23,0.1); }
-    .role-btn.active.rider { color: #F97316; }
-    .role-btn.active.driver { color: #F97316; }
+    .role-btn.active { background: #fff; color: #1C1917; box-shadow: 0 4px 12px rgba(28,25,23,0.05); }
+    .role-btn.active.rider { color: #10B981; }
+    .role-btn.active.driver { color: #10B981; }
 
-    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 400px; }
-    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; }
+    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(28,25,23,0.02); }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; letter-spacing: -0.02em; }
     .card-sub { font-size: 0.75rem; color: #78716C; margin-bottom: 24px; }
 
     .tabs { display: flex; gap: 8px; margin-bottom: 22px; }
-    .tab { flex: 1; padding: 9px; border: 1px solid #E5DDD0; border-radius: 10px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #A8A29E; transition: all 0.2s; }
-    .tab.active { border-color: #F97316; color: #F97316; background: #FFF7ED; }
+    .tab { flex: 1; padding: 9px; border: 1px solid #E5DDD0; border-radius: 10px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #A8A29E; transition: all 0.2s; text-align: center; }
+    .tab.active { border-color: #10B981; color: #10B981; background: #F0FDF4; }
 
     .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 0.72rem; color: #78716C; margin-bottom: 5px; font-weight: 500; }
-    .field input { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 12px 14px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
-    .field input:focus { border-color: #F97316; background: #fff; }
+    .field label { display: block; font-size: 0.72rem; color: #78716C; margin-bottom: 5px; font-weight: 600; letter-spacing: 0.02em; }
+    .field input { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 12px 14px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: all 0.2s; }
+    .field input:focus { border-color: #10B981; background: #fff; box-shadow: 0 0 0 3px rgba(16,185,129,0.08); }
 
-    .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
-    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-orange { background: #F97316; color: #fff; }
-    .btn-dark { background: #1C1917; color: #fff; }
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-brand { background: #10B981; color: #fff; }
 
-    .pending-box { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
+    .pending-box { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
     .pending-icon { font-size: 1.5rem; margin-bottom: 6px; }
-    .pending-title { font-size: 0.85rem; font-weight: 600; color: #EA580C; margin-bottom: 4px; }
+    .pending-title { font-size: 0.85rem; font-weight: 600; color: #16A34A; margin-bottom: 4px; }
     .pending-sub { font-size: 0.73rem; color: #78716C; line-height: 1.5; }
 
-    .error-box { background: #fee2e2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #dc2626; margin-bottom: 14px; display: none; }
-    .success-box { background: #dcfce7; border: 1px solid #86efac; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #16a34a; margin-bottom: 14px; display: none; }
+    .error-box { background: #FEE2E2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #DC2626; margin-bottom: 14px; display: none; font-weight: 500; }
+    .success-box { background: #DCFCE7; border: 1px solid #86EFAC; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #16A34A; margin-bottom: 14px; display: none; font-weight: 500; }
 
     .form-section { display: none; }
     .form-section.visible { display: block; }
@@ -70,9 +69,9 @@
 
 <div class="logo-wrap">
   <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-    <rect width="44" height="44" rx="10" fill="#FFF7ED"/>
-    <rect x="8" y="22" width="28" height="12" rx="4" fill="#F97316"/>
-    <path d="M12 22V18C12 15.8 13.8 14 16 14H28C30.2 14 32 15.8 32 18V22" stroke="#F97316" stroke-width="2" fill="none"/>
+    <rect width="44" height="44" rx="10" fill="#F0FDF4"/>
+    <rect x="8" y="22" width="28" height="12" rx="4" fill="#10B981"/>
+    <path d="M12 22V18C12 15.8 13.8 14 16 14H28C30.2 14 32 15.8 32 18V22" stroke="#10B981" stroke-width="2" fill="none"/>
     <circle cx="14" cy="34" r="4" fill="#1C1917"/>
     <circle cx="30" cy="34" r="4" fill="#1C1917"/>
     <circle cx="14" cy="34" r="1.8" fill="#F5F0EA"/>
@@ -96,7 +95,6 @@
 
 <div class="card">
 
-  <!-- RIDER -->
   <div class="form-section visible" id="section-rider">
     <div class="card-title">Welcome back 👋</div>
     <div class="card-sub">Sign in or create your rider account</div>
@@ -109,18 +107,17 @@
     <div id="rider-login-form">
       <div class="field"><label>Phone Number</label><input type="tel" id="rl-phone" placeholder="71234567"/></div>
       <div class="field"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••"/></div>
-      <button class="btn btn-orange" onclick="riderLogin()">Login →</button>
+      <button class="btn btn-brand" onclick="riderLogin()">Login →</button>
     </div>
     <div id="rider-signup-form" style="display:none">
       <div class="field"><label>Full Name</label><input type="text" id="rs-name" placeholder="John Doe"/></div>
       <div class="field"><label>Phone Number</label><input type="tel" id="rs-phone" placeholder="71234567"/></div>
       <div class="field"><label>ID Number</label><input type="text" id="rs-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Password</label><input type="password" id="rs-pass" placeholder="Min 6 characters"/></div>
-      <button class="btn btn-orange" onclick="riderSignup()">Create Account →</button>
+      <button class="btn btn-brand" onclick="riderSignup()">Create Account →</button>
     </div>
   </div>
 
-  <!-- DRIVER -->
   <div class="form-section" id="section-driver">
     <div class="card-title">Driver Portal 🚗</div>
     <div class="card-sub">Sign in or register as a driver</div>
@@ -133,7 +130,7 @@
     <div id="driver-login-form">
       <div class="field"><label>Phone Number</label><input type="tel" id="dl-phone" placeholder="71234567"/></div>
       <div class="field"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••"/></div>
-      <button class="btn btn-dark" onclick="driverLogin()">Login →</button>
+      <button class="btn btn-brand" onclick="driverLogin()">Login →</button>
     </div>
     <div id="driver-signup-form" style="display:none">
       <div class="field"><label>Full Name</label><input type="text" id="ds-name" placeholder="John Doe"/></div>
@@ -141,7 +138,7 @@
       <div class="field"><label>ID Number</label><input type="text" id="ds-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Driver's License Number</label><input type="text" id="ds-license" placeholder="e.g. DL-12345"/><div class="hint">Must match your official license</div></div>
       <div class="field"><label>Password</label><input type="password" id="ds-pass" placeholder="Min 6 characters"/></div>
-      <button class="btn btn-dark" onclick="driverSignup()">Register as Driver →</button>
+      <button class="btn btn-brand" onclick="driverSignup()">Register as Driver →</button>
       <div class="pending-box" id="pending-box" style="display:none">
         <div class="pending-icon">⏳</div>
         <div class="pending-title">Application Submitted!</div>
@@ -159,10 +156,11 @@
   const rider = localStorage.getItem("spiti_rider");
   const driver = localStorage.getItem("spiti_driver");
   const admin = localStorage.getItem("spiti_admin");
+  document.body.classList.add("ready");
   if (rider) { window.location.href = "rider.html"; }
   else if (driver) { window.location.href = "driver.html"; }
   else if (admin) { window.location.href = "admin.html"; }
-  else { document.body.classList.add("ready"); }
+  
 
   function setRole(role) {
     currentRole = role;
