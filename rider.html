@@ -619,12 +619,6 @@
   })();
 
   // ── MAP CONTROLS ───────────────────────────────────────────────────────────
-  function triggerMapResize() {
-    if (!gmap) { setTimeout(triggerMapResize, 300); return; }
-    google.maps.event.trigger(gmap, "resize");
-    gmap.setCenter(riderLocation);
-  }
-
   function toggleTrackingMap() {
     if (trackingFullscreen) return;
     trackingExpanded = !trackingExpanded;
@@ -869,7 +863,7 @@
     } else {
       etaBadge.style.display = "none";
     }
-    document.getElementById("vp-eta").textContent = `${mins} ${mins === 1 ? "min" : "mins"}`;
+    document.getElementById("vp-eta").textContent = `${mins} ${mins === 1 ? 'min' : 'mins'}`;
     document.getElementById("vp-dist").textContent = distKm.toFixed(1) + " km away";
   }
 
@@ -908,7 +902,7 @@
     el.innerHTML = list.map(o => {
       const match = parseFloat(o.fare_offer) <= myFare;
       const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-      const stars = o.avg_rating ? `${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides)` : "New driver";
+      const` stars = o.avg_rating ? ${starSvg} ${parseFloat(o.avg_rating).toFixed(1)} (${o.total_ratings || 0} rides) : "New driver"`;
       const matchSvg = match ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Matches your price` : "Counter offer";
       return `<div class="offer-card">
         <div>
@@ -978,7 +972,7 @@
 
     if (ride.driver_id) {
       try {
-        const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
+        const` res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`)`;
         const data = await res.json();
         const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
         document.getElementById("driver-stars").innerHTML = data && data.avg_rating > 0
@@ -998,15 +992,14 @@
     ["request","waiting","active"].forEach(p =>
       document.getElementById("panel-" + p).classList.toggle("visible", p === name)
     );
-    if (name === "active") setTimeout(triggerMapResize, 350);
   }
 
   function updateProgress(status) {
     const map = { accepted: 1, in_progress: 2, completed: 3 };
     const cur = map[status] || 0;
     for (let i = 1; i <= 3; i++) {
-      const dot = document.getElementById(`p${i}`);
-      const lbl = document.getElementById(`pl${i}`);
+      const` dot = document.getElementById(`p${i}`)`;
+      const` lbl = document.getElementById(`pl${i}`)`;
       if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`pline${i}`).className = "prog-line done"; }
       else if (i === cur) { dot.className = "prog-dot active"; dot.querySelector("span").textContent = i; lbl.className = "prog-label active"; }
       else { dot.className = "prog-dot"; dot.querySelector("span").textContent = i; lbl.className = "prog-label"; }
@@ -1097,7 +1090,7 @@
 
   async function loadMsgs(rideId) {
     try {
-      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const` res = await fetch(`${BASE}/rides/${rideId}/messages`)`;
       const msgs = await res.json();
       const el = document.getElementById("chat-msgs");
       el.innerHTML = "";
@@ -1137,7 +1130,7 @@
   // ── HISTORY ────────────────────────────────────────────────────────────────
   async function loadHistory() {
     try {
-      const res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`);
+      const` res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`)`;
       const rides = await res.json();
       const el = document.getElementById("history");
       if (!rides.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; }
@@ -1151,7 +1144,7 @@
         </div>`).join("");
     } catch(e) {
       try {
-        const res = await fetch(`${BASE}/rides`);
+        const` res = await fetch(`${BASE}/rides`)`;
         const rides = await res.json();
         const mine = rides.filter(r => r.rider_id == RIDER_ID);
         const el = document.getElementById("history");
