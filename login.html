@@ -216,7 +216,7 @@
       const data = await res.json();
       if (!res.ok) return showError("rider", data.error);
       localStorage.setItem("spiti_rider", JSON.stringify(data.rider));
-      window.location.href = "rider.html";
+      setTimeout(() => { window.location.replace("rider.html"); }, 100);
     } catch(e) { showError("rider", "Connection failed. Try again."); }
   }
 
@@ -232,7 +232,7 @@
       const data = await res.json();
       if (!res.ok) return showError("rider", data.error);
       showSuccess("rider", "Account created! Logging you in...");
-      setTimeout(() => { localStorage.setItem("spiti_rider", JSON.stringify(data.rider)); window.location.href = "rider.html"; }, 1000);
+      setTimeout(() => { localStorage.setItem("spiti_rider", JSON.stringify(data.rider)); setTimeout(() => { window.location.replace("rider.html"); }, 100); }, 1000);
     } catch(e) { showError("rider", "Connection failed. Try again."); }
   }
 
@@ -248,7 +248,7 @@
         return showError("driver", data.error);
       }
       localStorage.setItem("spiti_driver", JSON.stringify(data.driver));
-      window.location.href = "driver.html";
+      setTimeout(() => { window.location.replace("driver.html"); }, 100);
     } catch(e) { showError("driver", "Connection failed. Try again."); }
   }
 
@@ -297,7 +297,8 @@
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error || "Invalid credentials"; errEl.style.display = "block"; return; }
       localStorage.setItem("spiti_admin", JSON.stringify({ name: data.name, role: "admin" }));
-      window.location.href = "admin.html";
+      // Small delay ensures localStorage write is flushed before navigation
+      setTimeout(() => { window.location.replace("admin.html"); }, 100);
     } catch(e) {
       errEl.textContent = "Cannot reach server. Check your connection.";
       errEl.style.display = "block";
