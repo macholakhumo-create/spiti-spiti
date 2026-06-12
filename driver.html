@@ -8,12 +8,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Driver</title>
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#F97316">
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F0EA; color: #1C1917; min-height: 100vh; }
+
     nav { background: #fff; border-bottom: 1px solid #E5DDD0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
     .brand { font-size: 1rem; font-weight: 700; letter-spacing: -0.03em; color: #1C1917; display: flex; align-items: center; gap: 6px; }
     .brand span { color: #F97316; }
@@ -25,45 +24,87 @@
     .conn-dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; }
     .conn-dot svg { fill: #D4CCBF; transition: all 0.3s; }
     .conn-dot.live svg { fill: #22c55e; filter: drop-shadow(0 0 4px #22c55e88); }
-    .container { max-width: 520px; margin: 0 auto; padding: 16px 16px 120px; }
-    .greeting { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
-    .greeting-sub { font-size: 0.8rem; color: #78716C; margin-bottom: 16px; }
 
-    /* MAP */
-    .map-module { border: 1px solid #E5DDD0; background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 14px; position: relative; transition: height 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .container { max-width: 520px; margin: 0 auto; padding: 16px 16px 120px; }
+
+    /* ── GOOGLE MAP MODULE ── */
+    .map-module {
+      border: 1px solid #E5DDD0;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      position: relative;
+      transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
     .map-module.collapsed { height: 52px; }
     .map-module.expanded { height: 300px; }
-    .map-module.fullscreen { position: fixed; top: 57px; left: 0; right: 0; bottom: 0; z-index: 500; border-radius: 0; border: none; height: auto !important; }
-    .map-header { display: flex; align-items: center; justify-content: space-between; padding: 0 14px; height: 52px; background: #fff; cursor: pointer; user-select: none; border-bottom: 1px solid #E5DDD0; position: relative; z-index: 10; }
+    .map-module.fullscreen {
+      position: fixed;
+      top: 57px; left: 0; right: 0; bottom: 0;
+      z-index: 500;
+      border-radius: 0; border: none;
+      height: auto !important; max-width: 100%;
+    }
+    .map-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 14px; height: 52px; background: #fff;
+      flex-shrink: 0; cursor: pointer; user-select: none;
+      border-bottom: 1px solid #E5DDD0;
+      position: relative; z-index: 10;
+    }
     .map-header-left { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #F97316; }
-    .map-header-left svg { width: 13px; height: 13px; stroke: #F97316; fill: none; stroke-width: 2.5; }
     .map-header-right { display: flex; align-items: center; gap: 6px; }
     .map-ctrl { width: 30px; height: 30px; border-radius: 8px; background: #F5F0EA; border: 1px solid #E5DDD0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .map-ctrl svg { width: 14px; height: 14px; stroke: #78716C; fill: none; stroke-width: 2; }
     .map-ctrl:hover { background: #EDE8E0; }
+
+    /* Real Google Map */
     #gmap-driver { position: absolute; top: 52px; left: 0; right: 0; bottom: 0; background: #EDE8E0; }
     .map-module.collapsed #gmap-driver { display: none; }
-    .map-overlay-bar { position: absolute; top: 60px; left: 8px; right: 8px; background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0; border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.68rem; font-weight: 600; pointer-events: none; z-index: 20; }
+
+    .map-overlay-bar {
+      position: absolute; top: 60px; left: 8px; right: 8px;
+      background: rgba(255,255,255,0.95); border: 1px solid #E5DDD0;
+      border-radius: 8px; padding: 6px 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.68rem; font-weight: 600; pointer-events: none; z-index: 20;
+    }
     .map-overlay-left { display: flex; align-items: center; gap: 6px; color: #1C1917; }
     .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #D4CCBF; flex-shrink: 0; }
     .live-dot.on { background: #22c55e; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .eta-pill { background: #FFF7ED; color: #F97316; border: 1px solid #FED7AA; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; display: none; }
-    .map-dest-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.97); border-top: 1px solid #E5DDD0; padding: 8px 14px 10px; z-index: 15; display: none; }
+
+    /* Rider destination panel at bottom of map */
+    .map-dest-panel {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.97); border-top: 1px solid #E5DDD0;
+      padding: 8px 14px 10px; z-index: 15;
+      display: none; animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
     .map-dest-panel.visible { display: block; }
-    .map-dest-title { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #A8A29E; margin-bottom: 4px; }
+    .map-dest-title { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #A8A29E; margin-bottom: 5px; }
     .map-dest-row { display: flex; align-items: center; justify-content: space-between; }
     .map-dest-addr { font-size: 0.8rem; font-weight: 600; color: #1C1917; }
-    .map-dest-eta { font-size: 1rem; font-weight: 800; color: #F97316; }
-    .map-dest-dist { font-size: 0.63rem; color: #78716C; }
+    .map-dest-eta { font-size: 1rem; font-weight: 800; color: #F97316; letter-spacing: -0.03em; }
+    .map-dest-dist { font-size: 0.63rem; color: #78716C; margin-top: 1px; }
 
-    /* DUTY */
+    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F97316; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+    .card-label svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
+
+    .greeting { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 3px; }
+    .greeting-sub { font-size: 0.8rem; color: #78716C; margin-bottom: 16px; }
+
+    /* DUTY SWITCH */
     .duty-row { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #E5DDD0; border-radius: 14px; padding: 14px 18px; margin-bottom: 14px; }
     .duty-label { font-size: 0.85rem; font-weight: 600; color: #1C1917; }
     .duty-sub { font-size: 0.68rem; color: #78716C; margin-top: 2px; }
     .sw { width: 50px; height: 26px; background: #E5DDD0; border-radius: 26px; padding: 3px; cursor: pointer; transition: background 0.3s; position: relative; flex-shrink: 0; }
     .sw.on { background: #F97316; }
-    .sw-knob { width: 20px; height: 20px; background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transform: translateX(0); transition: transform 0.3s; }
+    .sw-knob { width: 20px; height: 20px; background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transform: translateX(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
     .sw.on .sw-knob { transform: translateX(24px); }
 
     /* STATS */
@@ -73,7 +114,7 @@
     .stat-num.gold { color: #f59e0b; }
     .stat-lbl { font-size: 0.6rem; color: #A8A29E; margin-top: 2px; }
 
-    /* INCOMING */
+    /* INCOMING REQUEST */
     .incoming { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
     .incoming.visible { display: block; animation: ringpulse 2s infinite; }
     @keyframes ringpulse { 0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,0.2)} 50%{box-shadow:0 0 0 14px rgba(249,115,22,0)} }
@@ -82,6 +123,7 @@
     .inc-icon svg { width: 20px; height: 20px; stroke: #EA580C; fill: none; stroke-width: 2; }
     .inc-title { font-size: 0.9rem; font-weight: 700; color: #1C1917; }
     .inc-sub { font-size: 0.68rem; color: #EA580C; margin-top: 2px; }
+
     .route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .route-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .route-dot.from { background: #EDE8E0; }
@@ -91,13 +133,16 @@
     .route-dot svg { width: 14px; height: 14px; fill: none; stroke-width: 2.5; }
     .route-lbl { font-size: 0.6rem; color: #A8A29E; margin-bottom: 1px; }
     .route-val { font-size: 0.83rem; color: #1C1917; font-weight: 500; }
+
     .price-row { background: #F5F0EA; border-radius: 10px; padding: 10px 13px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
     .price-lbl { font-size: 0.65rem; color: #78716C; }
     .price-val { font-size: 1.3rem; font-weight: 700; color: #F97316; }
+
     .offer-row { margin-bottom: 12px; }
     .offer-row label { font-size: 0.65rem; color: #78716C; display: block; margin-bottom: 5px; }
     .offer-input { width: 100%; background: #fff; border: 1px solid #FED7AA; border-radius: 10px; padding: 10px 13px; color: #1C1917; font-family: inherit; font-size: 1rem; font-weight: 600; outline: none; }
     .offer-input:focus { border-color: #F97316; }
+
     .btn-row { display: flex; gap: 7px; }
     .btn-sm { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .btn-sm svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
@@ -109,9 +154,7 @@
     /* ACTIVE RIDE */
     .active-card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; display: none; }
     .active-card.visible { display: block; }
-    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
-    .card-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #F97316; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
-    .card-label svg { width: 12px; height: 12px; stroke: #F97316; fill: none; stroke-width: 2.5; }
+
     .progress-bar { display: flex; align-items: flex-start; margin-bottom: 16px; padding: 0 4px; }
     .prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
     .prog-dot { width: 30px; height: 30px; border-radius: 50%; background: #EDE8E0; border: 2px solid #E5DDD0; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; color: #A8A29E; transition: all 0.4s; }
@@ -126,18 +169,22 @@
     .prog-label { font-size: 0.58rem; color: #A8A29E; margin-top: 5px; text-align: center; font-weight: 500; }
     .prog-label.active { color: #F97316; }
     .prog-label.done { color: #F97316; }
+
     .fare-box { background: #FFF7ED; border-radius: 10px; padding: 12px; text-align: center; margin: 12px 0; }
     .fare-num { font-size: 1.7rem; font-weight: 700; color: #F97316; letter-spacing: -0.04em; }
     .fare-lbl { font-size: 0.62rem; color: #78716C; margin-top: 2px; }
+
     .action-row { display: flex; gap: 8px; margin-top: 12px; }
     .act-btn { flex: 1; padding: 11px; border-radius: 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid #E5DDD0; background: #F5F0EA; color: #78716C; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .act-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
     .act-btn.start:hover { border-color: #F97316; color: #F97316; background: #FFF7ED; }
     .act-btn.done:hover { border-color: #22c55e; color: #22c55e; background: #f0fdf4; }
     .act-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .nav-btn { width: 100%; padding: 11px; border-radius: 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; background: #1C1917; color: #fff; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
-    .nav-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* Navigate button */
+    .nav-btn { width: 100%; padding: 11px; border-radius: 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; background: #1C1917; color: #fff; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; transition: opacity 0.2s; }
     .nav-btn:hover { opacity: 0.88; }
+    .nav-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
 
     /* RIDES LIST */
     .ride-item { background: #F5F0EA; border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; }
@@ -154,9 +201,11 @@
     /* CHAT FAB */
     .chat-fab { position: fixed; bottom: 28px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #1C1917; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(28,25,23,0.3); z-index: 1000; }
     .chat-fab.visible { display: flex; }
+    .chat-fab:active { transform: scale(0.95); }
     .chat-fab svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
     .chat-fab-badge { position: absolute; top: -4px; right: -4px; width: 20px; height: 20px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 0.62rem; font-weight: 700; display: none; align-items: center; justify-content: center; border: 2px solid #F5F0EA; }
     .chat-fab-badge.show { display: flex; }
+
     .chat-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 1001; display: none; }
     .chat-overlay.open { display: block; }
     .chat-popup { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 1002; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); max-height: 80vh; display: flex; flex-direction: column; }
@@ -204,6 +253,7 @@
     .rating-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer; }
     .rating-btn.submit { background: #F97316; color: #fff; }
     .rating-btn.skip { background: #EDE8E0; color: #78716C; border: 1px solid #E5DDD0; }
+
     .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 11px 22px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1300; max-width: 88vw; text-align: center; white-space: nowrap; }
     .toast.show { opacity: 1; }
     .toast.error { background: #ef4444; }
@@ -226,7 +276,8 @@
     <div class="conn-dot" id="dot"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg></div>
     <div class="nav-user"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Hi, <strong id="nav-name">Driver</strong></div>
     <button class="logout-btn" onclick="logout()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#78716C" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
     </button>
   </div>
 </nav>
@@ -234,41 +285,60 @@
 <div class="container">
   <div class="greeting" id="greeting">Driver Dashboard</div>
   <div class="greeting-sub">Manage your rides in real time</div>
+  <a href="combi.html" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:1px solid #E5DDD0;border-radius:12px;padding:11px;font-size:0.82rem;font-weight:600;color:#1C1917;text-decoration:none;margin-bottom:14px">
+    🚌 Switch to Combi Mode
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </a>
 
-  <!-- MAP -->
+  <!-- GOOGLE MAP MODULE -->
   <div class="map-module collapsed" id="map-module">
     <div class="map-header" onclick="toggleMap()">
       <div class="map-header-left">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
         Your Location
       </div>
       <div class="map-header-right">
-        <div class="map-ctrl" onclick="toggleFullscreen(event)">
+        <div class="map-ctrl" id="map-fs-btn" onclick="toggleFullscreen(event)" title="Fullscreen">
           <svg id="fs-expand" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           <svg id="fs-contract" viewBox="0 0 24 24" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="10" y1="14" x2="3" y2="21"/></svg>
         </div>
-        <div class="map-ctrl">
+        <div class="map-ctrl" id="map-toggle-btn" title="Collapse">
           <svg id="chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
           <svg id="chevron-up" viewBox="0 0 24 24" style="display:none"><polyline points="18 15 12 9 6 15"/></svg>
         </div>
       </div>
     </div>
+
+    <!-- REAL GOOGLE MAP -->
     <div id="gmap-driver"></div>
+
+    <!-- Status overlay bar -->
     <div class="map-overlay-bar">
-      <div class="map-overlay-left"><div class="live-dot" id="live-dot"></div><span id="map-status-txt">Location not sharing</span></div>
+      <div class="map-overlay-left">
+        <div class="live-dot" id="live-dot"></div>
+        <span id="map-status-txt">Location not sharing</span>
+      </div>
       <span class="eta-pill" id="eta-pill"></span>
     </div>
+
+    <!-- Destination panel (shows pickup/dropoff address + ETA when ride active) -->
     <div class="map-dest-panel" id="map-dest-panel">
       <div class="map-dest-title">Navigating to</div>
       <div class="map-dest-row">
-        <div><div class="map-dest-addr" id="dest-addr">—</div><div class="map-dest-dist" id="dest-dist">Calculating...</div></div>
+        <div>
+          <div class="map-dest-addr" id="dest-addr">—</div>
+          <div class="map-dest-dist" id="dest-dist">Calculating route...</div>
+        </div>
         <div class="map-dest-eta" id="dest-eta">—</div>
       </div>
     </div>
   </div>
 
   <div class="duty-row">
-    <div><div class="duty-label">Available for Rides</div><div class="duty-sub" id="duty-sub">You are offline</div></div>
+    <div>
+      <div class="duty-label">Available for Rides</div>
+      <div class="duty-sub" id="duty-sub">You are offline</div>
+    </div>
     <div class="sw" id="duty-sw" onclick="toggleDuty()"><div class="sw-knob"></div></div>
   </div>
 
@@ -282,7 +352,9 @@
   <!-- INCOMING -->
   <div class="incoming" id="inc-card">
     <div class="inc-head">
-      <div class="inc-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div class="inc-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
       <div><div class="inc-title">New Ride Request</div><div class="inc-sub">Rider looking for a driver</div></div>
     </div>
     <div class="route-row">
@@ -302,43 +374,87 @@
       <input class="offer-input" id="my-fare" type="number" min="15"/>
     </div>
     <div class="btn-row">
-      <button class="btn-sm btn-acc" onclick="sendOffer(false)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accept</button>
-      <button class="btn-sm btn-ctr" onclick="sendOffer(true)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Counter</button>
-      <button class="btn-sm btn-dec" onclick="declineIncoming()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="btn-sm btn-acc" onclick="sendOffer(false)">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accept
+      </button>
+      <button class="btn-sm btn-ctr" onclick="sendOffer(true)">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Counter
+      </button>
+      <button class="btn-sm btn-dec" onclick="declineIncoming()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
   </div>
 
   <!-- ACTIVE RIDE -->
   <div class="active-card" id="active-card">
-    <div class="card-label"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Current Ride</div>
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Current Ride
+    </div>
     <div class="progress-bar">
-      <div class="prog-step"><div class="prog-dot done" id="dp1"><span>1</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="prog-label done" id="dpl1">Accepted</div></div>
+      <div class="prog-step">
+        <div class="prog-dot done" id="dp1"><span>1</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="prog-label done" id="dpl1">Accepted</div>
+      </div>
       <div class="prog-line" id="dpline1"></div>
-      <div class="prog-step"><div class="prog-dot" id="dp2"><span>2</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="prog-label" id="dpl2">Started</div></div>
+      <div class="prog-step">
+        <div class="prog-dot" id="dp2"><span>2</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="prog-label" id="dpl2">Started</div>
+      </div>
       <div class="prog-line" id="dpline2"></div>
-      <div class="prog-step"><div class="prog-dot" id="dp3"><span>3</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="prog-label" id="dpl3">Done</div></div>
+      <div class="prog-step">
+        <div class="prog-dot" id="dp3"><span>3</span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="prog-label" id="dpl3">Done</div>
+      </div>
     </div>
-    <div class="route-row"><div class="route-dot from"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div><div><div class="route-lbl">Pickup</div><div class="route-val" id="act-pickup">—</div></div></div>
-    <div class="route-row"><div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div><div><div class="route-lbl">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div></div>
-    <div class="fare-box"><div class="fare-num" id="act-fare">P0.00</div><div class="fare-lbl">Agreed Fare</div></div>
+    <div class="route-row">
+      <div class="route-dot from"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div><div class="route-lbl">Pickup</div><div class="route-val" id="act-pickup">—</div></div>
+    </div>
+    <div class="route-row">
+      <div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+      <div><div class="route-lbl">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div>
+    </div>
+    <div class="fare-box">
+      <div class="fare-num" id="act-fare">P0.00</div>
+      <div class="fare-lbl">Agreed Fare</div>
+    </div>
     <div class="action-row">
-      <button class="act-btn start" id="btn-start-ride" onclick="updateStatus('in_progress')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Ride</button>
-      <button class="act-btn done" id="btn-complete-ride" onclick="updateStatus('completed')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Complete</button>
+      <button class="act-btn start" id="btn-start-ride" onclick="updateStatus('in_progress')">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Ride
+      </button>
+      <button class="act-btn done" id="btn-complete-ride" onclick="updateStatus('completed')">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Complete
+      </button>
     </div>
-    <button class="nav-btn" onclick="openNavigation()"><svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Navigate in Maps</button>
+    <!-- Navigate button: opens Google Maps navigation to pickup/dropoff -->
+    <button class="nav-btn" id="nav-btn" onclick="openNavigation()">
+      <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      Navigate in Maps
+    </button>
   </div>
 
   <!-- ALL RIDES -->
   <div class="card">
-    <div class="card-label"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>All Rides</div>
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      All Rides
+    </div>
     <div id="rides-list"><div class="empty">No rides yet</div></div>
   </div>
 </div>
 
-<!-- RATING -->
+<!-- RATING MODAL -->
 <div class="rating-overlay" id="rating-overlay">
   <div class="rating-modal">
-    <div class="fare-completed"><div class="fare-completed-amount" id="rating-fare">P0.00</div><div class="fare-completed-label"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Ride Completed</div></div>
+    <div class="fare-completed">
+      <div class="fare-completed-amount" id="rating-fare">P0.00</div>
+      <div class="fare-completed-label">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Ride Completed
+      </div>
+    </div>
     <div class="rating-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     <div class="rating-title">Rate your rider</div>
     <div class="rating-sub">How was this passenger?</div>
@@ -350,7 +466,10 @@
       <div class="star-btn" onclick="setStar(5)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
     </div>
     <textarea class="rating-comment" id="rating-comment" placeholder="Leave a comment (optional)" rows="3"></textarea>
-    <div class="rating-btn-row"><button class="rating-btn skip" onclick="skipRating()">Skip</button><button class="rating-btn submit" onclick="submitRating()">Submit</button></div>
+    <div class="rating-btn-row">
+      <button class="rating-btn skip" onclick="skipRating()">Skip</button>
+      <button class="rating-btn submit" onclick="submitRating()">Submit</button>
+    </div>
   </div>
 </div>
 
@@ -386,21 +505,24 @@
   const DRIVER_NAME = driverData?.name || "Driver";
 
   document.getElementById("nav-name").textContent = DRIVER_NAME;
-  document.getElementById("greeting").textContent = "Hey " + DRIVER_NAME.split(" ")[0];
+  document.getElementById("greeting").textContent = ` `Hey ${DRIVER_NAME.split(" ")[0]}``;
 
   function logout() { localStorage.removeItem("spiti_driver"); window.location.href = "login.html"; }
 
+  // ── STATE ──────────────────────────────────────────────────────────────────
   let pending = null, activeRide = null, locInterval = null;
   let selectedStar = 0, completedRide = null, unreadCount = 0;
   let mapExpanded = false, mapFullscreen = false;
-  let mapsReady = false, gmap = null, driverSelfMarker = null;
+  let mapsReady = false;
+  let gmap = null, driverSelfMarker = null, pickupMarker = null, dropoffMarker = null;
   let directionsService = null, directionsRenderer = null;
   let currentLat = null, currentLng = null;
 
-  // ── GOOGLE MAPS ────────────────────────────────────────────────────────────
+  // ── GOOGLE MAPS INIT ───────────────────────────────────────────────────────
   function initGoogleMap() {
     mapsReady = true;
-    gmap = new google.maps.Map(document.getElementById("gmap-driver"), {
+    const mapDiv = document.getElementById("gmap-driver");
+    gmap = new google.maps.Map(mapDiv, {
       center: { lat: -24.6541, lng: 25.9087 },
       zoom: 15,
       disableDefaultUI: true,
@@ -415,51 +537,59 @@
         { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
         { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#f8f4ef" }] },
         { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#78716c" }] },
+        { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ color: "#78716c" }] },
         { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#e8f0e0" }] }
       ]
     });
+
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
       suppressMarkers: true,
-      polylineOptions: { strokeColor: "#F97316", strokeWeight: 4, strokeOpacity: 0.85 }
+      polylineOptions: {
+        strokeColor: "#F97316",
+        strokeWeight: 4,
+        strokeOpacity: 0.85
+      }
     });
     directionsRenderer.setMap(gmap);
   }
 
-  (function() {
-    var s = document.createElement("script");
-    s.src = "https://maps.googleapis.com/maps/api/js?key=" + GMAPS_KEY + "&callback=initGoogleMap";
+  // Load Google Maps dynamically
+  (function loadGMaps() {
+    const s = document.createElement("script");
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap`;
     s.async = true; s.defer = true;
     document.head.appendChild(s);
   })();
 
+  // ── MAP CONTROLS ───────────────────────────────────────────────────────────
   function toggleMap() {
     if (mapFullscreen) return;
     mapExpanded = !mapExpanded;
-    document.getElementById("map-module").className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
+    const mod = document.getElementById("map-module");
+    mod.className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
     document.getElementById("chevron-down").style.display = mapExpanded ? "none" : "block";
     document.getElementById("chevron-up").style.display = mapExpanded ? "block" : "none";
-    if (mapExpanded && gmap) setTimeout(function() { google.maps.event.trigger(gmap, "resize"); }, 350);
+    if (mapExpanded && gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
   }
 
   function toggleFullscreen(e) {
     e.stopPropagation();
-    var mod = document.getElementById("map-module");
+    const mod = document.getElementById("map-module");
+    const fsE = document.getElementById("fs-expand"), fsC = document.getElementById("fs-contract");
     mapFullscreen = !mapFullscreen;
     if (mapFullscreen) {
       mod.classList.add("fullscreen");
-      document.getElementById("fs-expand").style.display = "none";
-      document.getElementById("fs-contract").style.display = "block";
+      fsE.style.display = "none"; fsC.style.display = "block";
     } else {
       mod.classList.remove("fullscreen");
       mod.className = "map-module " + (mapExpanded ? "expanded" : "collapsed");
-      document.getElementById("fs-expand").style.display = "block";
-      document.getElementById("fs-contract").style.display = "none";
+      fsE.style.display = "block"; fsC.style.display = "none";
     }
-    if (gmap) setTimeout(function() { google.maps.event.trigger(gmap, "resize"); }, 350);
+    if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350);
   }
 
-  // ── LOCATION ───────────────────────────────────────────────────────────────
+  // ── LOCATION SHARING ───────────────────────────────────────────────────────
   function startLoc() {
     if (!navigator.geolocation) return showToast("Location not supported", "error");
     if (!mapExpanded && !mapFullscreen) toggleMap();
@@ -478,88 +608,166 @@
   }
 
   function sendLoc() {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      var lat = pos.coords.latitude, lng = pos.coords.longitude;
-      currentLat = lat; currentLng = lng;
-      document.getElementById("map-status-txt").textContent = lat.toFixed(4) + ", " + lng.toFixed(4);
-      // Broadcast to riders via socket
-      socket.emit("driver-location", { driverId: DRIVER_ID, lat: lat, lng: lng });
-      // Update own pin on map
-      if (mapsReady && gmap) {
-        var pos2 = { lat: lat, lng: lng };
-        if (!driverSelfMarker) {
-          driverSelfMarker = new google.maps.Marker({
-            position: pos2, map: gmap,
-            icon: {
-              url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="19" fill="#1C1917" opacity="0.12"/><circle cx="19" cy="19" r="13" fill="#1C1917"/><g transform="translate(10,11)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="16" height="9" rx="2"/><path d="M3 4V3C3 1.9 3.9 1 5 1H13C14.1 1 15 1.9 15 3V4"/><circle cx="5" cy="13" r="2"/><circle cx="13" cy="13" r="2"/></g></svg>'),
-              scaledSize: new google.maps.Size(38, 38),
-              anchor: new google.maps.Point(19, 19)
-            },
-            title: "You", zIndex: 20
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude: lat, longitude: lng } }) => {
+        currentLat = lat; currentLng = lng;
+        updateDriverSelfOnMap(lat, lng);
+        document.getElementById("map-status-txt").textContent = ` `${lat.toFixed(4)}, ${lng.toFixed(4)}``;
+        socket.emit("driver-location", { driverId: DRIVER_ID, lat, lng });
+        try {
+          await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
+            method: "PATCH", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lat, lng })
           });
-        } else {
-          driverSelfMarker.setPosition(pos2);
-        }
-        if (!activeRide) gmap.setCenter(pos2);
-      }
-      // Update route if active ride
-      if (activeRide) updateRouteToDestination(lat, lng);
-      // POST to server
-      fetch(BASE + "/drivers/" + DRIVER_ID + "/location", {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat: lat, lng: lng })
-      }).catch(function() {});
-    }, function(err) {
-      var msgs = { 1: "Permission denied.", 2: "Location unavailable.", 3: "Location timed out." };
-      showToast(msgs[err.code] || "Location error", "error");
-      stopLoc();
-    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 });
+        } catch(e) {}
+        // If active ride, update route to pickup/dropoff
+        if (activeRide) updateRouteToDestination(lat, lng);
+      },
+      (err) => {
+        const msgs = { 1: "Permission denied.", 2: "Location unavailable.", 3: "Location timed out." };
+        showToast(msgs[err.code] || "Location error", "error");
+        stopLoc();
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
+    );
   }
 
+  // Show driver's own position on map (blue dot style)
+  function updateDriverSelfOnMap(lat, lng) {
+    if (!mapsReady || !gmap) return;
+    const pos = { lat, lng };
+    if (!driverSelfMarker) {
+      driverSelfMarker = new google.maps.Marker({
+        position: pos, map: gmap,
+        icon: {
+          url: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+              <circle cx="19" cy="19" r="19" fill="#1C1917" opacity="0.12"/>
+              <circle cx="19" cy="19" r="13" fill="#1C1917"/>
+              <g transform="translate(10,11)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="16" height="9" rx="2"/>
+                <path d="M3 4V3C3 1.9 3.9 1 5 1H13C14.1 1 15 1.9 15 3V4"/>
+                <circle cx="5" cy="13" r="2"/><circle cx="13" cy="13" r="2"/>
+              </g>
+            </svg>
+          `),
+          scaledSize: new google.maps.Size(38, 38),
+          anchor: new google.maps.Point(19, 19)
+        },
+        title: "You", zIndex: 20
+      });
+    } else {
+      animateMarker(driverSelfMarker, driverSelfMarker.getPosition(), new google.maps.LatLng(lat, lng), 600);
+    }
+    if (!activeRide) gmap.setCenter(pos);
+  }
+
+  // Smooth marker animation
+  function animateMarker(marker, startPos, endPos, duration) {
+    const sLat = startPos.lat(), sLng = startPos.lng();
+    const eLat = endPos.lat(), eLng = endPos.lng();
+    const t0 = performance.now();
+    function step(now) {
+      const t = Math.min((now - t0) / duration, 1);
+      const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      marker.setPosition({ lat: sLat + (eLat - sLat)*e, lng: sLng + (eLng - sLng)*e });
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Draw route from driver to destination and show ETA
   function updateRouteToDestination(driverLat, driverLng) {
     if (!directionsService || !activeRide) return;
-    var dest = activeRide.status === "in_progress" ? activeRide.dropoff : activeRide.pickup;
-    document.getElementById("dest-addr").textContent = dest;
+    // While accepted → navigate to pickup; while in_progress → navigate to dropoff
+    const destText = activeRide.status === "in_progress" ? activeRide.dropoff : activeRide.pickup;
+    document.getElementById("dest-addr").textContent = destText;
     document.getElementById("map-dest-panel").classList.add("visible");
+
     directionsService.route({
       origin: { lat: driverLat, lng: driverLng },
-      destination: dest,
+      destination: destText,
       travelMode: google.maps.TravelMode.DRIVING
-    }, function(result, status) {
+    }, (result, status) => {
       if (status === "OK") {
         directionsRenderer.setDirections(result);
-        var leg = result.routes[0].legs[0];
+        const leg = result.routes[0].legs[0];
         document.getElementById("dest-eta").textContent = leg.duration.text;
         document.getElementById("dest-dist").textContent = leg.distance.text + " away";
         document.getElementById("eta-pill").textContent = "ETA " + leg.duration.text;
         document.getElementById("eta-pill").style.display = "block";
-        var bounds = new google.maps.LatLngBounds();
+
+        // Fit bounds
+        const bounds = new google.maps.LatLngBounds();
         bounds.extend({ lat: driverLat, lng: driverLng });
         bounds.extend(leg.end_location);
+        if (pickupMarker) bounds.extend(pickupMarker.getPosition());
         gmap.fitBounds(bounds, { top: 60, right: 20, bottom: 100, left: 20 });
       } else {
         document.getElementById("dest-dist").textContent = "Route unavailable";
+        document.getElementById("dest-eta").textContent = "—";
       }
     });
   }
 
+  // Place pickup and dropoff markers on map
+  function placeRideMarkers(ride) {
+    if (!mapsReady || !gmap) return;
+    // Pickup marker (green)
+    if (pickupMarker) pickupMarker.setMap(null);
+    pickupMarker = new google.maps.Marker({
+      position: ride.pickup,  // may be a string; geocode or leave for directions
+      map: gmap,
+      label: { text: "P", color: "#fff", fontWeight: "700", fontSize: "11px" },
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 14,
+        fillColor: "#22c55e",
+        fillOpacity: 1,
+        strokeColor: "#fff",
+        strokeWeight: 2.5
+      },
+      title: "Pickup: " + ride.pickup,
+      zIndex: 15
+    });
+
+    // Dropoff marker (orange flag)
+    if (dropoffMarker) dropoffMarker.setMap(null);
+    dropoffMarker = new google.maps.Marker({
+      position: ride.dropoff,
+      map: gmap,
+      label: { text: "D", color: "#fff", fontWeight: "700", fontSize: "11px" },
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 14,
+        fillColor: "#F97316",
+        fillOpacity: 1,
+        strokeColor: "#fff",
+        strokeWeight: 2.5
+      },
+      title: "Dropoff: " + ride.dropoff,
+      zIndex: 15
+    });
+  }
+
+  // Open Google Maps navigation
   function openNavigation() {
     if (!activeRide) return;
-    var dest = activeRide.status === "in_progress" ? activeRide.dropoff : activeRide.pickup;
-    var origin = currentLat ? currentLat + "," + currentLng : "";
-    var url = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(dest) + (origin ? "&origin=" + origin : "") + "&travelmode=driving";
+    const dest = activeRide.status === "in_progress" ? activeRide.dropoff : activeRide.pickup;
+    const origin = currentLat ? `${currentLat},${currentLng}` : "";
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}${origin ? "&origin=" + origin : ""}&travelmode=driving`;
     window.open(url, "_blank");
   }
 
-  // ── DUTY ───────────────────────────────────────────────────────────────────
+  // ── DUTY TOGGLE ────────────────────────────────────────────────────────────
   async function toggleDuty() {
-    var sw = document.getElementById("duty-sw");
-    var isOn = !sw.classList.contains("on");
+    const sw = document.getElementById("duty-sw");
+    const isOn = !sw.classList.contains("on");
     sw.classList.toggle("on", isOn);
     document.getElementById("duty-sub").textContent = isOn ? "You are online" : "You are offline";
     if (isOn) startLoc(); else stopLoc();
     try {
-      await fetch(BASE + "/drivers/" + DRIVER_ID + "/availability", {
+      await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ available: isOn })
       });
@@ -568,16 +776,16 @@
   }
 
   // ── SOCKET ─────────────────────────────────────────────────────────────────
-  var socket = io(BASE, { transports: ["websocket", "polling"] });
+  const socket = io(BASE, { transports: ["websocket", "polling"] });
 
-  socket.on("connect", function() {
+  socket.on("connect", () => {
     document.getElementById("dot").classList.add("live");
     socket.emit("join-role", { role: "drivers", userId: DRIVER_ID });
     loadRides(); loadMyRating();
   });
-  socket.on("disconnect", function() { document.getElementById("dot").classList.remove("live"); });
+  socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
 
-  socket.on("new-ride", function(ride) {
+  socket.on("new-ride", (ride) => {
     if (activeRide) return;
     pending = ride;
     document.getElementById("inc-pickup").textContent = ride.pickup;
@@ -588,7 +796,7 @@
     showToast("New ride request");
   });
 
-  socket.on("offer-accepted", function(ride) {
+  socket.on("offer-accepted", (ride) => {
     activeRide = ride;
     document.getElementById("inc-card").classList.remove("visible");
     document.getElementById("active-card").classList.add("visible");
@@ -602,51 +810,54 @@
     loadMsgs(ride.id);
     showToast("Rider accepted! Head to pickup");
     loadRides();
+    // Expand map and show route
     if (!mapExpanded) toggleMap();
     if (currentLat) updateRouteToDestination(currentLat, currentLng);
   });
 
-  socket.on("offer-declined", function() { showToast("Rider declined your offer", "error"); });
+  socket.on("offer-declined", () => showToast("Rider declined your offer", "error"));
 
-  socket.on("ride-updated", function(ride) {
+  socket.on("ride-updated", (ride) => {
     if (activeRide && ride.id === activeRide.id) {
       activeRide = ride;
       updateDriverProgress(ride.status);
       if (ride.status === "in_progress") {
-        showToast("Ride started!");
-        document.getElementById("btn-start-ride").disabled = true;
+        showToast("Ride started! 🚀");
+        // Switch navigation target to dropoff
         if (currentLat) updateRouteToDestination(currentLat, currentLng);
       }
       if (ride.status === "completed") {
         completedRide = ride;
         showToast("Ride completed!");
-        setTimeout(function() { showRatingModal(ride); }, 1500);
+        setTimeout(() => showRatingModal(ride), 1500);
       }
       loadRides();
     }
   });
 
-  socket.on("new-message", function(msg) {
+  socket.on("new-message", (msg) => {
     if (!activeRide) return;
+    // Skip if this is our own message — already appended optimistically in sendMsg
+    if (msg.sender_role === "driver") return;
     appendMsg(msg);
     if (!document.getElementById("chat-popup").classList.contains("open")) {
       unreadCount++;
-      var b = document.getElementById("chat-badge");
+      const b = document.getElementById("chat-badge");
       b.textContent = unreadCount; b.classList.add("show");
     }
   });
 
-  // ── OFFERS ─────────────────────────────────────────────────────────────────
+  // ── OFFER ACTIONS ──────────────────────────────────────────────────────────
   async function sendOffer(isCounter) {
     if (!pending) return;
-    var fare = Math.max(15, parseFloat(document.getElementById("my-fare").value) || 15);
+    const fare = Math.max(15, parseFloat(document.getElementById("my-fare").value) || 15);
     try {
-      await fetch(BASE + "/rides/" + pending.id + "/offer", {
+      await fetch(`${BASE}/rides/${pending.id}/offer`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fare_offer: fare, driverId: DRIVER_ID, driver_name: DRIVER_NAME })
       });
       document.getElementById("inc-card").classList.remove("visible");
-      showToast(isCounter ? "Counter P" + fare.toFixed(2) + " sent" : "Offer sent! Waiting for rider...");
+      showToast(isCounter ? `Counter P${fare.toFixed(2)} sent` : "Offer sent! Waiting for rider...");
     } catch(e) { showToast("Failed", "error"); }
   }
 
@@ -660,11 +871,11 @@
   async function updateStatus(status) {
     if (!activeRide) return;
     try {
-      var res = await fetch(BASE + "/rides/" + activeRide.id + "/status", {
+      const res = await fetch(`${BASE}/rides/${activeRide.id}/status`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: status })
+        body: JSON.stringify({ status })
       });
-      var ride = await res.json();
+      const ride = await res.json();
       activeRide = ride;
       updateDriverProgress(status);
       if (status === "in_progress") {
@@ -677,19 +888,19 @@
         showToast("Ride completed!");
         document.getElementById("eta-pill").style.display = "none";
         document.getElementById("map-dest-panel").classList.remove("visible");
-        setTimeout(function() { showRatingModal(ride); }, 1500);
+        setTimeout(() => showRatingModal(ride), 1500);
       }
       loadRides();
     } catch(e) { showToast("Failed", "error"); }
   }
 
   function updateDriverProgress(status) {
-    var map = { accepted: 1, in_progress: 2, completed: 3 };
-    var cur = map[status] || 0;
-    for (var i = 1; i <= 3; i++) {
-      var dot = document.getElementById("dp" + i);
-      var lbl = document.getElementById("dpl" + i);
-      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById("dpline" + i).className = "prog-line done"; }
+    const map = { accepted: 1, in_progress: 2, completed: 3 };
+    const cur = map[status] || 0;
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`dp${i}`);
+      const lbl = document.getElementById(`dpl${i}`);
+      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if (i < 3) document.getElementById(`dpline${i}`).className = "prog-line done"; }
       else if (i === cur) { dot.className = "prog-dot active"; lbl.className = "prog-label active"; }
       else { dot.className = "prog-dot"; lbl.className = "prog-label"; }
     }
@@ -699,20 +910,21 @@
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
     selectedStar = 0;
-    document.querySelectorAll(".star-btn").forEach(function(s) { s.classList.remove("active"); });
+    document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
     document.getElementById("rating-overlay").classList.add("open");
   }
 
   function setStar(n) {
     selectedStar = n;
-    document.querySelectorAll(".star-btn").forEach(function(s, i) { s.classList.toggle("active", i < n); });
+    document.querySelectorAll(".star-btn").forEach((s, i) => s.classList.toggle("active", i < n));
   }
 
   async function submitRating() {
-    if (!completedRide || selectedStar === 0) return showToast("Please select a rating", "warn");
+    if (!completedRide) return;
+    if (selectedStar === 0) return showToast("Please select a rating", "warn");
     try {
-      await fetch(BASE + "/rides/" + completedRide.id + "/rate-rider", {
+      await fetch(`${BASE}/rides/${completedRide.id}/rate-rider`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value.trim() })
       });
@@ -736,14 +948,17 @@
     unreadCount = 0;
     closeChat();
     activeRide = null;
+    // Clean up markers and route
+    if (pickupMarker) { pickupMarker.setMap(null); pickupMarker = null; }
+    if (dropoffMarker) { dropoffMarker.setMap(null); dropoffMarker = null; }
     if (directionsRenderer) directionsRenderer.setDirections({ routes: [] });
     loadRides(); loadMyRating();
   }
 
   async function loadMyRating() {
     try {
-      var res = await fetch(BASE + "/drivers/" + DRIVER_ID + "/rating");
-      var data = await res.json();
+      const res = await fetch(`${BASE}/drivers/${DRIVER_ID}/rating`);
+      const data = await res.json();
       if (data && data.avg_rating > 0) document.getElementById("s-rating").textContent = parseFloat(data.avg_rating).toFixed(1);
     } catch(e) {}
   }
@@ -754,7 +969,7 @@
     document.getElementById("chat-popup").classList.add("open");
     unreadCount = 0;
     document.getElementById("chat-badge").classList.remove("show");
-    setTimeout(function() { var m = document.getElementById("chat-msgs"); m.scrollTop = m.scrollHeight; }, 350);
+    setTimeout(() => { const m = document.getElementById("chat-msgs"); m.scrollTop = m.scrollHeight; }, 350);
   }
 
   function closeChat() {
@@ -764,9 +979,9 @@
 
   async function loadMsgs(rideId) {
     try {
-      var res = await fetch(BASE + "/rides/" + rideId + "/messages");
-      var msgs = await res.json();
-      var el = document.getElementById("chat-msgs");
+      const res = await fetch(`${BASE}/rides/${rideId}/messages`);
+      const msgs = await res.json();
+      const el = document.getElementById("chat-msgs");
       el.innerHTML = "";
       if (!msgs.length) { el.innerHTML = '<div class="empty" style="padding:12px;font-size:0.78rem">No messages yet</div>'; return; }
       msgs.forEach(appendMsg);
@@ -774,52 +989,57 @@
   }
 
   function appendMsg(msg) {
-    var el = document.getElementById("chat-msgs");
-    var empty = el.querySelector(".empty");
+    const el = document.getElementById("chat-msgs");
+    const empty = el.querySelector(".empty");
     if (empty) empty.remove();
-    var isMe = msg.sender_role === "driver";
-    var time = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    var div = document.createElement("div");
-    div.className = "msg " + (isMe ? "me" : "them");
-    div.innerHTML = "<div>" + (msg.message || msg.message_text || "") + "</div><div class='msg-time'>" + time + "</div>";
+    const isMe = msg.sender_role === "driver";
+    const time = new Date(msg.created_at || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const div = document.createElement("div");
+    div.className = `msg ${isMe ? "me" : "them"}`;
+    div.innerHTML = `<div>${msg.message || msg.message_text}</div><div class="msg-time">${time}</div>`;
     el.appendChild(div);
     el.scrollTop = el.scrollHeight;
   }
 
-  async function sendMsg() {
+  function sendMsg() {
     if (!activeRide) return;
-    var input = document.getElementById("chat-in");
-    var message = input.value.trim();
+    const input = document.getElementById("chat-in");
+    const message = input.value.trim();
     if (!message) return;
     input.value = "";
-    appendMsg({ sender_role: "driver", message: message, created_at: new Date() });
-    fetch(BASE + "/rides/" + activeRide.id + "/messages", {
+    appendMsg({ sender_role: "driver", message, created_at: new Date() });
+    fetch(`${BASE}/rides/${activeRide.id}/messages`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender_role: "driver", message: message })
-    }).catch(function() { showToast("Message failed", "error"); });
+      body: JSON.stringify({ sender_role: "driver", message })
+    }).catch(() => showToast("Message failed", "error"));
   }
 
   // ── RIDES LIST ─────────────────────────────────────────────────────────────
   async function loadRides() {
     try {
-      var res = await fetch(BASE + "/rides");
-      var rides = await res.json();
-      var mine = rides.filter(function(r) { return r.driver_id == DRIVER_ID; });
-      document.getElementById("rides-list").innerHTML = mine.length ? mine.map(function(r) {
-        return '<div class="ride-item"><div><div class="ride-route">' + r.pickup + ' &rarr; ' + r.dropoff + '</div><div class="ride-meta">#' + r.id + (r.fare ? ' &middot; P' + parseFloat(r.fare).toFixed(2) : r.offered_fare ? ' &middot; Offered P' + parseFloat(r.offered_fare).toFixed(2) : '') + '</div></div><span class="badge badge-' + r.status + '">' + r.status.replace(/_/g, " ") + '</span></div>';
-      }).join("") : '<div class="empty">No rides yet</div>';
+      const res = await fetch(`${BASE}/rides`);
+      const rides = await res.json();
+      const mine = rides.filter(r => r.driver_id == DRIVER_ID);
+      document.getElementById("rides-list").innerHTML = mine.length ? mine.map(r => `
+        <div class="ride-item">
+          <div>
+            <div class="ride-route">${r.pickup} → ${r.dropoff}</div>
+            <div class="ride-meta">#${r.id}${r.fare ? " · P" + parseFloat(r.fare).toFixed(2) : r.offered_fare ? " · Offered P" + parseFloat(r.offered_fare).toFixed(2) : ""}</div>
+          </div>
+          <span class="badge badge-${r.status}">${r.status.replace(/_/g, " ")}</span>
+        </div>`).join("") : '<div class="empty">No rides yet</div>';
       document.getElementById("s-total").textContent = mine.length;
-      document.getElementById("s-done").textContent = mine.filter(function(r) { return r.status === "completed"; }).length;
-      var earn = mine.filter(function(r) { return r.status === "completed"; }).reduce(function(s, r) { return s + parseFloat(r.fare || 0); }, 0);
+      document.getElementById("s-done").textContent = mine.filter(r => r.status === "completed").length;
+      const earn = mine.filter(r => r.status === "completed").reduce((s, r) => s + parseFloat(r.fare || 0), 0);
       document.getElementById("s-earn").textContent = "P" + earn.toFixed(2);
     } catch(e) {}
   }
 
-  function showToast(msg, type) {
-    var t = document.getElementById("toast");
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
     t.textContent = msg;
     t.className = "toast show" + (type ? " " + type : "");
-    setTimeout(function() { t.className = "toast"; }, 3500);
+    setTimeout(() => t.className = "toast", 3500);
   }
 </script>
 </body>
