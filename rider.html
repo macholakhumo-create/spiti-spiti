@@ -8,8 +8,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
   <title>Spiti-Spiti Rider</title>
-  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#F97316">
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -108,6 +106,19 @@
     .driver-sub svg { width: 11px; height: 11px; stroke: #78716C; fill: none; stroke-width: 2; }
     .driver-stars { font-size: 0.72rem; color: #78716C; margin-top: 3px; display: flex; align-items: center; gap: 3px; }
     .driver-stars svg { width: 11px; height: 11px; fill: #f59e0b; }
+
+    /* DRIVER VERIFICATIONS */
+    .verif-btn { margin-left: auto; background: #dcfce7; border: 1px solid #bbf7d0; color: #16a34a; border-radius: 20px; padding: 4px 10px; font-size: 0.65rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .verif-btn svg { width: 11px; height: 11px; stroke: #16a34a; fill: none; stroke-width: 2; }
+    .verif-panel { background: #F5F0EA; border-radius: 12px; padding: 14px; margin-bottom: 12px; display: none; }
+    .verif-panel.open { display: block; animation: slideIn 0.2s ease; }
+    .verif-title { font-size: 0.72rem; font-weight: 700; color: #1C1917; margin-bottom: 12px; }
+    .verif-row { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid #E5DDD0; }
+    .verif-icon { width: 32px; height: 32px; border-radius: 8px; background: #dcfce7; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .verif-icon svg { width: 16px; height: 16px; }
+    .verif-label { font-size: 0.78rem; font-weight: 500; color: #1C1917; }
+    .verif-sub { font-size: 0.62rem; color: #78716C; margin-top: 1px; }
+    .verif-check { width: 16px; height: 16px; margin-left: auto; flex-shrink: 0; }
 
     /* ── GOOGLE MAP MODULE ── */
     .map-module {
@@ -304,6 +315,9 @@
         Request Ride
         <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
+      <button class="btn btn-ghost" onclick="window.location.href='find-combi.html'" style="margin-top:4px">
+        🚌 Find a Combi
+      </button>
     </div>
   </div>
 
@@ -388,6 +402,39 @@
             On the way to you
           </div>
           <div class="driver-stars" id="driver-stars"></div>
+        </div>
+        <button class="verif-btn" onclick="toggleVerifications()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Verified
+        </button>
+      </div>
+
+      <!-- DRIVER VERIFICATIONS PANEL -->
+      <div class="verif-panel" id="verif-panel">
+        <div class="verif-title">Driver's Verifications</div>
+        <div class="verif-row">
+          <div class="verif-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8h4M6 11h6"/></svg></div>
+          <div>
+            <div class="verif-label">Driver licence validated</div>
+            <div class="verif-sub">Identity &amp; licence confirmed</div>
+          </div>
+          <svg class="verif-check" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="verif-row">
+          <div class="verif-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+          <div>
+            <div class="verif-label">Photocontrol completed</div>
+            <div class="verif-sub">Profile photo verified</div>
+          </div>
+          <svg class="verif-check" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="verif-row" style="border:none;margin:0;padding-bottom:0">
+          <div class="verif-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <div>
+            <div class="verif-label">Vehicle registration certificate</div>
+            <div class="verif-sub">Vehicle documents on file</div>
+          </div>
+          <svg class="verif-check" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
       </div>
 
@@ -529,7 +576,7 @@
   const RIDER_NAME = riderData?.name || "Rider";
 
   document.getElementById("nav-name").textContent = RIDER_NAME;
-  document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]}`;
+  document.getElementById("greeting").textContent = ` `Hey ${RIDER_NAME.split(" ")[0]}``;
 
   function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
@@ -620,6 +667,10 @@
     document.head.appendChild(s);
   })();
 
+  function toggleVerifications() {
+    document.getElementById("verif-panel").classList.toggle("open");
+  }
+
   // ── MAP CONTROLS ───────────────────────────────────────────────────────────
   function toggleTrackingMap() {
     if (trackingFullscreen) return;
@@ -701,6 +752,8 @@
 
   socket.on("new-message", (msg) => {
     if (!activeRide) return;
+    // Skip if this is our own message — already appended optimistically in sendMsg
+    if (msg.sender_role === "rider") return;
     appendMsg(msg);
     if (!document.getElementById("chat-popup").classList.contains("open")) {
       unreadCount++;
@@ -836,7 +889,7 @@
         // Update ETA badge
         const etaBadge = document.getElementById("eta-badge");
         if (activeRide?.status === "accepted") {
-          etaBadge.textContent = `ETA: ${durationText}`;
+          etaBadge.textContent = ` `ETA: ${durationText}``;
           etaBadge.style.display = "block";
         } else {
           etaBadge.style.display = "none";
@@ -860,12 +913,12 @@
   function updateETADisplay(mins, distKm) {
     const etaBadge = document.getElementById("eta-badge");
     if (activeRide?.status === "accepted") {
-      etaBadge.textContent = `ETA: ${mins} ${mins === 1 ? 'min' : 'mins'}`;
+      etaBadge.textContent = ` `ETA: ${mins} ${mins === 1 ? 'min' : 'mins'}``;
       etaBadge.style.display = "block";
     } else {
       etaBadge.style.display = "none";
     }
-    document.getElementById("vp-eta").textContent = `${mins} ${mins === 1 ? 'min' : 'mins'}`;
+    document.getElementById("vp-eta").textContent = ` `${mins} ${mins === 1 ? 'min' : 'mins'}``;
     document.getElementById("vp-dist").textContent = distKm.toFixed(1) + " km away";
   }
 
@@ -1045,7 +1098,7 @@
   // ── RATING ─────────────────────────────────────────────────────────────────
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
-    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || "your driver"}?`;
+    document.getElementById("rating-driver-name").textContent = ` `How was your ride with ${ride.driver_name || "your driver"}?``;
     selectedStar = 0;
     document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
