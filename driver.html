@@ -505,7 +505,7 @@
   const DRIVER_NAME = driverData?.name || "Driver";
 
   document.getElementById("nav-name").textContent = DRIVER_NAME;
-  document.getElementById("greeting").textContent = ` `Hey ${DRIVER_NAME.split(" ")[0]}``;
+  document.getElementById("greeting").textContent = `Hey ${DRIVER_NAME.split(" ")[0]}`;
 
   function logout() { localStorage.removeItem("spiti_driver"); window.location.href = "login.html"; }
 
@@ -612,7 +612,7 @@
       async ({ coords: { latitude: lat, longitude: lng } }) => {
         currentLat = lat; currentLng = lng;
         updateDriverSelfOnMap(lat, lng);
-        document.getElementById("map-status-txt").textContent = ` `${lat.toFixed(4)}, ${lng.toFixed(4)}``;
+        document.getElementById("map-status-txt").textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         socket.emit("driver-location", { driverId: DRIVER_ID, lat, lng });
         try {
           await fetch(`${BASE}/drivers/${DRIVER_ID}/location`, {
