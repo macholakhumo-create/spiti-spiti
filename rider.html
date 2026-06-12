@@ -576,7 +576,7 @@
   const RIDER_NAME = riderData?.name || "Rider";
 
   document.getElementById("nav-name").textContent = RIDER_NAME;
-  document.getElementById("greeting").textContent = ` `Hey ${RIDER_NAME.split(" ")[0]}``;
+  document.getElementById("greeting").textContent = `Hey ${RIDER_NAME.split(" ")[0]}`;
 
   function logout() { localStorage.removeItem("spiti_rider"); window.location.href = "login.html"; }
 
@@ -889,7 +889,7 @@
         // Update ETA badge
         const etaBadge = document.getElementById("eta-badge");
         if (activeRide?.status === "accepted") {
-          etaBadge.textContent = ` `ETA: ${durationText}``;
+          etaBadge.textContent = `ETA: ${durationText}`;
           etaBadge.style.display = "block";
         } else {
           etaBadge.style.display = "none";
@@ -913,12 +913,12 @@
   function updateETADisplay(mins, distKm) {
     const etaBadge = document.getElementById("eta-badge");
     if (activeRide?.status === "accepted") {
-      etaBadge.textContent = ` `ETA: ${mins} ${mins === 1 ? 'min' : 'mins'}``;
+      etaBadge.textContent = `ETA: ${mins} ${mins === 1 ? 'min' : 'mins'}`;
       etaBadge.style.display = "block";
     } else {
       etaBadge.style.display = "none";
     }
-    document.getElementById("vp-eta").textContent = ` `${mins} ${mins === 1 ? 'min' : 'mins'}``;
+    document.getElementById("vp-eta").textContent = `${mins} ${mins === 1 ? 'min' : 'mins'}`;
     document.getElementById("vp-dist").textContent = distKm.toFixed(1) + " km away";
   }
 
@@ -1098,7 +1098,7 @@
   // ── RATING ─────────────────────────────────────────────────────────────────
   function showRatingModal(ride) {
     document.getElementById("rating-fare").textContent = "P" + parseFloat(ride.fare || 0).toFixed(2);
-    document.getElementById("rating-driver-name").textContent = ` `How was your ride with ${ride.driver_name || "your driver"}?``;
+    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name || "your driver"}?`;
     selectedStar = 0;
     document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
     document.getElementById("rating-comment").value = "";
