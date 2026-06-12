@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Find a Combi — Spiti-Spiti</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#F5F0EA; color:#1C1917; min-height:100vh; }
+    nav { background:#fff; border-bottom:1px solid #E5DDD0; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .brand { font-size:1rem; font-weight:700; letter-spacing:-0.03em; display:flex; align-items:center; gap:6px; }
+    .brand span { color:#F97316; }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .conn-dot { width:14px; height:14px; display:flex; align-items:center; justify-content:center; }
+    .conn-dot svg { fill:#D4CCBF; transition:all 0.3s; }
+    .conn-dot.live svg { fill:#22c55e; filter:drop-shadow(0 0 4px #22c55e88); }
+    .back-btn { background:none; border:1px solid #E5DDD0; color:#78716C; font-family:inherit; font-size:0.7rem; padding:5px 10px; border-radius:8px; cursor:pointer; }
+    .container { max-width:480px; margin:0 auto; padding:16px 16px 100px; }
+    .greeting { font-size:1.3rem; font-weight:700; letter-spacing:-0.03em; margin-bottom:2px; }
+    .greeting-sub { font-size:0.8rem; color:#78716C; margin-bottom:20px; }
+    .card { background:#fff; border:1px solid #E5DDD0; border-radius:16px; padding:18px; margin-bottom:14px; }
+    .card-label { font-size:0.62rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#F97316; margin-bottom:14px; display:flex; align-items:center; gap:5px; }
+    .card-label svg { width:12px; height:12px; stroke:#F97316; fill:none; stroke-width:2.5; }
+
+    /* ROUTE FILTER */
+    .field { margin-bottom:12px; }
+    .field label { display:block; font-size:0.7rem; color:#78716C; margin-bottom:4px; font-weight:500; }
+    .field select { width:100%; background:#F5F0EA; border:1px solid #E5DDD0; border-radius:10px; padding:11px 13px; color:#1C1917; font-family:inherit; font-size:0.85rem; outline:none; }
+    .field select:focus { border-color:#F97316; }
+
+    /* LIVE MAP */
+    .map-wrap { border-radius:12px; overflow:hidden; height:260px; position:relative; background:#EDE8E0; margin-bottom:14px; }
+    #find-gmap { width:100%; height:100%; }
+    .map-badge { position:absolute; top:8px; left:8px; background:rgba(255,255,255,0.95); border:1px solid #E5DDD0; border-radius:8px; padding:5px 10px; font-size:0.68rem; font-weight:600; display:flex; align-items:center; gap:6px; pointer-events:none; z-index:10; }
+    .live-dot { width:6px; height:6px; border-radius:50%; background:#D4CCBF; }
+    .live-dot.on { background:#22c55e; animation:blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .map-legend { position:absolute; bottom:8px; left:8px; background:rgba(255,255,255,0.95); border:1px solid #E5DDD0; border-radius:8px; padding:6px 10px; font-size:0.62rem; color:#78716C; pointer-events:none; z-index:10; display:flex; flex-direction:column; gap:3px; }
+    .legend-row { display:flex; align-items:center; gap:5px; }
+
+    /* COMBI CARDS */
+    .combi-item { background:#F5F0EA; border-radius:12px; padding:12px 14px; margin-bottom:8px; animation:slideIn 0.25s ease; }
+    @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+    .combi-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .combi-route { font-size:0.85rem; font-weight:600; color:#1C1917; }
+    .combi-cap { padding:3px 10px; border-radius:20px; font-size:0.62rem; font-weight:700; }
+    .cap-available { background:#dcfce7; color:#16a34a; }
+    .cap-one { background:#FFF7ED; color:#d97706; }
+    .cap-full { background:#fee2e2; color:#dc2626; }
+    .combi-meta { display:flex; align-items:center; gap:12px; font-size:0.68rem; color:#78716C; margin-bottom:10px; }
+    .combi-meta span { display:flex; align-items:center; gap:3px; }
+    .combi-meta svg { width:11px; height:11px; stroke:#78716C; fill:none; stroke-width:2; }
+    .combi-fare { background:#fff; border-radius:8px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .fare-label { font-size:0.65rem; color:#A8A29E; }
+    .fare-val { font-size:0.9rem; font-weight:700; color:#F97316; }
+    .ping-btn { width:100%; padding:9px; background:#F97316; color:#fff; border:none; border-radius:8px; font-family:inherit; font-size:0.78rem; font-weight:600; cursor:pointer; transition:opacity 0.2s; }
+    .ping-btn:hover { opacity:0.88; }
+    .ping-btn.pinged { background:#22c55e; cursor:default; }
+    .ping-btn:disabled { opacity:0.6; cursor:not-allowed; }
+
+    /* MY LOCATION */
+    .my-loc-row { display:flex; align-items:center; gap:8px; background:#FFF7ED; border:1px solid #FED7AA; border-radius:10px; padding:10px 12px; margin-bottom:14px; }
+    .my-loc-row svg { width:16px; height:16px; stroke:#F97316; fill:none; stroke-width:2; flex-shrink:0; }
+    .my-loc-text { font-size:0.75rem; color:#78716C; flex:1; }
+    .my-loc-text strong { color:#1C1917; }
+
+    .empty { text-align:center; color:#A8A29E; font-size:0.78rem; padding:20px; }
+    .empty-icon { font-size:2rem; margin-bottom:8px; }
+
+    .btn { width:100%; padding:12px; border:none; border-radius:10px; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .btn svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .btn-primary { background:#F97316; color:#fff; }
+    .btn:hover { opacity:0.88; }
+
+    .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1C1917; color:#fff; padding:11px 22px; border-radius:10px; font-size:0.8rem; font-weight:600; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:1200; max-width:88vw; text-align:center; }
+    .toast.show { opacity:1; }
+    .toast.warn { background:#F97316; }
+    .toast.error { background:#ef4444; }
+    .toast.success { background:#22c55e; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="1" y="7" width="16" height="7" rx="2" fill="#F97316"/>
+      <path d="M3 7V5C3 3.3 4.3 2 6 2H12C13.7 2 15 3.3 15 5V7" stroke="#F97316" stroke-width="1.5" fill="none"/>
+      <circle cx="5" cy="14" r="2" fill="#1C1917"/><circle cx="13" cy="14" r="2" fill="#1C1917"/>
+      <circle cx="5" cy="14" r="1" fill="#F5F0EA"/><circle cx="13" cy="14" r="1" fill="#F5F0EA"/>
+    </svg>
+    Spiti-Spiti<span>.</span>
+  </div>
+  <div class="nav-right">
+    <div class="conn-dot" id="dot"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg></div>
+    <button class="back-btn" onclick="window.location.href='rider.html'">← Back</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="greeting">Find a Combi</div>
+  <div class="greeting-sub">See live combis heading your way</div>
+
+  <!-- MY LOCATION -->
+  <div class="my-loc-row">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
+    <div class="my-loc-text">Your location: <strong id="my-loc-text">Getting location...</strong></div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="card">
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Filter by Route
+    </div>
+    <div class="field">
+      <select id="route-filter" onchange="filterCombis()">
+        <option value="">All Routes</option>
+        <option value="Station → Game City">Station → Game City</option>
+        <option value="Station → Broadhurst">Station → Broadhurst</option>
+        <option value="Station → Tlokweng">Station → Tlokweng</option>
+        <option value="Station → Mogoditshane">Station → Mogoditshane</option>
+        <option value="Station → Mogoditshane Block 6">Station → Mogoditshane Block 6</option>
+        <option value="Station → Gabane">Station → Gabane</option>
+        <option value="Station → Mmopane">Station → Mmopane</option>
+        <option value="Station → Old Naledi">Station → Old Naledi</option>
+        <option value="Station → Bontleng">Station → Bontleng</option>
+        <option value="Station → Extension 14">Station → Extension 14</option>
+        <option value="Station → Riverwalk">Station → Riverwalk</option>
+        <option value="Game City → Mogoditshane">Game City → Mogoditshane</option>
+        <option value="Riverwalk → Tlokweng">Riverwalk → Tlokweng</option>
+        <option value="Main Mall → Airport">Main Mall → Airport</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- LIVE MAP -->
+  <div class="map-wrap">
+    <div id="find-gmap"></div>
+    <div class="map-badge">
+      <div class="live-dot on" id="live-dot"></div>
+      <span id="map-status">Scanning for combis...</span>
+    </div>
+    <div class="map-legend">
+      <div class="legend-row">🚌 Combi</div>
+      <div class="legend-row">📍 You</div>
+      <div class="legend-row">🧍 Waiting passenger</div>
+    </div>
+  </div>
+
+  <!-- COMBI LIST -->
+  <div class="card">
+    <div class="card-label">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Live Combis Near You
+      <span id="combi-count" style="margin-left:auto;font-weight:400;color:#A8A29E;letter-spacing:0;text-transform:none;font-size:0.65rem">0 found</span>
+    </div>
+    <div id="combis-list">
+      <div class="empty"><div class="empty-icon">🚌</div>No combis broadcasting yet.<br>Check back in a moment.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const BASE = "https://spiti-spiti-production.up.railway.app";
+  const riderData = JSON.parse(localStorage.getItem("spiti_rider") || "null");
+  const RIDER_ID = riderData?.id || null;
+  const PASSENGER_ID = `p_${Date.now()}_${Math.random().toString(36).substr(2,6)}`;
+
+  const GMAPS_KEY = "AIzaSyC0tqvQPPWHh3gL1ExnRo-Lzh0QNGVcYHk";
+  let gmap = null, myMarker = null, combiMarkers = {};
+  let myLat = null, myLng = null;
+  let liveCombis = {}; // driverId → combi data
+  let pinnedCombi = null;
+
+  // ── GOOGLE MAPS ──────────────────────────────────────────
+  function initFindMap() {
+    gmap = new google.maps.Map(document.getElementById("find-gmap"), {
+      center: { lat: -24.6541, lng: 25.9087 },
+      zoom: 13,
+      disableDefaultUI: true,
+      zoomControl: true,
+      styles: [
+        { featureType: "poi", stylers: [{ visibility: "off" }] },
+        { elementType: "geometry", stylers: [{ color: "#f5f0ea" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+        { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#E5DDD0" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9e4f0" }] }
+      ]
+    });
+    getMyLocation();
+  }
+
+  window.addEventListener("load", () => {
+    const s = document.createElement("script");
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initFindMap`;
+    s.async = true; s.defer = true;
+    document.head.appendChild(s);
+  });
+
+  function getMyLocation() {
+    if (!navigator.geolocation) { document.getElementById("my-loc-text").textContent = "Not available"; return; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      myLat = pos.coords.latitude;
+      myLng = pos.coords.longitude;
+      document.getElementById("my-loc-text").textContent = `${myLat.toFixed(4)}, ${myLng.toFixed(4)}`;
+      if (gmap) {
+        gmap.setCenter({ lat: myLat, lng: myLng });
+        myMarker = new google.maps.Marker({
+          position: { lat: myLat, lng: myLng }, map: gmap, title: "You",
+          icon: {
+            url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="16" fill="#1C1917" stroke="#fff" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="6" fill="#fff"/>
+              </svg>`),
+            scaledSize: new google.maps.Size(36, 36),
+            anchor: new google.maps.Point(18, 18)
+          }, zIndex: 5
+        });
+      }
+      // Re-render combis with updated distances
+      renderCombis();
+    }, () => {
+      document.getElementById("my-loc-text").textContent = "Permission denied";
+    });
+  }
+
+  // ── SOCKET ────────────────────────────────────────────────
+  const socket = io(BASE, { transports: ["websocket", "polling"] });
+  socket.on("connect", () => {
+    document.getElementById("dot").classList.add("live");
+  });
+  socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
+
+  // Receive live combi broadcasts
+  socket.on("combi-location", (data) => {
+    liveCombis[data.driverId] = { ...data, lastSeen: Date.now() };
+    updateCombiOnMap(data);
+    renderCombis();
+    document.getElementById("map-status").textContent = `${Object.keys(liveCombis).length} combi${Object.keys(liveCombis).length !== 1 ? "s" : ""} live`;
+  });
+
+  socket.on("combi-offline", (data) => {
+    delete liveCombis[data.driverId];
+    if (combiMarkers[data.driverId]) { combiMarkers[data.driverId].setMap(null); delete combiMarkers[data.driverId]; }
+    renderCombis();
+  });
+
+  // Stale combi cleanup (remove if no update in 30s)
+  setInterval(() => {
+    const now = Date.now();
+    Object.keys(liveCombis).forEach(id => {
+      if (now - liveCombis[id].lastSeen > 30000) {
+        delete liveCombis[id];
+        if (combiMarkers[id]) { combiMarkers[id].setMap(null); delete combiMarkers[id]; }
+      }
+    });
+    renderCombis();
+  }, 10000);
+
+  // ── MAP COMBI MARKERS ─────────────────────────────────────
+  function updateCombiOnMap(data) {
+    if (!gmap) return;
+    const pos = { lat: data.lat, lng: data.lng };
+    const capEmoji = data.capacity === "full" ? "🔴" : data.capacity === "one_space" ? "⚠️" : "✅";
+    const icon = {
+      url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="22" fill="#F97316" stroke="#fff" stroke-width="3"/>
+          <text x="24" y="30" text-anchor="middle" font-size="22" fill="white">🚌</text>
+        </svg>`),
+      scaledSize: new google.maps.Size(48, 48),
+      anchor: new google.maps.Point(24, 24)
+    };
+    if (!combiMarkers[data.driverId]) {
+      combiMarkers[data.driverId] = new google.maps.Marker({
+        position: pos, map: gmap, title: data.route, icon, zIndex: 15
+      });
+      combiMarkers[data.driverId].addListener("click", () => {
+        document.getElementById("route-filter").value = data.route;
+        filterCombis();
+      });
+    } else {
+      combiMarkers[data.driverId].setPosition(pos);
+    }
+  }
+
+  // ── COMBI LIST ────────────────────────────────────────────
+  function filterCombis() {
+    renderCombis();
+  }
+
+  function renderCombis() {
+    const filter = document.getElementById("route-filter").value;
+    let combis = Object.values(liveCombis);
+    if (filter) combis = combis.filter(c => c.route === filter);
+
+    // Sort: available first, then one_space, then full; then by distance
+    combis.sort((a, b) => {
+      const order = { available: 0, one_space: 1, full: 2 };
+      if (order[a.capacity] !== order[b.capacity]) return order[a.capacity] - order[b.capacity];
+      return distKm(a) - distKm(b);
+    });
+
+    document.getElementById("combi-count").textContent = `${combis.length} found`;
+
+    const list = document.getElementById("combis-list");
+    if (!combis.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon">🚌</div>No combis on this route right now.<br>Try a different route or check back soon.</div>';
+      return;
+    }
+
+    list.innerHTML = combis.map(c => {
+      const dist = distKm(c);
+      const eta = dist < 999 ? `~${Math.max(1, Math.round((dist / 30) * 60))} min away` : "—";
+      const capClass = c.capacity === "available" ? "cap-available" : c.capacity === "one_space" ? "cap-one" : "cap-full";
+      const capLabel = c.capacity === "available" ? "✅ Available" : c.capacity === "one_space" ? "⚠️ One Space" : "🔴 Full";
+      const pinged = pinnedCombi === c.driverId;
+      const canPing = c.capacity !== "full";
+      return `<div class="combi-item">
+        <div class="combi-top">
+          <div class="combi-route">🚌 ${c.route}</div>
+          <span class="combi-cap ${capClass}">${capLabel}</span>
+        </div>
+        <div class="combi-meta">
+          <span><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>${dist < 999 ? dist.toFixed(1) + " km" : "—"}</span>
+          <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${eta}</span>
+          <span>👤 ${c.driverName || "Driver"}</span>
+        </div>
+        <div class="combi-fare">
+          <div><div class="fare-label">Standard fare</div></div>
+          <div class="fare-val">P3.50 <span style="font-size:0.62rem;color:#A8A29E;font-weight:400">/ person</span></div>
+        </div>
+        <button class="ping-btn ${pinged ? "pinged" : ""}" ${(!canPing && !pinged) ? "disabled" : ""} onclick="pingCombi('${c.driverId}', '${c.route}')">
+          ${pinged ? "✓ Driver Notified!" : canPing ? "📍 Flag — I'm Waiting Here" : "Combi Full"}
+        </button>
+      </div>`;
+    }).join("");
+  }
+
+  function distKm(combi) {
+    if (!myLat || !combi.lat) return 999;
+    const R = 6371;
+    const dLat = (combi.lat - myLat) * Math.PI / 180;
+    const dLng = (combi.lng - myLng) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(myLat*Math.PI/180)*Math.cos(combi.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  // ── PING COMBI ────────────────────────────────────────────
+  function pingCombi(driverId, route) {
+    if (pinnedCombi === driverId) return;
+    pinnedCombi = driverId;
+    socket.emit("passenger-waiting", {
+      passengerId: PASSENGER_ID,
+      riderId: RIDER_ID,
+      driverId,
+      route,
+      lat: myLat,
+      lng: myLng,
+      location: `${myLat?.toFixed(4) || "?"}, ${myLng?.toFixed(4) || "?"}`
+    });
+    showToast("Driver notified — flag them down when they pass!", "success");
+    renderCombis();
+    // Auto-clear ping after 10 mins
+    setTimeout(() => {
+      if (pinnedCombi === driverId) {
+        pinnedCombi = null;
+        socket.emit("passenger-boarding", { passengerId: PASSENGER_ID, driverId });
+        renderCombis();
+      }
+    }, 600000);
+  }
+
+  function showToast(msg, type = "") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (type ? " " + type : "");
+    setTimeout(() => t.className = "toast", 4000);
+  }
+</script>
+</body>
+</html>
