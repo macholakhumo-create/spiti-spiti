@@ -27,6 +27,23 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", () => {
     console.log("Disconnected:", socket.id);
+    socket.on("combi-location", (data) => {
+  // Broadcast to all riders looking for combis
+  io.emit("combi-location", data);
+});
+
+socket.on("combi-offline", (data) => {
+  io.emit("combi-offline", data);
+});
+
+socket.on("passenger-waiting", (data) => {
+  // Broadcast to drivers on that route
+  io.to("drivers").emit("passenger-waiting", data);
+});
+
+socket.on("passenger-boarding", (data) => {
+  io.to("drivers").emit("passenger-boarding", data);
+});
   });
 });
 
