@@ -15,35 +15,37 @@ const io = new Server(server, { cors: { origin: "*" } });
 
 io.on("connection", (socket) => {
   console.log("Connected:", socket.id);
+
   socket.on("join-role", ({ role, userId }) => {
     socket.join(role);
     if (role === "drivers") socket.join(`driver:${userId}`);
     if (role === "rider") socket.join(`rider:${userId}`);
     console.log("ROLE JOIN:", role, userId, [...socket.rooms]);
   });
+
   socket.on("join-ride", ({ rideId }) => {
     socket.join(`ride:${rideId}`);
     console.log("RIDE JOIN:", rideId);
   });
+
+  socket.on("combi-location", (data) => {
+    io.emit("combi-location", data);
+  });
+
+  socket.on("combi-offline", (data) => {
+    io.emit("combi-offline", data);
+  });
+
+  socket.on("passenger-waiting", (data) => {
+    io.to("drivers").emit("passenger-waiting", data);
+  });
+
+  socket.on("passenger-boarding", (data) => {
+    io.to("drivers").emit("passenger-boarding", data);
+  });
+
   socket.on("disconnect", () => {
     console.log("Disconnected:", socket.id);
-    socket.on("combi-location", (data) => {
-  // Broadcast to all riders looking for combis
-  io.emit("combi-location", data);
-});
-
-socket.on("combi-offline", (data) => {
-  io.emit("combi-offline", data);
-});
-
-socket.on("passenger-waiting", (data) => {
-  // Broadcast to drivers on that route
-  io.to("drivers").emit("passenger-waiting", data);
-});
-
-socket.on("passenger-boarding", (data) => {
-  io.to("drivers").emit("passenger-boarding", data);
-});
   });
 });
 
@@ -494,7 +496,8 @@ app.delete("/deliveries/:id", async (req, res) => {
   }
 });
 
-// ─── START SERVER ─────────────────────────────────────────────
+// ─── RATINGS ──────────────────────────────────────────────────
+
 // RATE driver (by rider)
 app.post("/rides/:id/rate-driver", async (req, res) => {
   const { rating, comment } = req.body;
@@ -507,7 +510,7 @@ app.post("/rides/:id/rate-driver", async (req, res) => {
     const ride = result.rows[0];
     if (ride.driver_id) {
       await pool.query(`
-        UPDATE drivers SET 
+        UPDATE drivers SET
           total_ratings = total_ratings + 1,
           avg_rating = ((avg_rating * total_ratings) + $1) / (total_ratings + 1)
         WHERE id = $2
@@ -555,6 +558,8 @@ app.get("/drivers/:id/rating", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ─── START SERVER ─────────────────────────────────────────────
 server.listen(process.env.PORT || 5000, () => {
   console.log("Server running on port", process.env.PORT || 5000);
 });
