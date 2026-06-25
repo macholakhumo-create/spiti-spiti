@@ -5,103 +5,171 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Spiti-Spiti — Portal Login</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Black · Login</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #F5F0EA;
-      color: #1C1917;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+    :root {
+      --void:      #060606;
+      --matte-1:   #0D0D0D;
+      --matte-2:   #111111;
+      --matte-3:   #161616;
+      --matte-4:   #1C1C1C;
+      --gloss-bg:  linear-gradient(160deg, #222222 0%, #141414 55%, #0D0D0D 100%);
+      --gloss-btn: linear-gradient(180deg, #282828 0%, #141414 100%);
+      --border:    #222222;
+      --border-hi: #333333;
+      --border-gl: #3A3A3A;
+      --text:      #F0F0F0;
+      --text-mid:  #888888;
+      --text-dim:  #3A3A3A;
+      --white:     #FFFFFF;
+      --chrome:    #C8C8C8;
+      --silver:    #888888;
+      --green:     #22C55E;
+      --red:       #EF4444;
+      --amber:     #F59E0B;
+      --gloss-highlight: rgba(255,255,255,0.10);
+      --gloss-shadow:    0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9);
     }
-    body.ready { opacity: 1; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:var(--void);color:var(--text);min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
+      opacity:0;transition:opacity 0.3s ease;
+    }
+    body.ready{opacity:1}
 
-    .logo-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-    .logo { font-size: 2rem; font-weight: 800; letter-spacing: -0.05em; color: #1C1917; }
-    .logo span { color: #10B981; }
-    .tagline { font-size: 0.78rem; color: #78716C; margin-bottom: 32px; letter-spacing: 0.06em; text-align: center; font-weight: 600; }
+    /* LOGO */
+    .logo-wrap{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .logo-mark{
+      width:44px;height:44px;border-radius:12px;
+      background:var(--gloss-bg);border:1px solid var(--border-hi);
+      box-shadow:inset 0 1px 0 var(--gloss-highlight),var(--gloss-shadow);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .logo-mark svg{width:22px;height:22px}
+    .logo{font-size:2rem;font-weight:800;letter-spacing:-0.05em;color:var(--text)}
+    .logo-dot{color:var(--silver)}
+    .tagline{font-size:0.72rem;color:var(--text-dim);margin-bottom:32px;letter-spacing:0.14em;text-align:center;font-weight:600;text-transform:uppercase}
 
-    .role-select { display: flex; gap: 8px; margin-bottom: 24px; background: #EDE8E0; border-radius: 14px; padding: 5px; width: 100%; max-width: 400px; border: 1px solid #E5DDD0; }
-    .role-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; background: transparent; color: #78716C; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .role-btn.active { background: #fff; color: #1C1917; box-shadow: 0 4px 12px rgba(28,25,23,0.05); }
-    .role-btn.active.rider { color: #10B981; }
-    .role-btn.active.driver { color: #10B981; }
+    /* ROLE SELECTOR */
+    .role-select{display:flex;gap:6px;margin-bottom:24px;background:var(--matte-1);border-radius:14px;padding:4px;width:100%;max-width:400px;border:1px solid var(--border)}
+    .role-btn{flex:1;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;background:transparent;color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px}
+    .role-btn.active{
+      background:var(--gloss-btn);color:var(--text);
+      border-top:1px solid var(--border-gl);
+      box-shadow:inset 0 1px 0 var(--gloss-highlight),0 2px 8px rgba(0,0,0,0.5);
+    }
+    .role-btn svg{width:14px;height:14px}
 
-    .card { background: #fff; border: 1px solid #E5DDD0; border-radius: 20px; padding: 28px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(28,25,23,0.02); }
-    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: #1C1917; letter-spacing: -0.02em; }
-    .card-sub { font-size: 0.75rem; color: #78716C; margin-bottom: 24px; }
+    /* CARD */
+    .card{
+      background:var(--matte-2);border:1px solid var(--border);border-radius:20px;
+      padding:28px;width:100%;max-width:400px;
+      box-shadow:var(--gloss-shadow);
+    }
+    .card-title{font-size:1.1rem;font-weight:700;margin-bottom:4px;color:var(--text);letter-spacing:-0.02em;display:flex;align-items:center;gap:8px}
+    .card-title svg{width:20px;height:20px;stroke:var(--chrome);fill:none;stroke-width:2;stroke-linecap:round}
+    .card-sub{font-size:0.75rem;color:var(--text-mid);margin-bottom:24px}
 
-    .tabs { display: flex; gap: 8px; margin-bottom: 22px; }
-    .tab { flex: 1; padding: 9px; border: 1px solid #E5DDD0; border-radius: 10px; font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: transparent; color: #A8A29E; transition: all 0.2s; text-align: center; }
-    .tab.active { border-color: #10B981; color: #10B981; background: #F0FDF4; }
+    /* TABS */
+    .tabs{display:flex;gap:8px;margin-bottom:22px}
+    .tab{flex:1;padding:9px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;background:transparent;color:var(--text-dim);transition:all 0.2s;text-align:center}
+    .tab.active{
+      border-color:var(--border-gl);color:var(--text);
+      background:var(--gloss-btn);
+      box-shadow:inset 0 1px 0 var(--gloss-highlight);
+    }
 
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 0.72rem; color: #78716C; margin-bottom: 5px; font-weight: 600; letter-spacing: 0.02em; }
-    .field input { width: 100%; background: #F5F0EA; border: 1px solid #E5DDD0; border-radius: 10px; padding: 12px 14px; color: #1C1917; font-family: inherit; font-size: 0.85rem; outline: none; transition: all 0.2s; }
-    .field input:focus { border-color: #10B981; background: #fff; box-shadow: 0 0 0 3px rgba(16,185,129,0.08); }
+    /* FIELDS */
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:0.72rem;color:var(--text-mid);margin-bottom:5px;font-weight:600;letter-spacing:0.02em}
+    .field input{
+      width:100%;background:var(--matte-1);border:1px solid var(--border);border-radius:10px;
+      padding:12px 14px;color:var(--text);font-family:inherit;font-size:0.85rem;outline:none;transition:all 0.2s;
+    }
+    .field input:focus{border-color:var(--border-gl);background:var(--matte-3);box-shadow:0 0 0 2px rgba(255,255,255,0.04)}
+    .field input::placeholder{color:var(--text-dim)}
+    .hint{font-size:0.68rem;color:var(--text-dim);margin-top:4px}
 
-    .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-brand { background: #10B981; color: #fff; }
+    /* BUTTON */
+    .btn{
+      width:100%;padding:13px;border:none;border-radius:12px;font-family:inherit;font-size:0.88rem;font-weight:700;
+      cursor:pointer;transition:all 0.2s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;
+    }
+    .btn:hover{opacity:0.9;transform:translateY(-1px)}
+    .btn-brand{
+      background:var(--gloss-btn);color:var(--text);
+      border:1px solid var(--border-gl);
+      box-shadow:inset 0 1px 0 var(--gloss-highlight),var(--gloss-shadow);
+    }
+    .btn-brand:hover{border-color:var(--white);color:var(--white)}
+    .btn-brand svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
 
-    .pending-box { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 14px 16px; margin-top: 14px; }
-    .pending-icon { font-size: 1.5rem; margin-bottom: 6px; }
-    .pending-title { font-size: 0.85rem; font-weight: 600; color: #16A34A; margin-bottom: 4px; }
-    .pending-sub { font-size: 0.73rem; color: #78716C; line-height: 1.5; }
+    /* PENDING / ERROR / SUCCESS */
+    .pending-box{background:var(--matte-3);border:1px solid var(--border-hi);border-radius:12px;padding:14px 16px;margin-top:14px}
+    .pending-icon{margin-bottom:8px;display:flex;align-items:center;justify-content:center}
+    .pending-icon svg{width:28px;height:28px;stroke:var(--chrome);fill:none;stroke-width:2;stroke-linecap:round}
+    .pending-title{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:4px}
+    .pending-sub{font-size:0.73rem;color:var(--text-mid);line-height:1.5}
 
-    .error-box { background: #FEE2E2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #DC2626; margin-bottom: 14px; display: none; font-weight: 500; }
-    .success-box { background: #DCFCE7; border: 1px solid #86EFAC; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #16A34A; margin-bottom: 14px; display: none; font-weight: 500; }
+    .error-box{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px 14px;font-size:0.78rem;color:var(--red);margin-bottom:14px;display:none;font-weight:500}
+    .success-box{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:10px 14px;font-size:0.78rem;color:var(--green);margin-bottom:14px;display:none;font-weight:500}
 
-    .form-section { display: none; }
-    .form-section.visible { display: block; }
-    .hint { font-size: 0.68rem; color: #A8A29E; margin-top: 4px; }
+    .form-section{display:none}
+    .form-section.visible{display:block}
 
-    .admin-login-box { display: none; background: #1C1917; border: 1px solid #444; border-radius: 12px; padding: 18px; margin-top: 16px; }
-    .admin-login-box.visible { display: block; }
-    .admin-login-box .field input { background: #333; border-color: #555; color: #fff; }
-    .admin-tap-hint { font-size: 0.62rem; color: #A8A29E; text-align: center; margin-top: 8px; }
+    /* ADMIN */
+    .admin-login-box{display:none;background:var(--matte-3);border:1px solid var(--border-hi);border-radius:12px;padding:18px;margin-top:16px;width:100%;max-width:400px}
+    .admin-login-box.visible{display:block}
+    .admin-login-box .field input{background:var(--matte-1);border-color:var(--border);color:var(--text)}
+    .admin-login-box .field input:focus{border-color:var(--amber)}
+    .admin-label{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .admin-label svg{width:14px;height:14px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round}
+    .admin-btn{
+      width:100%;padding:10px;background:var(--gloss-btn);color:var(--amber);
+      border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;font-family:inherit;
+      box-shadow:inset 0 1px 0 var(--gloss-highlight);transition:all 0.2s;
+    }
+    .admin-btn:hover{border-color:var(--amber);color:var(--amber)}
   </style>
 </head>
 <body>
 
-<div class="logo-wrap">
-  <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-    <rect width="44" height="44" rx="10" fill="#F0FDF4"/>
-    <rect x="8" y="22" width="28" height="12" rx="4" fill="#10B981"/>
-    <path d="M12 22V18C12 15.8 13.8 14 16 14H28C30.2 14 32 15.8 32 18V22" stroke="#10B981" stroke-width="2" fill="none"/>
-    <circle cx="14" cy="34" r="4" fill="#1C1917"/>
-    <circle cx="30" cy="34" r="4" fill="#1C1917"/>
-    <circle cx="14" cy="34" r="1.8" fill="#F5F0EA"/>
-    <circle cx="30" cy="34" r="1.8" fill="#F5F0EA"/>
-    <rect x="18" y="26" width="8" height="2" rx="1" fill="#fff" opacity="0.6"/>
-  </svg>
-  <div class="logo">Spiti-Spiti<span>.</span></div>
+<div class="logo-wrap" onclick="onLogoTap()">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="10" width="20" height="9" rx="2.5" fill="#F0F0F0"/>
+      <path d="M5 10V8C5 6.3 6.3 5 8 5H16C17.7 5 19 6.3 19 8V10" stroke="#F0F0F0" stroke-width="1.8" fill="none"/>
+      <circle cx="6.5" cy="19" r="2.5" fill="#060606" stroke="#F0F0F0" stroke-width="1.5"/>
+      <circle cx="17.5" cy="19" r="2.5" fill="#060606" stroke="#F0F0F0" stroke-width="1.5"/>
+      <rect x="9" y="13" width="6" height="2" rx="1" fill="#060606" opacity="0.4"/>
+    </svg>
+  </div>
+  <div class="logo">Black<span class="logo-dot">.</span></div>
 </div>
-<div class="tagline">RIDES · DELIVERIES · LOGISTICS</div>
+<div class="tagline">Rides · Deliveries · Logistics</div>
 
 <div class="role-select">
   <button class="role-btn rider active" onclick="setRole('rider')">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="2.5" fill="currentColor"/><path d="M2 12C2 9.2 4.2 7 7 7C9.8 7 12 9.2 12 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="2.5" fill="currentColor"/><path d="M2 12C2 9.2 4.2 7 7 7C9.8 7 12 9.2 12 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
     Rider
   </button>
   <button class="role-btn driver" onclick="setRole('driver')">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="12" height="6" rx="1.5" fill="currentColor"/><path d="M3 5V4C3 2.9 3.9 2 5 2H9C10.1 2 11 2.9 11 4V5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="3.5" cy="11" r="1.5" fill="currentColor"/><circle cx="10.5" cy="11" r="1.5" fill="currentColor"/></svg>
+    <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="12" height="6" rx="1.5" fill="currentColor"/><path d="M3 5V4C3 2.9 3.9 2 5 2H9C10.1 2 11 2.9 11 4V5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="3.5" cy="11" r="1.5" fill="currentColor"/><circle cx="10.5" cy="11" r="1.5" fill="currentColor"/></svg>
     Driver
   </button>
 </div>
 
 <div class="card">
 
+  <!-- RIDER SECTION -->
   <div class="form-section visible" id="section-rider">
-    <div class="card-title">Welcome back 👋</div>
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Welcome back
+    </div>
     <div class="card-sub">Sign in or create your rider account</div>
     <div class="tabs">
       <button class="tab active" id="rider-login-tab" onclick="riderTab('login')">Login</button>
@@ -112,19 +180,23 @@
     <div id="rider-login-form">
       <div class="field"><label>Phone Number</label><input type="tel" id="rl-phone" placeholder="71234567"/></div>
       <div class="field"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••"/></div>
-      <button class="btn btn-brand" onclick="riderLogin()">Login →</button>
+      <button class="btn btn-brand" onclick="riderLogin()">Login <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
     </div>
     <div id="rider-signup-form" style="display:none">
       <div class="field"><label>Full Name</label><input type="text" id="rs-name" placeholder="John Doe"/></div>
       <div class="field"><label>Phone Number</label><input type="tel" id="rs-phone" placeholder="71234567"/></div>
       <div class="field"><label>ID Number</label><input type="text" id="rs-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Password</label><input type="password" id="rs-pass" placeholder="Min 6 characters"/></div>
-      <button class="btn btn-brand" onclick="riderSignup()">Create Account →</button>
+      <button class="btn btn-brand" onclick="riderSignup()">Create Account <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
     </div>
   </div>
 
+  <!-- DRIVER SECTION -->
   <div class="form-section" id="section-driver">
-    <div class="card-title">Driver Portal 🚗</div>
+    <div class="card-title">
+      <svg viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="10" rx="2"/><polygon points="16 9 20 9 23 12 23 17 16 17 16 9"/><circle cx="5" cy="17" r="2"/><circle cx="18" cy="17" r="2"/></svg>
+      Driver Portal
+    </div>
     <div class="card-sub">Sign in or register as a driver</div>
     <div class="tabs">
       <button class="tab active" id="driver-login-tab" onclick="driverTab('login')">Login</button>
@@ -135,7 +207,7 @@
     <div id="driver-login-form">
       <div class="field"><label>Phone Number</label><input type="tel" id="dl-phone" placeholder="71234567"/></div>
       <div class="field"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••"/></div>
-      <button class="btn btn-brand" onclick="driverLogin()">Login →</button>
+      <button class="btn btn-brand" onclick="driverLogin()">Login <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
     </div>
     <div id="driver-signup-form" style="display:none">
       <div class="field"><label>Full Name</label><input type="text" id="ds-name" placeholder="John Doe"/></div>
@@ -143,15 +215,33 @@
       <div class="field"><label>ID Number</label><input type="text" id="ds-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Driver's License Number</label><input type="text" id="ds-license" placeholder="e.g. DL-12345"/><div class="hint">Must match your official license</div></div>
       <div class="field"><label>Password</label><input type="password" id="ds-pass" placeholder="Min 6 characters"/></div>
-      <button class="btn btn-brand" onclick="driverSignup()">Register as Driver →</button>
+      <button class="btn btn-brand" onclick="driverSignup()">Register as Driver <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
       <div class="pending-box" id="pending-box" style="display:none">
-        <div class="pending-icon">⏳</div>
-        <div class="pending-title">Application Submitted!</div>
+        <div class="pending-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="pending-title">Application Submitted</div>
         <div class="pending-sub">Your account is pending admin approval. You will be able to log in once approved. This usually takes a few hours.</div>
       </div>
     </div>
   </div>
 
+</div>
+
+<!-- Hidden Admin Login (tap logo 5x) -->
+<div class="admin-login-box" id="admin-login-box">
+  <div class="admin-label">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Admin Access
+  </div>
+  <div class="field" style="margin-bottom:10px">
+    <label style="font-size:0.7rem;color:var(--text-mid)">Username</label>
+    <input type="text" id="admin-username" placeholder="Admin username" autocomplete="off"/>
+  </div>
+  <div class="field" style="margin-bottom:12px">
+    <label style="font-size:0.7rem;color:var(--text-mid)">Password</label>
+    <input type="password" id="admin-password" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()"/>
+  </div>
+  <button class="admin-btn" onclick="adminLogin()">Login as Admin</button>
+  <div id="admin-error" style="color:var(--red);font-size:0.72rem;margin-top:8px;display:none"></div>
 </div>
 
 <script>
@@ -193,18 +283,16 @@
   function showError(prefix, msg) {
     const el = document.getElementById(`${prefix}-error`);
     el.textContent = msg; el.style.display = "block";
-    document.getElementById(`${prefix}-success`) && (document.getElementById(`${prefix}-success`).style.display = "none");
+    const s = document.getElementById(`${prefix}-success`); if(s) s.style.display = "none";
   }
-
   function showSuccess(prefix, msg) {
     const el = document.getElementById(`${prefix}-success`);
     el.textContent = msg; el.style.display = "block";
-    document.getElementById(`${prefix}-error`) && (document.getElementById(`${prefix}-error`).style.display = "none");
+    const e = document.getElementById(`${prefix}-error`); if(e) e.style.display = "none";
   }
-
   function hideMessages(prefix) {
-    document.getElementById(`${prefix}-error`) && (document.getElementById(`${prefix}-error`).style.display = "none");
-    document.getElementById(`${prefix}-success`) && (document.getElementById(`${prefix}-success`).style.display = "none");
+    const e = document.getElementById(`${prefix}-error`); if(e) e.style.display = "none";
+    const s = document.getElementById(`${prefix}-success`); if(s) s.style.display = "none";
   }
 
   async function riderLogin() {
@@ -270,16 +358,13 @@
     } catch(e) { showError("driver", "Connection failed. Try again."); }
   }
 
-  // ── ADMIN LOGIN ──────────────────────────────────────────
+  // ADMIN LOGIN (tap logo 5x)
   let logoTaps = 0, logoTimer = null;
   function onLogoTap() {
     logoTaps++;
     clearTimeout(logoTimer);
     logoTimer = setTimeout(() => { logoTaps = 0; }, 2000);
-    if (logoTaps >= 5) {
-      logoTaps = 0;
-      document.getElementById("admin-login-box").classList.toggle("visible");
-    }
+    if (logoTaps >= 5) { logoTaps = 0; document.getElementById("admin-login-box").classList.toggle("visible"); }
   }
 
   async function adminLogin() {
@@ -289,36 +374,13 @@
     errEl.style.display = "none";
     if (!username || !password) { errEl.textContent = "Enter username and password"; errEl.style.display = "block"; return; }
     try {
-      const res = await fetch(`${BASE}/auth/admin/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
+      const res = await fetch(`${BASE}/auth/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
       const data = await res.json();
       if (!res.ok) { errEl.textContent = data.error || "Invalid credentials"; errEl.style.display = "block"; return; }
       localStorage.setItem("spiti_admin", JSON.stringify({ name: data.name, role: "admin" }));
-      // Small delay ensures localStorage write is flushed before navigation
       setTimeout(() => { window.location.replace("admin.html"); }, 100);
-    } catch(e) {
-      errEl.textContent = "Cannot reach server. Check your connection.";
-      errEl.style.display = "block";
-    }
+    } catch(e) { errEl.textContent = "Cannot reach server."; errEl.style.display = "block"; }
   }
 </script>
-
-<!-- Hidden Admin Login (tap logo 5x) -->
-<div class="admin-login-box" id="admin-login-box">
-  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f59e0b;margin-bottom:12px">Admin Access</div>
-  <div class="field" style="margin-bottom:10px">
-    <label style="font-size:0.7rem;color:#A8A29E">Username</label>
-    <input type="text" id="admin-username" placeholder="Admin username" autocomplete="off"/>
-  </div>
-  <div class="field" style="margin-bottom:12px">
-    <label style="font-size:0.7rem;color:#A8A29E">Password</label>
-    <input type="password" id="admin-password" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()"/>
-  </div>
-  <button onclick="adminLogin()" style="width:100%;padding:10px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem">Login as Admin</button>
-  <div id="admin-error" style="color:#ef4444;font-size:0.72rem;margin-top:8px;display:none"></div>
-</div>
 </body>
 </html>
