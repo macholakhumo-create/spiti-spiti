@@ -455,14 +455,35 @@
       <div class="field"><label>Dropoff Location</label><input type="text" id="dropoff" placeholder="Where to?"/></div>
       <div id="fare-field" class="field">
         <label>Your Offered Fare (BWP)</label>
-        <input type="number" id="offered-fare" min="15" placeholder="e.g. 30"/>
+        <input type="number" id="offered-fare" min="70" placeholder="e.g. 75"/>
         <div class="fare-hint">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           Minimum P70.00 · Drivers can accept or counter
         </div>
       </div>
       <button class="btn btn-primary" onclick="createRide()">
-        Book Now
+        <div class="field">
+  <label>Payment Method</label>
+
+  <div class="pay-method-row">
+
+    <div class="pay-btn active" id="pm-cash" onclick="setPayMethod('cash')">
+      <div class="pay-btn-icon">💵</div>
+      <div class="pay-btn-label">Cash</div>
+      <div class="pay-btn-sub">Pay driver directly</div>
+    </div>
+
+    <div class="pay-btn" id="pm-orange_money" onclick="setPayMethod('orange_money')">
+      <div class="pay-btn-icon">🟠</div>
+      <div class="pay-btn-label">Orange Money</div>
+      <div class="pay-btn-sub">Mobile Wallet</div>
+    </div>
+
+  </div>
+</div>
+
+<button class="btn btn-primary" onclick="createRide()">
+  Book Now
         <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
