@@ -587,7 +587,15 @@
     </div>
     <div class="price-row">
       <div><div class="price-lbl">Rider's offered price</div><div class="price-val" id="inc-fare">P0.00</div></div>
-      <div style="font-size:0.62rem;color:var(--silver);font-weight:600" id="inc-min-label">Min P100</div>
+      <div class="route-row">
+  <div class="route-lbl">Payment</div>
+  <div class="route-val" id="inc-payment">Cash</div>
+</div>
+      <div class="route-row">
+  <div class="route-lbl">Payment</div>
+  <div class="route-val" id="inc-payment">Cash</div>
+</div>
+      <div style="font-size:0.62rem;color:var(--silver);font-weight:600" id="inc-min-label">Min P70</div>
     </div>
     <div class="offer-row">
       <label>Your price (edit to counter):</label>
@@ -622,6 +630,10 @@
       <div><div class="route-lbl">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div>
     </div>
     <div class="fare-box"><div class="fare-num" id="act-fare">P0.00</div><div class="fare-lbl">Agreed Fare</div></div>
+<div class="route-row">
+  <div class="route-lbl">Payment</div>
+  <div class="route-val" id="act-payment">Cash</div>
+</div>
     <div class="action-row">
       <button class="act-btn start" id="btn-start-ride" onclick="updateStatus('in_progress')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Ride</button>
       <button class="act-btn done" id="btn-complete-ride" onclick="updateStatus('completed')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Complete</button>
@@ -941,6 +953,7 @@ socket.on("new-ride",(ride)=>{
   if(activeRide)return;pending=ride;
   document.getElementById("inc-pickup").textContent=ride.pickup;document.getElementById("inc-dropoff").textContent=ride.dropoff;
   document.getElementById("inc-fare").textContent="P"+parseFloat(ride.offered_fare||15).toFixed(2);
+  document.getElementById("inc-payment").textContent=ride.payment_method || "Cash";
   document.getElementById("my-fare").value=currentMode==="chauffeur"?Math.max(80,ride.offered_fare||80):ride.offered_fare||15;
   document.getElementById("inc-chauffeur-badge").classList.toggle("show",currentMode==="chauffeur");
   document.getElementById("inc-sub-label").textContent=currentMode==="chauffeur"?"Premium chauffeur booking":"Rider looking for a driver";
@@ -949,6 +962,7 @@ socket.on("new-ride",(ride)=>{
 socket.on("offer-accepted",(ride)=>{
   activeRide=ride;document.getElementById("inc-card").classList.remove("visible");document.getElementById("active-card").classList.add("visible");
   document.getElementById("act-pickup").textContent=ride.pickup;document.getElementById("act-dropoff").textContent=ride.dropoff;document.getElementById("act-fare").textContent="P"+parseFloat(ride.fare||0).toFixed(2);
+  document.getElementById("act-payment").textContent=ride.payment_method || "Cash";
   document.getElementById("chat-fab").classList.add("visible");document.getElementById("chat-rider-name").textContent="Rider #"+ride.rider_id;
   updateDriverProgress("accepted");socket.emit("join-ride",{rideId:ride.id});loadMsgs(ride.id);
   showToast("Rider accepted! Head to pickup");loadRides();
