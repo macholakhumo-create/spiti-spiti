@@ -9,7 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
-
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  res.json([{
+    relation: ["delegate_permission/common.handle_all_urls"],
+    target: {
+      namespace: "android_app",
+      package_name: "com.blackapp.rides",
+      sha256_cert_fingerprints: [
+        "9D:F1:8B:3E:1A:59:43:FC:A7:91:C0:B1:A7:7E:4F:BF:A9:30:2B:AB:A9:01:47:DF:B0:B8:56:7A:34:72:A8:32"
+      ]
+    }
+  }]);
+});
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
