@@ -11,27 +11,15 @@
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
     :root {
-      --void:      #060606;
-      --matte-1:   #0D0D0D;
-      --matte-2:   #111111;
-      --matte-3:   #161616;
-      --matte-4:   #1C1C1C;
-      --gloss-bg:  linear-gradient(160deg, #222222 0%, #141414 55%, #0D0D0D 100%);
-      --gloss-btn: linear-gradient(180deg, #282828 0%, #141414 100%);
-      --border:    #222222;
-      --border-hi: #333333;
-      --border-gl: #3A3A3A;
-      --text:      #F0F0F0;
-      --text-mid:  #888888;
-      --text-dim:  #3A3A3A;
-      --white:     #FFFFFF;
-      --chrome:    #C8C8C8;
-      --silver:    #888888;
-      --green:     #22C55E;
-      --red:       #EF4444;
-      --amber:     #F59E0B;
-      --gloss-highlight: rgba(255,255,255,0.10);
-      --gloss-shadow:    0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9);
+      --void:#060606;--matte-1:#0D0D0D;--matte-2:#111111;--matte-3:#161616;--matte-4:#1C1C1C;
+      --gloss-bg:linear-gradient(160deg,#222222 0%,#141414 55%,#0D0D0D 100%);
+      --gloss-btn:linear-gradient(180deg,#282828 0%,#141414 100%);
+      --border:#222222;--border-hi:#333333;--border-gl:#3A3A3A;
+      --text:#F0F0F0;--text-mid:#888888;--text-dim:#3A3A3A;
+      --white:#FFFFFF;--chrome:#C8C8C8;--silver:#888888;
+      --green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+      --gloss-highlight:rgba(255,255,255,0.10);
+      --gloss-shadow:0 2px 12px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.9);
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--void);color:var(--text);min-height:100vh}
@@ -61,9 +49,38 @@
     .field label{display:block;font-size:0.7rem;color:var(--text-mid);margin-bottom:4px;font-weight:500}
     .field input,.field select{width:100%;background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:0.85rem;outline:none;transition:border-color 0.2s}
     .field input:focus,.field select:focus{border-color:var(--border-gl)}
-    .field select option{background:var(--matte-2)}
     .fare-hint{font-size:0.65rem;color:var(--text-dim);margin-top:3px;display:flex;align-items:center;gap:4px}
     .fare-hint svg{width:10px;height:10px;stroke:var(--text-dim);fill:none;stroke-width:2;flex-shrink:0}
+
+    /* PAYMENT DROPDOWN */
+    .pay-drop{position:relative;margin-bottom:11px}
+    .pay-field-lbl{display:block;font-size:0.7rem;color:var(--text-mid);margin-bottom:4px;font-weight:500}
+    .pay-trigger{display:flex;align-items:center;gap:10px;background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .2s;user-select:none}
+    .pay-trigger:hover{border-color:var(--border-hi)}
+    .pay-trigger.open{border-color:var(--border-gl);border-radius:10px 10px 0 0;border-bottom-color:var(--border)}
+    .pt-icon{width:32px;height:32px;border-radius:8px;background:var(--matte-4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .pt-label{flex:1}
+    .pt-name{font-size:0.82rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px}
+    .pt-sub{font-size:0.58rem;color:var(--text-mid);margin-top:1px}
+    .pt-chev{width:16px;height:16px;flex-shrink:0;transition:transform .2s}
+    .pay-trigger.open .pt-chev{transform:rotate(180deg)}
+    .pt-chev svg{width:16px;height:16px;stroke:var(--silver);fill:none;stroke-width:2.5;stroke-linecap:round}
+    .pay-menu{background:var(--matte-3);border:1px solid var(--border-gl);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;display:none;position:relative;z-index:10}
+    .pay-menu.open{display:block}
+    .pay-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-top:1px solid var(--border);transition:background .15s}
+    .pay-opt:hover,.pay-opt.sel{background:var(--matte-4)}
+    .po-icon{width:28px;height:28px;border-radius:7px;background:var(--matte-4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .pay-opt.sel .po-icon{border-color:var(--border-gl)}
+    .po-name{font-size:0.78rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:5px}
+    .po-sub{font-size:0.57rem;color:var(--text-mid);margin-top:1px}
+    .po-check{width:14px;height:14px;flex-shrink:0;opacity:0;margin-left:auto;transition:opacity .15s}
+    .pay-opt.sel .po-check{opacity:1}
+    .po-check svg{width:14px;height:14px;stroke:var(--chrome);fill:none;stroke-width:2.5;stroke-linecap:round}
+    .pay-pill{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:1px 6px;font-size:0.5rem;font-weight:700}
+    .pay-pill svg{width:4px;height:4px;fill:currentColor}
+    .pp-pop{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+    .pp-ins{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green)}
+    .pp-def{background:var(--matte-4);border:1px solid var(--border-hi);color:var(--silver)}
 
     /* BUTTONS */
     .btn{width:100%;padding:13px;border:1px solid var(--border-hi);border-top-color:var(--border-gl);border-radius:12px;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:0.01em}
@@ -73,8 +90,6 @@
     .btn-primary:hover{border-color:var(--chrome)}
     .btn-danger{background:rgba(239,68,68,0.12);color:var(--red);border-color:rgba(239,68,68,0.3)}
     .btn-ghost{background:var(--matte-3);color:var(--text-mid);border-color:var(--border)}
-    .btn-chauffeur{background:var(--gloss-bg);color:var(--chrome);border-color:var(--border-hi);box-shadow:inset 0 1px 0 var(--gloss-highlight)}
-    .btn:hover{opacity:0.9}
 
     /* SERVICE TABS */
     .service-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
@@ -166,7 +181,6 @@
     .driver-stars{font-size:0.68rem;color:var(--text-mid);margin-top:3px;display:flex;align-items:center;gap:3px}
     .driver-stars svg{width:11px;height:11px;fill:var(--amber)}
 
-    /* VERIFIED */
     .verif-btn{margin-left:auto;background:var(--matte-4);border:1px solid var(--border-hi);color:var(--chrome);border-radius:20px;padding:4px 10px;font-size:0.65rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0}
     .verif-panel{background:var(--matte-3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;display:none}
     .verif-panel.open{display:block;animation:slideIn 0.2s ease}
@@ -408,13 +422,14 @@
   <div class="greeting" id="greeting">Hey there</div>
   <div class="greeting-sub">Where are you headed?</div>
 
-  <!-- REQUEST -->
+  <!-- REQUEST PANEL -->
   <div id="panel-request" class="panel visible">
     <div class="card">
       <div class="card-label">
         <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         Book a Ride
       </div>
+
       <div class="service-tabs">
         <div class="svc-tab active" id="tab-ride" onclick="switchService('ride')">
           <div class="svc-tab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="15" height="10" rx="2"/><polygon points="16 9 20 9 23 12 23 17 16 17 16 9"/><circle cx="5" cy="17" r="2"/><circle cx="18" cy="17" r="2"/></svg></div>
@@ -427,6 +442,7 @@
           <div class="svc-tab-sub">Premium</div>
         </div>
       </div>
+
       <div class="chauffeur-opts" id="chauffeur-opts">
         <div class="chauff-type-row">
           <div class="chauff-type active" id="ct-zone" onclick="setChauffType('zone')">
@@ -451,45 +467,69 @@
           <div class="chauff-price-lbl" id="chauff-price-lbl">Estimated fare</div>
         </div>
       </div>
+
       <div class="field"><label>Pickup Location</label><input type="text" id="pickup" placeholder="Where are you?"/></div>
       <div class="field"><label>Dropoff Location</label><input type="text" id="dropoff" placeholder="Where to?"/></div>
+
       <div id="fare-field" class="field">
         <label>Your Offered Fare (BWP)</label>
         <input type="number" id="offered-fare" min="70" placeholder="e.g. 75"/>
-        <div class="fare-hint">
+        <div class="fare-hint" id="fare-hint-txt">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           Minimum P70.00 · Drivers can accept or counter
         </div>
       </div>
-      <button class="btn btn-primary" onclick="createRide()">
-        <div class="field">
-  <label>Payment Method</label>
 
-  <div class="pay-method-row">
+      <!-- PAYMENT DROPDOWN -->
+      <span class="pay-field-lbl">Payment method</span>
+      <div class="pay-drop" id="payDrop">
+        <div class="pay-trigger" id="payTrigger" onclick="togglePayDrop()">
+          <div class="pt-icon" id="ptIcon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="2.5" stroke="#888" stroke-width="1.3"/><circle cx="12" cy="12.5" r="2.2" stroke="#C8C8C8" stroke-width="1.2"/></svg>
+          </div>
+          <div class="pt-label">
+            <div class="pt-name" id="ptName">Cash <span class="pay-pill pp-pop"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Most used</span></div>
+            <div class="pt-sub" id="ptSub">Pay driver directly on arrival</div>
+          </div>
+          <div class="pt-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="pay-menu" id="payMenu">
+          <div class="pay-opt sel" onclick="pickPay(this,'cash')">
+            <div class="po-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="2.5" stroke="#888" stroke-width="1.3"/><circle cx="12" cy="12.5" r="2.2" stroke="#C8C8C8" stroke-width="1.2"/></svg></div>
+            <div><div class="po-name">Cash <span class="pay-pill pp-pop"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Most used</span></div><div class="po-sub">Pay driver directly on arrival</div></div>
+            <div class="po-check"><svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg></div>
+          </div>
+          <div class="pay-opt" onclick="pickPay(this,'orange_money')">
+            <div class="po-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#F97316" stroke-width="1.3"/><path d="M8.5 8.5L10.5 15.5L12 11L13.5 15.5L15.5 8.5" stroke="#F97316" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg></div>
+            <div><div class="po-name">Orange Money <span class="pay-pill pp-ins"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Instant</span></div><div class="po-sub">Mobile wallet · auto transfer</div></div>
+            <div class="po-check"><svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg></div>
+          </div>
+          <div class="pay-opt" onclick="pickPay(this,'smega')">
+            <div class="po-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#3B82F6" stroke-width="1.3"/><rect x="6" y="8" width="12" height="1.8" rx=".9" fill="#3B82F6" opacity=".7"/><rect x="6" y="12" width="7" height="1.4" rx=".7" fill="#3B82F6" opacity=".45"/></svg></div>
+            <div><div class="po-name">Smega <span class="pay-pill pp-ins"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Instant</span></div><div class="po-sub">Mascom mobile money</div></div>
+            <div class="po-check"><svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg></div>
+          </div>
+          <div class="pay-opt" onclick="pickPay(this,'myzaka')">
+            <div class="po-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3C5.5 3 3 8 3 12C3 16 5.5 21 12 21C18.5 21 21 16 21 12C21 8 18.5 3 12 3Z" stroke="#22C55E" stroke-width="1.3" fill="none"/><line x1="3" y1="12" x2="21" y2="12" stroke="#22C55E" stroke-width=".9" opacity=".5"/></svg></div>
+            <div><div class="po-name">MyZaka <span class="pay-pill pp-ins"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Instant</span></div><div class="po-sub">BTC mobile money</div></div>
+            <div class="po-check"><svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg></div>
+          </div>
+          <div class="pay-opt" onclick="pickPay(this,'eft')">
+            <div class="po-icon"><svg width="17" height="17" viewBox="0 0 26 26" fill="none"><rect x="2" y="12" width="22" height="9.5" rx="1.8" stroke="#888" stroke-width="1.3"/><path d="M2 12L13 4.5L24 12" stroke="#888" stroke-width="1.3" stroke-linejoin="round"/><rect x="5.5" y="14.5" width="2.5" height="7" rx=".5" fill="#888" opacity=".6"/><rect x="11.5" y="14.5" width="2.5" height="7" rx=".5" fill="#888" opacity=".6"/><rect x="17.5" y="14.5" width="2.5" height="7" rx=".5" fill="#888" opacity=".6"/></svg></div>
+            <div><div class="po-name">Bank Transfer · EFT <span class="pay-pill pp-def">Pre-booked</span></div><div class="po-sub">Direct bank · verified bookings only</div></div>
+            <div class="po-check"><svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg></div>
+          </div>
+        </div>
+      </div>
 
-    <div class="pay-btn active" id="pm-cash" onclick="setPayMethod('cash')">
-      <div class="pay-btn-icon">💵</div>
-      <div class="pay-btn-label">Cash</div>
-      <div class="pay-btn-sub">Pay driver directly</div>
-    </div>
-
-    <div class="pay-btn" id="pm-orange_money" onclick="setPayMethod('orange_money')">
-      <div class="pay-btn-icon">🟠</div>
-      <div class="pay-btn-label">Orange Money</div>
-      <div class="pay-btn-sub">Mobile Wallet</div>
-    </div>
-
-  </div>
-</div>
-
-<button class="btn btn-primary" onclick="createRide()">
-  Book Now
+      <button class="btn btn-primary" onclick="createRide()" style="margin-top:14px">
+        Book Now
         <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- WAITING -->
+  <!-- WAITING PANEL -->
   <div id="panel-waiting" class="panel">
     <div class="card">
       <div class="card-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Looking for Drivers</div>
@@ -506,7 +546,7 @@
     </div>
   </div>
 
-  <!-- ACTIVE -->
+  <!-- ACTIVE PANEL -->
   <div id="panel-active" class="panel">
     <div class="card">
       <div class="card-label"><svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Active Ride</div>
@@ -640,7 +680,6 @@
   </div>
 </div>
 
-<!-- All JavaScript unchanged from original rider.html -->
 <script>
   const GMAPS_KEY = "AIzaSyC0tqvQPPWHh3gL1ExnRo-Lzh0QNGVcYHk";
   const BASE = "https://spiti-spiti-production.up.railway.app";
@@ -659,9 +698,72 @@
   let tvMap = null, tvDriverMarker = null, tvRiderMarker = null;
   let tvDirectionsService = null, tvDirectionsRenderer = null, tvAutoFollow = true;
   let tvRoutePath = [], lastDriverLat = null, lastDriverLng = null, driverHeading = 0;
-
   let currentService = "ride", chauffType = "zone";
   const HOURLY_RATE = 150;
+
+  // ── Payment dropdown ──
+  let selectedPayMethod = 'cash';
+  let payDropOpen = false;
+  const payMeta = {
+    cash: {
+      name: 'Cash',
+      badge: '<span class="pay-pill pp-pop"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Most used</span>',
+      sub: 'Pay driver directly on arrival',
+      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="2.5" stroke="#888" stroke-width="1.3"/><circle cx="12" cy="12.5" r="2.2" stroke="#C8C8C8" stroke-width="1.2"/></svg>`
+    },
+    orange_money: {
+      name: 'Orange Money',
+      badge: '<span class="pay-pill pp-ins"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Instant</span>',
+      sub: 'Mobile wallet · auto transfer',
+      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.2" stroke="#F97316" stroke-width="1.3"/><path d="M8.5 8.5L10.5 15.5L12 11L13.5 15.5L15.5 8.5" stroke="#F97316" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>`
+    },
+    smega: {
+      name: 'Smega',
+      badge: '<span class="pay-pill pp-ins"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Instant</span>',
+      sub: 'Mascom mobile money',
+      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#3B82F6" stroke-width="1.3"/><rect x="6" y="8" width="12" height="1.8" rx=".9" fill="#3B82F6" opacity=".7"/></svg>`
+    },
+    myzaka: {
+      name: 'MyZaka',
+      badge: '<span class="pay-pill pp-ins"><svg viewBox="0 0 4 4"><circle cx="2" cy="2" r="2"/></svg>Instant</span>',
+      sub: 'BTC mobile money',
+      icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3C5.5 3 3 8 3 12C3 16 5.5 21 12 21C18.5 21 21 16 21 12C21 8 18.5 3 12 3Z" stroke="#22C55E" stroke-width="1.3" fill="none"/><line x1="3" y1="12" x2="21" y2="12" stroke="#22C55E" stroke-width=".9" opacity=".5"/></svg>`
+    },
+    eft: {
+      name: 'Bank Transfer · EFT',
+      badge: '<span class="pay-pill pp-def">Pre-booked</span>',
+      sub: 'Direct bank · verified bookings only',
+      icon: `<svg width="18" height="18" viewBox="0 0 26 26" fill="none"><rect x="2" y="12" width="22" height="9.5" rx="1.8" stroke="#888" stroke-width="1.3"/><path d="M2 12L13 4.5L24 12" stroke="#888" stroke-width="1.3" stroke-linejoin="round"/><rect x="5.5" y="14.5" width="2.5" height="7" rx=".5" fill="#888" opacity=".6"/></svg>`
+    }
+  };
+
+  function togglePayDrop() {
+    payDropOpen = !payDropOpen;
+    document.getElementById('payTrigger').classList.toggle('open', payDropOpen);
+    document.getElementById('payMenu').classList.toggle('open', payDropOpen);
+  }
+
+  function pickPay(el, key) {
+    document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    selectedPayMethod = key;
+    const m = payMeta[key];
+    document.getElementById('ptIcon').innerHTML = m.icon;
+    document.getElementById('ptName').innerHTML = m.name + ' ' + m.badge;
+    document.getElementById('ptSub').textContent = m.sub;
+    payDropOpen = false;
+    document.getElementById('payTrigger').classList.remove('open');
+    document.getElementById('payMenu').classList.remove('open');
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('payDrop').contains(e.target)) {
+      payDropOpen = false;
+      document.getElementById('payTrigger').classList.remove('open');
+      document.getElementById('payMenu').classList.remove('open');
+    }
+  });
 
   function switchService(svc) {
     currentService = svc;
@@ -669,8 +771,13 @@
     document.getElementById("tab-chauffeur").classList.toggle("active", svc === "chauffeur");
     document.getElementById("chauffeur-opts").classList.toggle("visible", svc === "chauffeur");
     document.getElementById("fare-field").style.display = svc === "chauffeur" ? "none" : "block";
-    if (svc === "chauffeur") { setChauffType("zone"); }
+    const hint = document.getElementById("fare-hint-txt");
+    if (hint) hint.innerHTML = svc === "chauffeur"
+      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P80.00 · Chauffeur premium service'
+      : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P70.00 · Drivers can accept or counter';
+    if (svc === "chauffeur") setChauffType("zone");
   }
+
   function setChauffType(type) {
     chauffType = type;
     document.getElementById("ct-zone").classList.toggle("active", type === "zone");
@@ -679,18 +786,42 @@
     document.getElementById("chauff-price-display").style.display = "block";
     updateChauffPrice();
   }
+
   function updateChauffPrice() {
     const priceEl = document.getElementById("chauff-price-num");
     const lblEl = document.getElementById("chauff-price-lbl");
-    if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); priceEl.textContent = `P${hrs * HOURLY_RATE}`; lblEl.textContent = `${hrs} hour${hrs > 1 ? "s" : ""} · P${HOURLY_RATE}/hr`; }
-    else { priceEl.textContent = "P80 – P150"; lblEl.textContent = "Fixed rate by zone · Driver confirms price"; }
+    if (chauffType === "hourly") {
+      const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2);
+      priceEl.textContent = `P${hrs * HOURLY_RATE}`;
+      lblEl.textContent = `${hrs} hour${hrs > 1 ? "s" : ""} · P${HOURLY_RATE}/hr`;
+    } else {
+      priceEl.textContent = "P80 – P150";
+      lblEl.textContent = "Fixed rate by zone · Driver confirms price";
+    }
   }
 
-  window.addEventListener("load", () => { loadHistory(); navigator.geolocation?.getCurrentPosition(pos => { riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude }; if (riderMarker) riderMarker.setPosition(riderLocation); if (tvRiderMarker) tvRiderMarker.setPosition(riderLocation); }, () => {}); });
+  window.addEventListener("load", () => {
+    loadHistory();
+    navigator.geolocation?.getCurrentPosition(pos => {
+      riderLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (riderMarker) riderMarker.setPosition(riderLocation);
+      if (tvRiderMarker) tvRiderMarker.setPosition(riderLocation);
+    }, () => {});
+  });
 
   function initGoogleMap() {
     mapsReady = true;
-    const darkStyle = [{featureType:"poi",stylers:[{visibility:"off"}]},{featureType:"transit",stylers:[{visibility:"off"}]},{elementType:"geometry",stylers:[{color:"#0d0d0d"}]},{featureType:"road",elementType:"geometry",stylers:[{color:"#1a1a1a"}]},{featureType:"road.arterial",elementType:"geometry",stylers:[{color:"#222222"}]},{featureType:"road.highway",elementType:"geometry",stylers:[{color:"#2a2a2a"}]},{featureType:"water",elementType:"geometry",stylers:[{color:"#060606"}]},{featureType:"road",elementType:"labels.text.fill",stylers:[{color:"#555555"}]},{featureType:"road",elementType:"labels.text.stroke",stylers:[{color:"#0d0d0d"}]}];
+    const darkStyle = [
+      {featureType:"poi",stylers:[{visibility:"off"}]},
+      {featureType:"transit",stylers:[{visibility:"off"}]},
+      {elementType:"geometry",stylers:[{color:"#0d0d0d"}]},
+      {featureType:"road",elementType:"geometry",stylers:[{color:"#1a1a1a"}]},
+      {featureType:"road.arterial",elementType:"geometry",stylers:[{color:"#222222"}]},
+      {featureType:"road.highway",elementType:"geometry",stylers:[{color:"#2a2a2a"}]},
+      {featureType:"water",elementType:"geometry",stylers:[{color:"#060606"}]},
+      {featureType:"road",elementType:"labels.text.fill",stylers:[{color:"#555555"}]},
+      {featureType:"road",elementType:"labels.text.stroke",stylers:[{color:"#0d0d0d"}]}
+    ];
     gmap = new google.maps.Map(document.getElementById("gmap"), { center: riderLocation, zoom: 15, disableDefaultUI: true, zoomControl: true, gestureHandling: "greedy", styles: darkStyle });
     miniDirectionsService = new google.maps.DirectionsService();
     miniDirectionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true, polylineOptions: { strokeColor: "#C8C8C8", strokeWeight: 4, strokeOpacity: 0.8 } });
@@ -735,6 +866,7 @@
     if (miniDirectionsService) { miniDirectionsService.route({ origin: driverPos, destination: riderLocation, travelMode: google.maps.TravelMode.DRIVING }, (result, status) => { if (status === "OK") { miniDirectionsRenderer.setDirections(result); const b = new google.maps.LatLngBounds(); b.extend(driverPos); b.extend(riderLocation); gmap.fitBounds(b, { top: 60, right: 14, bottom: 60, left: 14 }); } }); }
     if (tvDirectionsService && activeRide) { const dest = activeRide.status === "in_progress" ? activeRide.dropoff : activeRide.pickup; tvDirectionsService.route({ origin: driverPos, destination: dest, travelMode: google.maps.TravelMode.DRIVING }, (result, status) => { if (status === "OK") { tvDirectionsRenderer.setDirections(result); tvRoutePath = []; result.routes[0].overview_path.forEach(pt => tvRoutePath.push({ lat: pt.lat(), lng: pt.lng() })); } }); }
   }
+
   function computeLiveETA(driverPos) {
     if (!miniDirectionsService) return;
     const dest = activeRide?.status === "in_progress" ? activeRide.dropoff : riderLocation;
@@ -748,7 +880,12 @@
       document.getElementById("tv-dist").textContent = leg.distance.text + " away";
     });
   }
-  function animateMarker(marker, startPos, endPos, duration) { const sLat = startPos.lat(), sLng = startPos.lng(), eLat = endPos.lat(), eLng = endPos.lng(), t0 = performance.now(); function step(now) { const t = Math.min((now - t0) / duration, 1); const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; marker.setPosition({ lat: sLat+(eLat-sLat)*e, lng: sLng+(eLng-sLng)*e }); if (t < 1) requestAnimationFrame(step); } requestAnimationFrame(step); }
+
+  function animateMarker(marker, startPos, endPos, duration) {
+    const sLat = startPos.lat(), sLng = startPos.lng(), eLat = endPos.lat(), eLng = endPos.lng(), t0 = performance.now();
+    function step(now) { const t = Math.min((now - t0) / duration, 1); const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; marker.setPosition({ lat: sLat+(eLat-sLat)*e, lng: sLng+(eLng-sLng)*e }); if (t < 1) requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
 
   function toggleTrackingMap() { if (trackingFullscreen) return; trackingExpanded = !trackingExpanded; document.getElementById("tracking-map-module").className = "map-module " + (trackingExpanded ? "expanded" : "collapsed"); document.getElementById("t-chevron-down").style.display = trackingExpanded ? "none" : "block"; document.getElementById("t-chevron-up").style.display = trackingExpanded ? "block" : "none"; if (trackingExpanded) { document.getElementById("open-tracking-mini-btn").classList.add("show"); if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350); } else document.getElementById("open-tracking-mini-btn").classList.remove("show"); }
   function toggleTrackingFullscreen(e) { e.stopPropagation(); const mod = document.getElementById("tracking-map-module"); trackingFullscreen = !trackingFullscreen; if (trackingFullscreen) { mod.classList.add("fullscreen"); document.getElementById("t-fs-expand").style.display = "none"; document.getElementById("t-fs-contract").style.display = "block"; } else { mod.classList.remove("fullscreen"); mod.className = "map-module " + (trackingExpanded ? "expanded" : "collapsed"); document.getElementById("t-fs-expand").style.display = "block"; document.getElementById("t-fs-contract").style.display = "none"; } if (gmap) setTimeout(() => google.maps.event.trigger(gmap, "resize"), 350); }
@@ -774,10 +911,16 @@
     const dropoff = document.getElementById("dropoff").value.trim();
     if (!pickup || !dropoff) { showToast("Enter pickup and dropoff", "warn"); return; }
     let fare, rideType = currentService;
-    if (currentService === "chauffeur") { if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); fare = hrs * HOURLY_RATE; } else { fare = 80; } }
-    else { fare = parseFloat(document.getElementById("offered-fare").value); if (isNaN(fare) || fare < 15) { showToast("Enter fare (min P15)", "warn"); return; } }
+    const minFare = currentService === "chauffeur" ? 80 : 70;
+    if (currentService === "chauffeur") {
+      if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); fare = hrs * HOURLY_RATE; }
+      else { fare = 80; }
+    } else {
+      fare = parseFloat(document.getElementById("offered-fare").value);
+      if (isNaN(fare) || fare < minFare) { showToast(`Enter fare (min P${minFare})`, "warn"); return; }
+    }
     try {
-      const res = await fetch(`${BASE}/rides`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ riderId: RIDER_ID, pickup, dropoff, offered_fare: fare, ride_type: rideType }) });
+      const res = await fetch(`${BASE}/rides`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ riderId: RIDER_ID, pickup, dropoff, offered_fare: fare, ride_type: rideType, payment_method: selectedPayMethod }) });
       const data = await res.json();
       activeRide = data;
       showPanel("waiting");
@@ -795,7 +938,7 @@
     const el = document.getElementById("offers-list");
     if (!list.length) { section.style.display = "none"; return; }
     section.style.display = "block";
-    const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 15;
+    const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 70;
     const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
     el.innerHTML = list.map(o => {
       const match = parseFloat(o.fare_offer) <= myFare;
@@ -826,28 +969,91 @@
     loadMsgs(ride.id);
     document.getElementById("open-tracking-mini-btn").classList.add("show");
     if (mapsReady && gmap) { gmap.setCenter(riderLocation); gmap.setZoom(15); }
-    if (ride.driver_id) { try { const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`); const data = await res.json(); const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`; const starsHtml = data?.avg_rating > 0 ? `${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides` : "New driver"; document.getElementById("driver-stars").innerHTML = starsHtml; document.getElementById("tv-driver-stars").innerHTML = starsHtml; } catch(e) {} }
+    if (ride.driver_id) {
+      try {
+        const res = await fetch(`${BASE}/drivers/${ride.driver_id}/rating`);
+        const data = await res.json();
+        const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+        const starsHtml = data?.avg_rating > 0 ? `${starSvg} ${parseFloat(data.avg_rating).toFixed(1)} · ${data.total_ratings} rides` : "New driver";
+        document.getElementById("driver-stars").innerHTML = starsHtml;
+        document.getElementById("tv-driver-stars").innerHTML = starsHtml;
+      } catch(e) {}
+    }
   }
 
   function showPanel(name) { ["request","waiting","active"].forEach(p => document.getElementById("panel-"+p).classList.toggle("visible", p === name)); }
-  function updateProgress(status) { const map = { accepted:1, in_progress:2, completed:3 }, cur = map[status] || 0; for (let i = 1; i <= 3; i++) { const dot = document.getElementById(`p${i}`), lbl = document.getElementById(`pl${i}`); if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if(i<3) document.getElementById(`pline${i}`).className = "prog-line done"; } else if (i === cur) { dot.className = "prog-dot active"; dot.querySelector("span").textContent = i; lbl.className = "prog-label active"; } else { dot.className = "prog-dot"; dot.querySelector("span").textContent = i; lbl.className = "prog-label"; } } }
+
+  function updateProgress(status) {
+    const map = { accepted:1, in_progress:2, completed:3 }, cur = map[status] || 0;
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`p${i}`), lbl = document.getElementById(`pl${i}`);
+      if (i < cur) { dot.className = "prog-dot done"; lbl.className = "prog-label done"; if(i<3) document.getElementById(`pline${i}`).className = "prog-line done"; }
+      else if (i === cur) { dot.className = "prog-dot active"; dot.querySelector("span").textContent = i; lbl.className = "prog-label active"; }
+      else { dot.className = "prog-dot"; dot.querySelector("span").textContent = i; lbl.className = "prog-label"; }
+    }
+  }
+
   async function cancelRequest() { if (!activeRide) return; try { await fetch(`${BASE}/rides/${activeRide.id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "cancelled" }) }); } catch(e) {} resetAll(); loadHistory(); }
   function cancelRide() { cancelRequest(); }
-  function resetAll() { activeRide = null; offers = {}; document.getElementById("pickup").value = ""; document.getElementById("dropoff").value = ""; document.getElementById("offered-fare").value = ""; document.getElementById("eta-badge").style.display = "none"; document.getElementById("map-live-dot").classList.remove("on"); document.getElementById("map-status-text").textContent = "Waiting for driver location..."; document.getElementById("live-tracking-badge").style.display = "none"; document.getElementById("chat-fab").classList.remove("visible"); document.getElementById("chat-badge").classList.remove("show"); document.getElementById("open-tracking-mini-btn").classList.remove("show"); unreadCount = 0; if (miniDriverMarker) { miniDriverMarker.setMap(null); miniDriverMarker = null; } if (tvDriverMarker) { tvDriverMarker.setMap(null); tvDriverMarker = null; } if (miniDirectionsRenderer) miniDirectionsRenderer.setDirections({ routes: [] }); if (tvDirectionsRenderer) tvDirectionsRenderer.setDirections({ routes: [] }); lastDriverLat = null; lastDriverLng = null; tvRoutePath = []; closeTrackingView(); showPanel("request"); }
 
-  function showRatingModal(ride) { document.getElementById("rating-fare").textContent = `P${parseFloat(ride.fare||0).toFixed(2)}`; document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name||"your driver"}?`; selectedStar = 0; document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active")); document.getElementById("rating-comment").value = ""; document.getElementById("rating-overlay").classList.add("open"); }
+  function resetAll() {
+    activeRide = null; offers = {};
+    document.getElementById("pickup").value = "";
+    document.getElementById("dropoff").value = "";
+    document.getElementById("offered-fare").value = "";
+    document.getElementById("eta-badge").style.display = "none";
+    document.getElementById("map-live-dot").classList.remove("on");
+    document.getElementById("map-status-text").textContent = "Waiting for driver location...";
+    document.getElementById("live-tracking-badge").style.display = "none";
+    document.getElementById("chat-fab").classList.remove("visible");
+    document.getElementById("chat-badge").classList.remove("show");
+    document.getElementById("open-tracking-mini-btn").classList.remove("show");
+    unreadCount = 0;
+    if (miniDriverMarker) { miniDriverMarker.setMap(null); miniDriverMarker = null; }
+    if (tvDriverMarker) { tvDriverMarker.setMap(null); tvDriverMarker = null; }
+    if (miniDirectionsRenderer) miniDirectionsRenderer.setDirections({ routes: [] });
+    if (tvDirectionsRenderer) tvDirectionsRenderer.setDirections({ routes: [] });
+    lastDriverLat = null; lastDriverLng = null; tvRoutePath = [];
+    closeTrackingView(); showPanel("request");
+  }
+
+  function showRatingModal(ride) {
+    document.getElementById("rating-fare").textContent = `P${parseFloat(ride.fare||0).toFixed(2)}`;
+    document.getElementById("rating-driver-name").textContent = `How was your ride with ${ride.driver_name||"your driver"}?`;
+    selectedStar = 0;
+    document.querySelectorAll(".star-btn").forEach(s => s.classList.remove("active"));
+    document.getElementById("rating-comment").value = "";
+    document.getElementById("rating-overlay").classList.add("open");
+  }
+
   function setStar(n) { selectedStar = n; document.querySelectorAll(".star-btn").forEach((s,i) => s.classList.toggle("active", i < n)); }
-  async function submitRating() { if (!completedRide || selectedStar === 0) { showToast("Please pick a rating","warn"); return; } try { await fetch(`${BASE}/rides/${completedRide.id}/rate-driver`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value }) }); showToast("Thanks for rating!"); } catch(e) {} document.getElementById("rating-overlay").classList.remove("open"); resetAll(); loadHistory(); }
+
+  async function submitRating() {
+    if (!completedRide || selectedStar === 0) { showToast("Please pick a rating","warn"); return; }
+    try { await fetch(`${BASE}/rides/${completedRide.id}/rate-driver`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rating: selectedStar, comment: document.getElementById("rating-comment").value }) }); showToast("Thanks for rating!"); } catch(e) {}
+    document.getElementById("rating-overlay").classList.remove("open");
+    resetAll(); loadHistory();
+  }
+
   function skipRating() { document.getElementById("rating-overlay").classList.remove("open"); resetAll(); loadHistory(); }
 
   function openChat() { document.getElementById("chat-overlay").classList.add("open"); document.getElementById("chat-popup").classList.add("open"); unreadCount = 0; document.getElementById("chat-badge").classList.remove("show"); setTimeout(() => { const m = document.getElementById("chat-msgs"); m.scrollTop = m.scrollHeight; }, 300); }
   function closeChat() { document.getElementById("chat-overlay").classList.remove("open"); document.getElementById("chat-popup").classList.remove("open"); }
+
   async function loadMsgs(rideId) { try { const res = await fetch(`${BASE}/rides/${rideId}/messages`); const msgs = await res.json(); const el = document.getElementById("chat-msgs"); el.innerHTML = ""; if (!msgs.length) { el.innerHTML = '<div class="empty" style="padding:12px;font-size:0.78rem">Say hi to your driver</div>'; return; } msgs.forEach(appendMsg); } catch(e) {} }
+
   function appendMsg(msg) { const el = document.getElementById("chat-msgs"); const empty = el.querySelector(".empty"); if (empty) empty.remove(); const isMe = msg.sender_role === "rider"; const time = new Date(msg.created_at||Date.now()).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); const div = document.createElement("div"); div.className = `msg ${isMe?"me":"them"}`; div.innerHTML = `<div>${msg.message}</div><div class="msg-time">${time}</div>`; el.appendChild(div); el.scrollTop = el.scrollHeight; }
+
   async function sendMsg() { if (!activeRide) return; const input = document.getElementById("chat-in"); const message = input.value.trim(); if (!message) return; input.value = ""; appendMsg({ sender_role:"rider", message, created_at: new Date() }); try { await fetch(`${BASE}/rides/${activeRide.id}/messages`, { method: "POST", headers: { "Content-Type":"application/json" }, body: JSON.stringify({ sender_role:"rider", message }) }); } catch(e) { showToast("Message failed","error"); } }
 
   async function loadHistory() { try { const res = await fetch(`${BASE}/riders/${RIDER_ID}/rides`); const rides = await res.json(); renderHistory(rides); } catch(e) { try { const res = await fetch(`${BASE}/rides`); const rides = await res.json(); renderHistory(rides.filter(r => r.rider_id == RIDER_ID)); } catch(e2) {} } }
-  function renderHistory(rides) { const el = document.getElementById("history"); if (!rides.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; } el.innerHTML = rides.slice(0,8).map(r => `<div class="history-item"><div><div class="h-route">${r.pickup} → ${r.dropoff}</div><div class="h-meta">P${parseFloat(r.fare||0).toFixed(2)} · ${new Date(r.created_at).toLocaleDateString()}</div></div><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></div>`).join(""); }
+
+  function renderHistory(rides) {
+    const el = document.getElementById("history");
+    if (!rides.length) { el.innerHTML = '<div class="empty">No rides yet</div>'; return; }
+    el.innerHTML = rides.slice(0,8).map(r => `<div class="history-item"><div><div class="h-route">${r.pickup} → ${r.dropoff}</div><div class="h-meta">P${parseFloat(r.fare||0).toFixed(2)} · ${new Date(r.created_at).toLocaleDateString()}</div></div><span class="badge badge-${r.status}">${r.status.replace("_"," ")}</span></div>`).join("");
+  }
+
   function showToast(msg, type="") { const t = document.getElementById("toast"); t.textContent = msg; t.className = "toast show"+(type?" "+type:""); setTimeout(() => t.className = "toast", 3500); }
 </script>
 </body>
