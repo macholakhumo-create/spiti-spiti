@@ -72,8 +72,11 @@ function notifyRider(riderId, event, data) {
 // ADMIN LOGIN
 app.post("/auth/admin/login", async (req, res) => {
   const { username, password } = req.body;
-  const correctUser = process.env.ADMIN_USERNAME || "Spiti-Spiti2026";
-  const correctPass = process.env.ADMIN_PASSWORD || "Oloratomachola20";
+  const correctUser = process.env.ADMIN_USERNAME;
+const correctPass = process.env.ADMIN_PASSWORD;
+if (!correctUser || !correctPass) {
+  return res.status(500).json({ error: "Admin credentials not configured" });
+}
   if (username === correctUser && password === correctPass) {
     return res.json({ success: true, role: "admin", name: "Admin" });
   }
