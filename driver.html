@@ -11,39 +11,18 @@
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <style>
     :root {
-      /* MATTE surfaces */
-      --void:        #060606;
-      --matte-1:     #0D0D0D;
-      --matte-2:     #111111;
-      --matte-3:     #161616;
-      --matte-4:     #1C1C1C;
-      /* GLOSSY surface treatment */
-      --gloss-bg:    linear-gradient(160deg, #222222 0%, #141414 55%, #0D0D0D 100%);
-      --gloss-btn:   linear-gradient(180deg, #282828 0%, #141414 100%);
-      /* BORDERS */
-      --border:      #1E1E1E;
-      --border-hi:   #2A2A2A;
-      --border-gl:   #3A3A3A;   /* glossy top highlight */
-      /* TEXT */
-      --text:        #F0F0F0;
-      --text-mid:    #888888;
-      --text-dim:    #3A3A3A;
-      /* CHROME accent — replaces purple everywhere */
-      --white:       #FFFFFF;
-      --chrome:      #C8C8C8;
-      --silver:      #888888;
-      /* STATUS */
-      --green:       #22C55E;
-      --red:         #EF4444;
-      --amber:       #F59E0B;
-      /* GLOSS helpers */
-      --gloss-highlight: rgba(255,255,255,0.10);
-      --gloss-shadow: 0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9);
+      --void:#060606;--matte-1:#0D0D0D;--matte-2:#111111;--matte-3:#161616;--matte-4:#1C1C1C;
+      --gloss-bg:linear-gradient(160deg,#222222 0%,#141414 55%,#0D0D0D 100%);
+      --gloss-btn:linear-gradient(180deg,#282828 0%,#141414 100%);
+      --border:#1E1E1E;--border-hi:#2A2A2A;--border-gl:#3A3A3A;
+      --text:#F0F0F0;--text-mid:#888888;--text-dim:#3A3A3A;
+      --white:#FFFFFF;--chrome:#C8C8C8;--silver:#888888;
+      --green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+      --gloss-highlight:rgba(255,255,255,0.10);
+      --gloss-shadow:0 2px 12px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.9);
     }
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--void);color:var(--text);min-height:100vh}
-
-    /* NAV */
     nav{background:rgba(6,6,6,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
     .brand{font-size:1.05rem;font-weight:800;letter-spacing:-0.05em;color:var(--text);display:flex;align-items:center;gap:8px}
     .brand-mark{width:26px;height:26px;background:var(--gloss-bg);border-radius:7px;border:1px solid var(--border-hi);border-top-color:var(--border-gl);box-shadow:inset 0 1px 0 var(--gloss-highlight),var(--gloss-shadow);display:flex;align-items:center;justify-content:center}
@@ -57,29 +36,21 @@
     .logout-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font-family:inherit;font-size:0.68rem;padding:5px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.2s}
     .logout-btn:hover{border-color:var(--red);color:var(--red)}
     .logout-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
-
-    /* CONTAINER */
     .container{max-width:520px;margin:0 auto;padding:16px 16px 120px}
-
-    /* GREETING */
     .greeting{font-size:1.4rem;font-weight:700;letter-spacing:-0.04em;margin-bottom:2px}
     .greeting em{font-style:normal;color:var(--chrome)}
     .greeting-sub{font-size:0.78rem;color:var(--text-mid);margin-bottom:16px}
-
-    /* MODE SWITCH */
     .mode-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
     .mode-btn{display:flex;align-items:center;gap:10px;background:var(--matte-2);border:1px solid var(--border);border-radius:13px;padding:13px 15px;cursor:pointer;transition:all 0.25s;text-decoration:none}
     .mode-btn:hover{border-color:var(--border-gl);background:var(--matte-3)}
     .mode-btn.active{background:var(--gloss-bg);border-color:var(--border-hi);border-top-color:var(--border-gl);box-shadow:inset 0 1px 0 var(--gloss-highlight),var(--gloss-shadow)}
     .mode-icon{width:34px;height:34px;border-radius:9px;background:var(--matte-4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.25s}
-    .mode-btn.active .mode-icon{background:var(--matte-3);border-color:var(--border-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)}
+    .mode-btn.active .mode-icon{background:var(--matte-3);border-color:var(--border-hi)}
     .mode-icon svg{width:16px;height:16px;stroke:var(--text-mid);fill:none;stroke-width:2;stroke-linecap:round;transition:stroke 0.25s}
     .mode-btn.active .mode-icon svg{stroke:var(--chrome)}
     .mode-label{font-size:0.8rem;font-weight:600;color:var(--text-mid);transition:color 0.25s}
     .mode-sub{font-size:0.62rem;color:var(--text-dim);margin-top:1px}
     .mode-btn.active .mode-label{color:var(--text)}
-
-    /* CHAUFFEUR NAMEPLATE */
     .chauffeur-nameplate{background:var(--gloss-bg);border:1px solid var(--border-hi);border-top-color:var(--border-gl);box-shadow:inset 0 1px 0 var(--gloss-highlight),var(--gloss-shadow);border-radius:16px;padding:20px;margin-bottom:14px;display:none;position:relative;overflow:hidden}
     .chauffeur-nameplate.visible{display:block;animation:fadeUp 0.35s ease}
     .np-label{font-size:0.55rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--chrome);margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -95,8 +66,6 @@
     .np-edit-btn:hover{border-color:var(--border-gl);color:var(--chrome)}
     .np-show-btn{flex:1;background:var(--gloss-btn);border:1px solid var(--border-hi);border-top-color:var(--border-gl);box-shadow:inset 0 1px 0 var(--gloss-highlight);color:var(--text);font-family:inherit;font-size:0.73rem;font-weight:600;padding:9px;border-radius:10px;cursor:pointer;transition:all 0.2s}
     .np-show-btn:hover{border-color:var(--chrome);color:var(--white)}
-
-    /* BOOKING SLOTS */
     .booking-slot{background:var(--matte-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
     .slot-time{font-size:1rem;font-weight:700;color:var(--chrome);letter-spacing:-0.02em;min-width:52px}
     .slot-info{flex:1;min-width:0}
@@ -104,8 +73,6 @@
     .slot-route{font-size:0.65rem;color:var(--text-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .slot-fare{font-size:0.8rem;font-weight:700;color:var(--chrome)}
     .slot-badge{padding:3px 9px;border-radius:20px;font-size:0.58rem;font-weight:700;text-transform:uppercase;white-space:nowrap;background:var(--matte-4);color:var(--silver);border:1px solid var(--border-hi)}
-
-    /* MAP MODULE */
     .map-module{border:1px solid var(--border);background:var(--matte-2);border-radius:16px;overflow:hidden;margin-bottom:14px;position:relative;transition:height 0.35s cubic-bezier(0.4,0,0.2,1)}
     .map-module.collapsed{height:52px}
     .map-module.expanded{height:300px}
@@ -137,8 +104,6 @@
     .nav-gps-btn.visible{display:flex}
     .nav-gps-btn:hover{border-color:var(--chrome);color:var(--white)}
     .nav-gps-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
-
-    /* GPS NAV OVERLAY */
     #nav-mode{position:fixed;inset:0;z-index:900;background:var(--void);display:none;flex-direction:column}
     #nav-mode.active{display:flex}
     #nav-map{flex:1;min-height:0;position:relative}
@@ -185,13 +150,9 @@
     .nav-close-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
     .nav-close-btn:hover{background:var(--matte-4);color:var(--text)}
     .nav-dest-switch{background:var(--gloss-btn);border:1px solid var(--border-gl);border-top-color:#4A4A4A;box-shadow:inset 0 1px 0 var(--gloss-highlight);color:var(--chrome);font-family:inherit;font-size:0.72rem;font-weight:600;padding:6px 12px;cursor:pointer;border-radius:8px}
-
-    /* CARDS */
     .card{background:var(--matte-2);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px}
     .card-label{font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--silver);margin-bottom:12px;display:flex;align-items:center;gap:5px}
     .card-label svg{width:12px;height:12px;stroke:var(--silver);fill:none;stroke-width:2.5}
-
-    /* DUTY ROW */
     .duty-row{display:flex;align-items:center;justify-content:space-between;background:var(--matte-2);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:14px}
     .duty-label{font-size:0.85rem;font-weight:600;color:var(--text)}
     .duty-sub{font-size:0.67rem;color:var(--text-dim);margin-top:2px}
@@ -199,15 +160,11 @@
     .sw.on{background:var(--green);border-color:var(--green)}
     .sw-knob{width:20px;height:20px;background:var(--text-mid);border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.6);transform:translateX(0);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}
     .sw.on .sw-knob{transform:translateX(22px);background:#fff}
-
-    /* STATS */
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
     .stat{background:var(--gloss-bg);border:1px solid var(--border-hi);border-top-color:var(--border-gl);box-shadow:inset 0 1px 0 var(--gloss-highlight);border-radius:12px;padding:12px 8px;text-align:center}
     .stat-num{font-size:1.25rem;font-weight:700;color:var(--chrome)}
     .stat-num.gold{color:var(--amber)}
     .stat-lbl{font-size:0.58rem;color:var(--text-dim);margin-top:2px}
-
-    /* INCOMING */
     .incoming{background:var(--matte-2);border:1px solid var(--border-hi);border-radius:16px;padding:18px;margin-bottom:14px;display:none}
     .incoming.visible{display:block;animation:ringpulse 2s infinite}
     @keyframes ringpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.08)}50%{box-shadow:0 0 0 16px rgba(255,255,255,0)}}
@@ -242,8 +199,6 @@
     .btn-acc{background:var(--gloss-btn);border:1px solid var(--border-gl);border-top-color:#4A4A4A;color:var(--white);box-shadow:inset 0 1px 0 var(--gloss-highlight)}
     .btn-ctr{background:var(--matte-3);color:var(--text);border:1px solid var(--border-hi)}
     .btn-dec{background:var(--matte-2);color:var(--text-dim);border:1px solid var(--border)}
-
-    /* ACTIVE RIDE */
     .active-card{background:var(--matte-2);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;display:none}
     .active-card.visible{display:block}
     .progress-bar{display:flex;align-items:flex-start;margin-bottom:16px;padding:0 4px}
@@ -260,17 +215,26 @@
     .prog-label{font-size:0.57rem;color:var(--text-dim);margin-top:5px;text-align:center;font-weight:500}
     .prog-label.active{color:var(--chrome)}
     .prog-label.done{color:var(--silver)}
-    .fare-box{background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;margin:12px 0}
-    .fare-num{font-size:1.7rem;font-weight:700;color:var(--chrome);letter-spacing:-0.04em}
-    .fare-lbl{font-size:0.6rem;color:var(--text-dim);margin-top:2px}
+
+    /* ── COMMISSION FARE BOX ── */
+    .fare-box{background:var(--matte-3);border:1px solid var(--border);border-radius:12px;padding:14px;margin:12px 0}
+    .fare-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .fare-row:last-child{margin-bottom:0}
+    .fare-row-lbl{font-size:0.63rem;color:var(--text-mid)}
+    .fare-row-val{font-size:0.88rem;font-weight:600;color:var(--text-mid)}
+    .fare-commission-lbl{font-size:0.63rem;color:var(--text-mid);display:flex;align-items:center;gap:5px}
+    .fare-commission-badge{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--red);border-radius:20px;padding:1px 6px;font-size:0.5rem;font-weight:700}
+    .fare-commission-val{font-size:0.82rem;font-weight:600;color:var(--red)}
+    .fare-divider{height:1px;background:var(--border-hi);margin:8px 0}
+    .fare-net-lbl{font-size:0.63rem;color:var(--silver)}
+    .fare-net-val{font-size:1.65rem;font-weight:700;color:var(--chrome);letter-spacing:-0.03em}
+
     .action-row{display:flex;gap:8px;margin-top:12px}
     .act-btn{flex:1;padding:11px;border-radius:10px;font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--matte-3);color:var(--text-dim);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px}
     .act-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
     .act-btn.start:hover{border-color:var(--border-gl);color:var(--chrome)}
     .act-btn.done:hover{border-color:var(--green);color:var(--green)}
     .act-btn:disabled{opacity:0.3;cursor:not-allowed}
-
-    /* RIDES LIST */
     .ride-item{background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
     .ride-route{font-size:0.78rem;color:var(--text);font-weight:500}
     .ride-meta{font-size:0.62rem;color:var(--text-dim);margin-top:2px}
@@ -281,16 +245,12 @@
     .badge-completed{background:var(--matte-4);color:var(--silver);border:1px solid var(--border-hi)}
     .badge-cancelled{background:rgba(239,68,68,0.10);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
     .empty{text-align:center;color:var(--text-dim);font-size:0.78rem;padding:18px}
-
-    /* CHAT FAB */
     .chat-fab{position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--gloss-btn);border:1px solid var(--border-gl);border-top-color:#4A4A4A;box-shadow:0 4px 24px rgba(0,0,0,0.7),inset 0 1px 0 var(--gloss-highlight);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:1000}
     .chat-fab.visible{display:flex}
     .chat-fab:active{transform:scale(0.94)}
     .chat-fab svg{width:22px;height:22px;stroke:var(--chrome);fill:none;stroke-width:2;stroke-linecap:round}
     .chat-fab-badge{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:0.6rem;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid var(--void)}
     .chat-fab-badge.show{display:flex}
-
-    /* CHAT */
     .chat-overlay{position:fixed;inset:0;background:rgba(6,6,6,0.75);backdrop-filter:blur(4px);z-index:1001;display:none}
     .chat-overlay.open{display:block}
     .chat-popup{position:fixed;bottom:0;left:0;right:0;background:var(--matte-2);border-radius:24px 24px 0 0;border-top:1px solid var(--border-hi);z-index:1002;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);max-height:80vh;display:flex;flex-direction:column}
@@ -314,8 +274,6 @@
     .chat-in:focus{border-color:var(--border-gl)}
     .chat-send{background:var(--gloss-btn);border:1px solid var(--border-gl);border-top-color:#4A4A4A;box-shadow:inset 0 1px 0 var(--gloss-highlight);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
     .chat-send svg{width:16px;height:16px;stroke:var(--chrome);fill:none;stroke-width:2;stroke-linecap:round}
-
-    /* RATING OVERLAY */
     .rating-overlay{position:fixed;inset:0;background:rgba(6,6,6,0.88);backdrop-filter:blur(8px);z-index:1100;display:none;align-items:center;justify-content:center;padding:20px}
     .rating-overlay.open{display:flex}
     .rating-modal{background:var(--matte-2);border:1px solid var(--border-hi);border-top-color:var(--border-gl);box-shadow:inset 0 1px 0 var(--gloss-highlight),0 8px 40px rgba(0,0,0,0.9);border-radius:20px;padding:28px;width:100%;max-width:360px;text-align:center;animation:popIn 0.3s ease}
@@ -326,6 +284,8 @@
     .rating-title{font-size:1.1rem;font-weight:700;margin-bottom:4px;color:var(--text)}
     .rating-sub{font-size:0.77rem;color:var(--text-dim);margin-bottom:20px}
     .fare-completed{background:var(--matte-3);border:1px solid var(--border-hi);border-radius:12px;padding:14px;text-align:center;margin-bottom:16px}
+    .fare-completed-gross{font-size:0.75rem;color:var(--text-mid);margin-bottom:2px}
+    .fare-completed-commission{font-size:0.68rem;color:var(--red);margin-bottom:4px}
     .fare-completed-amount{font-size:2.2rem;font-weight:700;color:var(--chrome);letter-spacing:-0.04em}
     .fare-completed-label{font-size:0.68rem;color:var(--text-dim);margin-top:3px;display:flex;align-items:center;justify-content:center;gap:4px}
     .fare-completed-label svg{width:12px;height:12px;stroke:var(--green);fill:none;stroke-width:3;stroke-linecap:round}
@@ -339,8 +299,6 @@
     .rating-btn{flex:1;padding:11px;border:none;border-radius:10px;font-family:inherit;font-size:0.83rem;font-weight:600;cursor:pointer}
     .rating-btn.submit{background:var(--gloss-btn);border:1px solid var(--border-gl);border-top-color:#4A4A4A;color:var(--text);box-shadow:inset 0 1px 0 var(--gloss-highlight)}
     .rating-btn.skip{background:var(--matte-3);color:var(--text-mid);border:1px solid var(--border)}
-
-    /* NAMEPLATE FULLSCREEN */
     .nameplate-display{position:fixed;inset:0;background:var(--void);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center}
     .nameplate-display.open{display:flex;animation:fadeUp 0.4s ease}
     .nameplate-display-brand{font-size:0.65rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:40px;display:flex;align-items:center;gap:7px}
@@ -350,14 +308,6 @@
     .np-display-name{font-size:clamp(2.8rem,12vw,5rem);font-weight:800;letter-spacing:-0.04em;color:var(--text);line-height:1;margin-bottom:16px}
     .np-display-vehicle{font-size:1rem;color:var(--text-mid);margin-bottom:48px}
     .np-display-close{background:var(--matte-3);border:1px solid var(--border);color:var(--text-mid);font-family:inherit;font-size:0.8rem;font-weight:600;padding:12px 24px;border-radius:12px;cursor:pointer}
-
-    /* TOAST */
-    .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--matte-3);border:1px solid var(--border-gl);color:var(--text);padding:11px 22px;border-radius:10px;font-size:0.78rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:1300;max-width:88vw;text-align:center;white-space:nowrap}
-    .toast.show{opacity:1}
-    .toast.error{background:rgba(60,10,10,0.95);border-color:var(--red);color:var(--red)}
-    .toast.warn{background:var(--matte-4);border-color:var(--border-gl);color:var(--chrome)}
-
-    /* EDIT MODAL */
     .edit-overlay{position:fixed;inset:0;background:rgba(6,6,6,0.88);backdrop-filter:blur(8px);z-index:1500;display:none;align-items:flex-end;justify-content:center}
     .edit-overlay.open{display:flex}
     .edit-sheet{background:var(--matte-2);border:1px solid var(--border-hi);border-top-color:var(--border-gl);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px 40px;animation:slideUp 0.3s ease;box-shadow:inset 0 1px 0 var(--gloss-highlight)}
@@ -369,6 +319,39 @@
     .edit-field input{width:100%;background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none}
     .edit-field input:focus{border-color:var(--border-gl)}
     .edit-save{width:100%;background:var(--gloss-btn);border:1px solid var(--border-gl);border-top-color:#4A4A4A;box-shadow:inset 0 1px 0 var(--gloss-highlight);border-radius:12px;color:var(--text);font-family:inherit;font-size:0.9rem;font-weight:700;padding:13px;cursor:pointer;margin-top:4px}
+
+    /* ── Payment dropdown ── */
+    .pay-drop{position:relative;margin-bottom:11px}
+    .field-lbl-sm{font-size:0.65rem;color:var(--text-mid);margin-bottom:5px;display:block}
+    .pay-trigger{display:flex;align-items:center;gap:10px;background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .2s}
+    .pay-trigger:hover,.pay-trigger.open{border-color:var(--border-gl)}
+    .pay-trigger.open{border-radius:10px 10px 0 0;border-bottom-color:var(--border)}
+    .pt-icon{width:32px;height:32px;border-radius:8px;background:var(--matte-4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .pt-label{flex:1}
+    .pt-name{font-size:.82rem;font-weight:700;color:var(--text)}
+    .pt-sub{font-size:.58rem;color:var(--text-mid);margin-top:1px}
+    .pt-chev{width:16px;height:16px;flex-shrink:0;transition:transform .2s}
+    .pay-trigger.open .pt-chev{transform:rotate(180deg)}
+    .pt-chev svg{width:16px;height:16px;stroke:var(--silver);fill:none;stroke-width:2.5;stroke-linecap:round}
+    .pay-menu{background:var(--matte-3);border:1px solid var(--border-gl);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;display:none}
+    .pay-menu.open{display:block}
+    .pay-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;border-top:1px solid var(--border);transition:background .15s}
+    .pay-opt:hover,.pay-opt.sel{background:var(--matte-4)}
+    .po-icon{width:28px;height:28px;border-radius:7px;background:var(--matte-4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .po-name{font-size:.78rem;font-weight:600;color:var(--text)}
+    .po-sub{font-size:.57rem;color:var(--text-mid);margin-top:1px}
+    .po-check{width:14px;height:14px;flex-shrink:0;opacity:0;margin-left:auto;transition:opacity .15s}
+    .pay-opt.sel .po-check{opacity:1}
+    .po-check svg{width:14px;height:14px;stroke:var(--chrome);fill:none;stroke-width:2.5;stroke-linecap:round}
+    .pay-badge-sm{display:inline-flex;align-items:center;gap:2px;border-radius:20px;padding:1px 6px;font-size:.5rem;font-weight:700;margin-left:4px;vertical-align:middle}
+    .b-pop{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+    .b-ins{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green)}
+    .b-def{background:var(--matte-4);border:1px solid var(--border-hi);color:var(--silver)}
+
+    .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--matte-3);border:1px solid var(--border-gl);color:var(--text);padding:11px 22px;border-radius:10px;font-size:0.78rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:1300;max-width:88vw;text-align:center;white-space:nowrap}
+    .toast.show{opacity:1}
+    .toast.error{background:rgba(60,10,10,0.95);border-color:var(--red);color:var(--red)}
+    .toast.warn{background:var(--matte-4);border-color:var(--border-gl);color:var(--chrome)}
   </style>
 </head>
 <body>
@@ -425,12 +408,10 @@
   </div>
 </div>
 
-<!-- NAMEPLATE FULLSCREEN DISPLAY -->
+<!-- NAMEPLATE FULLSCREEN -->
 <div class="nameplate-display" id="nameplate-display">
   <div class="nameplate-display-brand">
-    <div class="nameplate-display-brand-dot">
-      <svg viewBox="0 0 12 12"><rect x="1" y="4" width="10" height="6" rx="1.5" fill="white"/><path d="M2 4V3C2 2.4 2.8 2 4 2H8C9.2 2 10 2.4 10 3V4" stroke="white" stroke-width="1" fill="none"/></svg>
-    </div>
+    <div class="nameplate-display-brand-dot"><svg viewBox="0 0 12 12"><rect x="1" y="4" width="10" height="6" rx="1.5" fill="white"/><path d="M2 4V3C2 2.4 2.8 2 4 2H8C9.2 2 10 2.4 10 3V4" stroke="white" stroke-width="1" fill="none"/></svg></div>
     Black
   </div>
   <div class="np-display-service">Premium Chauffeur Service</div>
@@ -446,14 +427,8 @@
       Edit Nameplate
       <button class="edit-sheet-close" onclick="closeEditSheet()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="edit-field">
-      <label>Display Name</label>
-      <input id="edit-name" placeholder="e.g. Kgosi Sithole" />
-    </div>
-    <div class="edit-field">
-      <label>Vehicle</label>
-      <input id="edit-vehicle" placeholder="e.g. Black Mercedes E-Class" />
-    </div>
+    <div class="edit-field"><label>Display Name</label><input id="edit-name" placeholder="e.g. Kgosi Sithole"/></div>
+    <div class="edit-field"><label>Vehicle</label><input id="edit-vehicle" placeholder="e.g. Black Mercedes E-Class"/></div>
     <button class="edit-save" onclick="saveNameplate()">Save Nameplate</button>
   </div>
 </div>
@@ -461,18 +436,13 @@
 <!-- MAIN DASHBOARD -->
 <nav>
   <div class="brand">
-    <div class="brand-mark">
-      <svg viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="7" rx="1.5" fill="white"/><path d="M2.5 5V3.5C2.5 2.7 3.2 2 4.5 2H9.5C10.8 2 11.5 2.7 11.5 3.5V5" stroke="white" stroke-width="1.2" fill="none"/><circle cx="4" cy="12" r="1.5" fill="white"/><circle cx="10" cy="12" r="1.5" fill="white"/></svg>
-    </div>
+    <div class="brand-mark"><svg viewBox="0 0 14 14"><rect x="1" y="5" width="12" height="7" rx="1.5" fill="white"/><path d="M2.5 5V3.5C2.5 2.7 3.2 2 4.5 2H9.5C10.8 2 11.5 2.7 11.5 3.5V5" stroke="white" stroke-width="1.2" fill="none"/><circle cx="4" cy="12" r="1.5" fill="white"/><circle cx="10" cy="12" r="1.5" fill="white"/></svg></div>
     Black<div class="brand-dot"></div>
   </div>
   <div class="nav-right">
     <div class="conn-dot" id="dot"></div>
     <div class="nav-user"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Hi, <strong id="nav-name">Driver</strong></div>
-    <button class="logout-btn" onclick="logout()">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Logout
-    </button>
+    <button class="logout-btn" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
   </div>
 </nav>
 
@@ -480,29 +450,17 @@
   <div class="greeting" id="greeting">Driver Dashboard</div>
   <div class="greeting-sub" id="greeting-sub">Ready to take on the road</div>
 
-  <!-- MODE SWITCH -->
   <div class="mode-strip">
     <div class="mode-btn active" id="mode-standard" onclick="setMode('standard')">
-      <div class="mode-icon">
-        <svg viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="10" rx="2"/><polygon points="16 9 20 9 23 12 23 17 16 17 16 9"/><circle cx="5" cy="17" r="2"/><circle cx="18" cy="17" r="2"/></svg>
-      </div>
-      <div>
-        <div class="mode-label">Standard</div>
-        <div class="mode-sub">Regular rides</div>
-      </div>
+      <div class="mode-icon"><svg viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="10" rx="2"/><polygon points="16 9 20 9 23 12 23 17 16 17 16 9"/><circle cx="5" cy="17" r="2"/><circle cx="18" cy="17" r="2"/></svg></div>
+      <div><div class="mode-label">Standard</div><div class="mode-sub">Regular rides</div></div>
     </div>
     <div class="mode-btn" id="mode-chauffeur" onclick="setMode('chauffeur')">
-      <div class="mode-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
-      <div>
-        <div class="mode-label">Chauffeur</div>
-        <div class="mode-sub">Premium service</div>
-      </div>
+      <div class="mode-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+      <div><div class="mode-label">Chauffeur</div><div class="mode-sub">Premium service</div></div>
     </div>
   </div>
 
-  <!-- CHAUFFEUR NAMEPLATE -->
   <div class="chauffeur-nameplate" id="chauffeur-nameplate">
     <div class="np-label">Your Nameplate</div>
     <div class="np-card">
@@ -517,13 +475,9 @@
     </div>
   </div>
 
-  <!-- MAP MODULE -->
   <div class="map-module collapsed" id="map-module">
     <div class="map-header" onclick="toggleMap()">
-      <div class="map-header-left">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>
-        Your Location
-      </div>
+      <div class="map-header-left"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg>Your Location</div>
       <div class="map-header-right">
         <div class="map-ctrl" id="map-fs-btn" onclick="toggleFullscreen(event)">
           <svg id="fs-expand" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
@@ -553,17 +507,15 @@
     </button>
   </div>
 
-  <!-- DUTY TOGGLE -->
   <div class="duty-row">
     <div><div class="duty-label">Available for Rides</div><div class="duty-sub" id="duty-sub">You are offline</div></div>
     <div class="sw" id="duty-sw" onclick="toggleDuty()"><div class="sw-knob"></div></div>
   </div>
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
     <div class="stat"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Done</div></div>
-    <div class="stat"><div class="stat-num" id="s-earn">P0</div><div class="stat-lbl">Earned</div></div>
+    <div class="stat"><div class="stat-num" id="s-earn">P0</div><div class="stat-lbl">Earned (net)</div></div>
     <div class="stat"><div class="stat-num gold" id="s-rating">—</div><div class="stat-lbl">Rating</div></div>
   </div>
 
@@ -587,19 +539,12 @@
     </div>
     <div class="price-row">
       <div><div class="price-lbl">Rider's offered price</div><div class="price-val" id="inc-fare">P0.00</div></div>
-      <div class="route-row">
-  <div class="route-lbl">Payment</div>
-  <div class="route-val" id="inc-payment">Cash</div>
-</div>
-      <div class="route-row">
-  <div class="route-lbl">Payment</div>
-  <div class="route-val" id="inc-payment">Cash</div>
-</div>
+      <div><div class="price-lbl">Payment</div><div class="route-val" id="inc-payment">Cash</div></div>
       <div style="font-size:0.62rem;color:var(--silver);font-weight:600" id="inc-min-label">Min P70</div>
     </div>
     <div class="offer-row">
       <label>Your price (edit to counter):</label>
-      <input class="offer-input" id="my-fare" type="number" min="100"/>
+      <input class="offer-input" id="my-fare" type="number" min="70"/>
     </div>
     <div class="btn-row">
       <button class="btn-sm btn-acc" onclick="sendOffer(false)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accept</button>
@@ -629,11 +574,31 @@
       <div class="route-dot to"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
       <div><div class="route-lbl">Dropoff</div><div class="route-val" id="act-dropoff">—</div></div>
     </div>
-    <div class="fare-box"><div class="fare-num" id="act-fare">P0.00</div><div class="fare-lbl">Agreed Fare</div></div>
-<div class="route-row">
-  <div class="route-lbl">Payment</div>
-  <div class="route-val" id="act-payment">Cash</div>
-</div>
+
+    <!-- COMMISSION FARE BOX -->
+    <div class="fare-box">
+      <div class="fare-row">
+        <span class="fare-row-lbl">Agreed fare</span>
+        <span class="fare-row-val" id="act-fare-gross">P0.00</span>
+      </div>
+      <div class="fare-row">
+        <span class="fare-commission-lbl">
+          Commission
+          <span class="fare-commission-badge" id="act-commission-badge">10%</span>
+        </span>
+        <span class="fare-commission-val" id="act-commission-amt">− P0.00</span>
+      </div>
+      <div class="fare-divider"></div>
+      <div class="fare-row">
+        <span class="fare-net-lbl">Your payout</span>
+        <span class="fare-net-val" id="act-fare-net">P0.00</span>
+      </div>
+    </div>
+
+    <div class="route-row" style="margin-top:4px">
+      <div class="route-lbl">Payment</div>
+      <div class="route-val" id="act-payment">Cash</div>
+    </div>
     <div class="action-row">
       <button class="act-btn start" id="btn-start-ride" onclick="updateStatus('in_progress')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Ride</button>
       <button class="act-btn done" id="btn-complete-ride" onclick="updateStatus('completed')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Complete</button>
@@ -653,7 +618,12 @@
 <!-- RATING OVERLAY -->
 <div class="rating-overlay" id="rating-overlay">
   <div class="rating-modal">
-    <div class="fare-completed"><div class="fare-completed-amount" id="rating-fare">P0.00</div><div class="fare-completed-label"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Ride Completed</div></div>
+    <div class="fare-completed">
+      <div class="fare-completed-gross" id="rating-fare-gross"></div>
+      <div class="fare-completed-commission" id="rating-fare-commission"></div>
+      <div class="fare-completed-amount" id="rating-fare-net">P0.00</div>
+      <div class="fare-completed-label"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Your payout</div>
+    </div>
     <div class="rating-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     <div class="rating-title">Rate your rider</div>
     <div class="rating-sub">How was this passenger?</div>
@@ -665,7 +635,10 @@
       <div class="star-btn" onclick="setStar(5)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
     </div>
     <textarea class="rating-comment" id="rating-comment" placeholder="Leave a comment (optional)" rows="3"></textarea>
-    <div class="rating-btn-row"><button class="rating-btn skip" onclick="skipRating()">Skip</button><button class="rating-btn submit" onclick="submitRating()">Submit</button></div>
+    <div class="rating-btn-row">
+      <button class="rating-btn skip" onclick="skipRating()">Skip</button>
+      <button class="rating-btn submit" onclick="submitRating()">Submit</button>
+    </div>
   </div>
 </div>
 
@@ -702,14 +675,12 @@ document.getElementById("nav-name").textContent=DRIVER_NAME;
 document.getElementById("greeting").textContent=`Hey ${DRIVER_NAME.split(" ")[0]}`;
 function logout(){localStorage.removeItem("spiti_driver");window.location.href="login.html";}
 
-// STATE
 let pending=null,activeRide=null,locInterval=null;
 let selectedStar=0,completedRide=null,unreadCount=0;
 let mapExpanded=false,mapFullscreen=false,mapsReady=false;
 let currentMode="standard";
-
-// Nameplate data
 let nameplateData=JSON.parse(localStorage.getItem("black_nameplate")||"null")||{name:DRIVER_NAME,vehicle:""};
+
 function syncNameplate(){
   document.getElementById("np-name-display").textContent=nameplateData.name||DRIVER_NAME;
   document.getElementById("np-vehicle-display").textContent=nameplateData.vehicle||"Set your vehicle";
@@ -717,7 +688,6 @@ function syncNameplate(){
   document.getElementById("np-display-vehicle").textContent=nameplateData.vehicle||"";
   document.getElementById("edit-name").value=nameplateData.name||"";
   document.getElementById("edit-vehicle").value=nameplateData.vehicle||"";
-  document.getElementById("greeting-sub").textContent=currentMode==="chauffeur"?"Premium chauffeur mode active":"Ready to take on the road";
 }
 syncNameplate();
 
@@ -730,9 +700,8 @@ function setMode(mode){
   else{npCard.classList.remove("visible");showToast("Standard mode");}
   document.getElementById("greeting-sub").textContent=mode==="chauffeur"?"Premium chauffeur mode active":"Ready to take on the road";
   document.getElementById("inc-chauffeur-badge").classList.toggle("show",mode==="chauffeur"&&!!pending);
-  document.getElementById("inc-min-label").textContent=mode==="chauffeur"?"Min P80":"Min P15";
+  document.getElementById("inc-min-label").textContent=mode==="chauffeur"?"Min P80":"Min P70";
 }
-
 function openEditSheet(){document.getElementById("edit-overlay").classList.add("open");}
 function closeEditSheet(){document.getElementById("edit-overlay").classList.remove("open");}
 function saveNameplate(){
@@ -744,11 +713,33 @@ function saveNameplate(){
 function showNameplateDisplay(){document.getElementById("nameplate-display").classList.add("open");}
 function closeNameplateDisplay(){document.getElementById("nameplate-display").classList.remove("open");}
 
-// Mini-map
+/* ── COMMISSION HELPER ── */
+function calcCommission(ride){
+  const gross=parseFloat(ride.fare||0);
+  const rate=ride.commission_rate!=null?parseFloat(ride.commission_rate):(ride.ride_type==="chauffeur"?0.15:0.10);
+  const commission=ride.commission_amount!=null?parseFloat(ride.commission_amount):(gross*rate);
+  const net=ride.net_fare!=null?parseFloat(ride.net_fare):(gross-commission);
+  return{gross,rate,commission,net,pct:Math.round(rate*100)};
+}
+
+function renderFareBox(ride){
+  const{gross,commission,net,pct}=calcCommission(ride);
+  document.getElementById("act-fare-gross").textContent="P"+gross.toFixed(2);
+  document.getElementById("act-commission-badge").textContent=pct+"%";
+  document.getElementById("act-commission-amt").textContent="− P"+commission.toFixed(2);
+  document.getElementById("act-fare-net").textContent="P"+net.toFixed(2);
+}
+
+function renderRatingFare(ride){
+  const{gross,commission,net,pct}=calcCommission(ride);
+  document.getElementById("rating-fare-gross").textContent="Fare: P"+gross.toFixed(2);
+  document.getElementById("rating-fare-commission").textContent="Commission ("+pct+"%): − P"+commission.toFixed(2);
+  document.getElementById("rating-fare-net").textContent="P"+net.toFixed(2);
+}
+
 let gmap=null,driverSelfMarker=null,directionsService=null,directionsRenderer=null;
 let currentLat=null,currentLng=null,prevLat=null,prevLng=null;
 let currentSpeedKmh=0,driverHeading=0;
-// Nav mode
 let navMap=null,navDriverMarker=null,navDirectionsService=null,navDirectionsRenderer=null;
 let navRouteSteps=[],navCurrentStep=0,navRoutePath=[],navIsActive=false,navAutoFollow=true;
 let navTotalDistM=0,rerouteThrottle=0;
@@ -767,15 +758,11 @@ function initGoogleMap(){
     {featureType:"transit",stylers:[{visibility:"off"}]},
     {featureType:"landscape",elementType:"geometry",stylers:[{color:"#0d0d0d"}]}
   ];
-  gmap=new google.maps.Map(document.getElementById("gmap-driver"),{
-    center:{lat:-24.6541,lng:25.9087},zoom:15,disableDefaultUI:true,zoomControl:true,gestureHandling:"greedy",styles:blackStyle
-  });
+  gmap=new google.maps.Map(document.getElementById("gmap-driver"),{center:{lat:-24.6541,lng:25.9087},zoom:15,disableDefaultUI:true,zoomControl:true,gestureHandling:"greedy",styles:blackStyle});
   directionsService=new google.maps.DirectionsService();
   directionsRenderer=new google.maps.DirectionsRenderer({suppressMarkers:true,polylineOptions:{strokeColor:"#C8C8C8",strokeWeight:4,strokeOpacity:0.85}});
   directionsRenderer.setMap(gmap);
-  navMap=new google.maps.Map(document.getElementById("nav-gmap"),{
-    center:{lat:-24.6541,lng:25.9087},zoom:17,disableDefaultUI:true,gestureHandling:"greedy",styles:blackStyle
-  });
+  navMap=new google.maps.Map(document.getElementById("nav-gmap"),{center:{lat:-24.6541,lng:25.9087},zoom:17,disableDefaultUI:true,gestureHandling:"greedy",styles:blackStyle});
   navDirectionsService=new google.maps.DirectionsService();
   navDirectionsRenderer=new google.maps.DirectionsRenderer({suppressMarkers:true,polylineOptions:{strokeColor:"#FFFFFF",strokeWeight:5,strokeOpacity:0.95}});
   navDirectionsRenderer.setMap(navMap);
@@ -792,20 +779,16 @@ function toggleMap(){
   if(mapExpanded&&gmap)setTimeout(()=>google.maps.event.trigger(gmap,"resize"),350);
 }
 function toggleFullscreen(e){
-  e.stopPropagation();
-  mapFullscreen=!mapFullscreen;
+  e.stopPropagation();mapFullscreen=!mapFullscreen;
   const mod=document.getElementById("map-module");
   if(mapFullscreen){mod.classList.add("fullscreen");document.getElementById("fs-expand").style.display="none";document.getElementById("fs-contract").style.display="block";}
   else{mod.classList.remove("fullscreen");mod.className="map-module "+(mapExpanded?"expanded":"collapsed");document.getElementById("fs-expand").style.display="block";document.getElementById("fs-contract").style.display="none";}
   if(gmap)setTimeout(()=>google.maps.event.trigger(gmap,"resize"),350);
 }
-
-// NAV MODE
 function openNavMode(){if(!activeRide||!currentLat){showToast("Need GPS location first","warn");return;}navIsActive=true;navAutoFollow=true;document.getElementById("nav-mode").classList.add("active");document.getElementById("nav-recenter-btn").classList.remove("off-center");setTimeout(()=>{google.maps.event.trigger(navMap,"resize");navMap.setCenter({lat:currentLat,lng:currentLng});navMap.setZoom(17);},100);buildNavRoute();}
 function closeNavMode(){navIsActive=false;document.getElementById("nav-mode").classList.remove("active");navRouteSteps=[];navRoutePath=[];navCurrentStep=0;}
 function switchNavDestination(){if(!activeRide||!currentLat)return;buildNavRoute();showToast("Route refreshed");}
 function recenterNavMap(){navAutoFollow=true;document.getElementById("nav-recenter-btn").classList.remove("off-center");if(currentLat&&navMap){navMap.setCenter({lat:currentLat,lng:currentLng});navMap.setZoom(17);}}
-
 function buildNavRoute(){
   if(!activeRide||!navDirectionsService||!currentLat)return;
   const destText=activeRide.status==="in_progress"?activeRide.dropoff:activeRide.pickup;
@@ -875,7 +858,6 @@ function throttledRebuildRoute(){
   const nearest=navRoutePath.reduce((best,pt)=>{const d=haversineM(currentLat,currentLng,pt.lat(),pt.lng());return d<best?d:best;},Infinity);
   if(nearest>200){rerouteThrottle=now;showToast("Off route — recalculating...","warn");buildNavRoute();}
 }
-
 function startLoc(){
   if(!navigator.geolocation)return showToast("Location not supported","error");
   if(!mapExpanded&&!mapFullscreen)toggleMap();
@@ -901,9 +883,7 @@ function sendLoc(){
     if(activeRide){updateRouteToDestination(lat,lng);if(navIsActive){updateNavDriverMarker(lat,lng);updateCurrentStep();throttledRebuildRoute();}}
   },(err)=>{const msgs={1:"Permission denied.",2:"Location unavailable.",3:"Location timed out."};showToast(msgs[err.code]||"Location error","error");stopLoc();},{enableHighAccuracy:true,timeout:10000,maximumAge:3000});
 }
-
 function buildCarSvg(headingDeg,size){
-  // Matte black car with white stroke
   return`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 48 48"><g transform="rotate(${headingDeg},24,24)"><circle cx="24" cy="24" r="22" fill="#141414" opacity="0.5"/><circle cx="24" cy="24" r="17" fill="#141414" stroke="#3A3A3A" stroke-width="1.5"/><g transform="translate(12,14)" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="22" height="11" rx="2"/><path d="M3 5V4C3 2.3 4.3 1 6 1H18C19.7 1 21 2.3 21 4V5"/><circle cx="6" cy="16" r="2.5"/><circle cx="18" cy="16" r="2.5"/><line x1="1" y1="9" x2="23" y2="9"/></g><polygon points="24,4 20,12 28,12" fill="white" opacity="0.85"/></g></svg>`;
 }
 function updateNavDriverMarker(lat,lng){
@@ -937,7 +917,6 @@ function updateRouteToDestination(driverLat,driverLng){
 function haversineM(lat1,lng1,lat2,lng2){const R=6371000,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function stripHtml(html){const d=document.createElement("div");d.innerHTML=html||"";return d.textContent||d.innerText||"";}
 
-// DUTY TOGGLE
 async function toggleDuty(){
   const sw=document.getElementById("duty-sw");const isOn=!sw.classList.contains("on");
   sw.classList.toggle("on",isOn);document.getElementById("duty-sub").textContent=isOn?"You are online":"You are offline";
@@ -945,36 +924,48 @@ async function toggleDuty(){
   try{await fetch(`${BASE}/drivers/${DRIVER_ID}/availability`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({available:isOn})});showToast(isOn?"Online":"Offline");}catch(e){}
 }
 
-// SOCKET
 const socket=io(BASE,{transports:["websocket","polling"]});
 socket.on("connect",()=>{document.getElementById("dot").classList.add("live");socket.emit("join-role",{role:"drivers",userId:DRIVER_ID});loadRides();loadMyRating();});
 socket.on("disconnect",()=>document.getElementById("dot").classList.remove("live"));
 socket.on("new-ride",(ride)=>{
   if(activeRide)return;pending=ride;
-  document.getElementById("inc-pickup").textContent=ride.pickup;document.getElementById("inc-dropoff").textContent=ride.dropoff;
+  document.getElementById("inc-pickup").textContent=ride.pickup;
+  document.getElementById("inc-dropoff").textContent=ride.dropoff;
   document.getElementById("inc-fare").textContent="P"+parseFloat(ride.offered_fare||15).toFixed(2);
-  document.getElementById("inc-payment").textContent=ride.payment_method || "Cash";
-  document.getElementById("my-fare").value=currentMode==="chauffeur"?Math.max(80,ride.offered_fare||80):ride.offered_fare||15;
+  document.getElementById("inc-payment").textContent=ride.payment_method||"Cash";
+  document.getElementById("my-fare").value=currentMode==="chauffeur"?Math.max(80,ride.offered_fare||80):ride.offered_fare||70;
   document.getElementById("inc-chauffeur-badge").classList.toggle("show",currentMode==="chauffeur");
   document.getElementById("inc-sub-label").textContent=currentMode==="chauffeur"?"Premium chauffeur booking":"Rider looking for a driver";
   document.getElementById("inc-card").classList.add("visible");showToast("New ride request");
 });
 socket.on("offer-accepted",(ride)=>{
-  activeRide=ride;document.getElementById("inc-card").classList.remove("visible");document.getElementById("active-card").classList.add("visible");
-  document.getElementById("act-pickup").textContent=ride.pickup;document.getElementById("act-dropoff").textContent=ride.dropoff;document.getElementById("act-fare").textContent="P"+parseFloat(ride.fare||0).toFixed(2);
-  document.getElementById("act-payment").textContent=ride.payment_method || "Cash";
-  document.getElementById("chat-fab").classList.add("visible");document.getElementById("chat-rider-name").textContent="Rider #"+ride.rider_id;
-  updateDriverProgress("accepted");socket.emit("join-ride",{rideId:ride.id});loadMsgs(ride.id);
-  showToast("Rider accepted! Head to pickup");loadRides();
-  if(!mapExpanded)toggleMap();if(currentLat)updateRouteToDestination(currentLat,currentLng);
-  document.getElementById("nav-gps-btn").classList.add("visible");document.getElementById("nav-gps-btn-label").textContent="Navigate to Pickup";
+  activeRide=ride;
+  document.getElementById("inc-card").classList.remove("visible");
+  document.getElementById("active-card").classList.add("visible");
+  document.getElementById("act-pickup").textContent=ride.pickup;
+  document.getElementById("act-dropoff").textContent=ride.dropoff;
+  document.getElementById("act-payment").textContent=ride.payment_method||"Cash";
+  renderFareBox(ride);
+  document.getElementById("chat-fab").classList.add("visible");
+  document.getElementById("chat-rider-name").textContent="Rider #"+ride.rider_id;
+  updateDriverProgress("accepted");
+  socket.emit("join-ride",{rideId:ride.id});
+  loadMsgs(ride.id);
+  showToast("Rider accepted! Head to pickup");
+  loadRides();
+  if(!mapExpanded)toggleMap();
+  if(currentLat)updateRouteToDestination(currentLat,currentLng);
+  document.getElementById("nav-gps-btn").classList.add("visible");
+  document.getElementById("nav-gps-btn-label").textContent="Navigate to Pickup";
 });
 socket.on("offer-declined",()=>showToast("Rider declined your offer","error"));
 socket.on("ride-updated",(ride)=>{
-  if(activeRide&&ride.id===activeRide.id){activeRide=ride;updateDriverProgress(ride.status);
-  if(ride.status==="in_progress"){showToast("Ride started!");document.getElementById("nav-gps-btn-label").textContent="Navigate to Dropoff";if(currentLat)updateRouteToDestination(currentLat,currentLng);if(navIsActive)buildNavRoute();}
-  if(ride.status==="completed"){completedRide=ride;showToast("Ride completed!");setTimeout(()=>showRatingModal(ride),1500);}
-  loadRides();}
+  if(activeRide&&ride.id===activeRide.id){
+    activeRide=ride;updateDriverProgress(ride.status);renderFareBox(ride);
+    if(ride.status==="in_progress"){showToast("Ride started!");document.getElementById("nav-gps-btn-label").textContent="Navigate to Dropoff";if(currentLat)updateRouteToDestination(currentLat,currentLng);if(navIsActive)buildNavRoute();}
+    if(ride.status==="completed"){completedRide=ride;showToast("Ride completed!");setTimeout(()=>showRatingModal(ride),1500);}
+    loadRides();
+  }
 });
 socket.on("new-message",(msg)=>{
   if(!activeRide)return;if(msg.sender_role==="driver")return;appendMsg(msg);
@@ -982,18 +973,27 @@ socket.on("new-message",(msg)=>{
 });
 
 async function sendOffer(isCounter){
-  if(!pending)return;const minFare=currentMode==="chauffeur"?80:15;const fare=Math.max(minFare,parseFloat(document.getElementById("my-fare").value)||minFare);
-  try{await fetch(`${BASE}/rides/${pending.id}/offer`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fare_offer:fare,driverId:DRIVER_ID,driver_name:DRIVER_NAME})});
-  document.getElementById("inc-card").classList.remove("visible");showToast(isCounter?`Counter P${fare.toFixed(2)} sent`:"Offer sent!");}catch(e){showToast("Failed","error");}
+  if(!pending)return;
+  const minFare=currentMode==="chauffeur"?80:70;
+  const fare=Math.max(minFare,parseFloat(document.getElementById("my-fare").value)||minFare);
+  try{
+    await fetch(`${BASE}/rides/${pending.id}/offer`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({fare_offer:fare,driverId:DRIVER_ID,driver_name:DRIVER_NAME})});
+    document.getElementById("inc-card").classList.remove("visible");
+    showToast(isCounter?`Counter P${fare.toFixed(2)} sent`:"Offer sent!");
+  }catch(e){showToast("Failed","error");}
 }
 function declineIncoming(){pending=null;document.getElementById("inc-card").classList.remove("visible");showToast("Declined");}
 
 async function updateStatus(status){
   if(!activeRide)return;
-  try{const res=await fetch(`${BASE}/rides/${activeRide.id}/status`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});const ride=await res.json();activeRide=ride;updateDriverProgress(status);
-  if(status==="in_progress"){showToast("Ride started!");document.getElementById("btn-start-ride").disabled=true;document.getElementById("nav-gps-btn-label").textContent="Navigate to Dropoff";if(currentLat)updateRouteToDestination(currentLat,currentLng);if(navIsActive)buildNavRoute();}
-  if(status==="completed"){completedRide=ride;showToast("Ride completed!");document.getElementById("eta-pill").style.display="none";document.getElementById("map-dest-panel").classList.remove("visible");setTimeout(()=>showRatingModal(ride),1500);}
-  loadRides();}catch(e){showToast("Failed","error");}
+  try{
+    const res=await fetch(`${BASE}/rides/${activeRide.id}/status`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});
+    const ride=await res.json();activeRide=ride;
+    updateDriverProgress(status);renderFareBox(ride);
+    if(status==="in_progress"){showToast("Ride started!");document.getElementById("btn-start-ride").disabled=true;document.getElementById("nav-gps-btn-label").textContent="Navigate to Dropoff";if(currentLat)updateRouteToDestination(currentLat,currentLng);if(navIsActive)buildNavRoute();}
+    if(status==="completed"){completedRide=ride;showToast("Ride completed!");document.getElementById("eta-pill").style.display="none";document.getElementById("map-dest-panel").classList.remove("visible");setTimeout(()=>showRatingModal(ride),1500);}
+    loadRides();
+  }catch(e){showToast("Failed","error");}
 }
 function updateDriverProgress(status){
   const map={accepted:1,in_progress:2,completed:3};const cur=map[status]||0;
@@ -1003,7 +1003,13 @@ function updateDriverProgress(status){
     else{dot.className="prog-dot";lbl.className="prog-label";}
   }
 }
-function showRatingModal(ride){document.getElementById("rating-fare").textContent="P"+parseFloat(ride.fare||0).toFixed(2);selectedStar=0;document.querySelectorAll(".star-btn").forEach(s=>s.classList.remove("active"));document.getElementById("rating-comment").value="";document.getElementById("rating-overlay").classList.add("open");}
+function showRatingModal(ride){
+  renderRatingFare(ride);
+  selectedStar=0;
+  document.querySelectorAll(".star-btn").forEach(s=>s.classList.remove("active"));
+  document.getElementById("rating-comment").value="";
+  document.getElementById("rating-overlay").classList.add("open");
+}
 function setStar(n){selectedStar=n;document.querySelectorAll(".star-btn").forEach((s,i)=>s.classList.toggle("active",i<n));}
 async function submitRating(){
   if(!completedRide)return;if(selectedStar===0)return showToast("Please select a rating","warn");
@@ -1021,7 +1027,6 @@ function closeRatingAndReset(){
   if(directionsRenderer)directionsRenderer.setDirections({routes:[]});loadRides();loadMyRating();
 }
 async function loadMyRating(){try{const res=await fetch(`${BASE}/drivers/${DRIVER_ID}/rating`);const data=await res.json();if(data&&data.avg_rating>0)document.getElementById("s-rating").textContent=parseFloat(data.avg_rating).toFixed(1);}catch(e){}}
-
 function openChat(){document.getElementById("chat-overlay").classList.add("open");document.getElementById("chat-popup").classList.add("open");unreadCount=0;document.getElementById("chat-badge").classList.remove("show");setTimeout(()=>{const m=document.getElementById("chat-msgs");m.scrollTop=m.scrollHeight;},350);}
 function closeChat(){document.getElementById("chat-overlay").classList.remove("open");document.getElementById("chat-popup").classList.remove("open");}
 async function loadMsgs(rideId){try{const res=await fetch(`${BASE}/rides/${rideId}/messages`);const msgs=await res.json();const el=document.getElementById("chat-msgs");el.innerHTML="";if(!msgs.length){el.innerHTML='<div class="empty" style="padding:12px;font-size:0.78rem">No messages yet</div>';return;}msgs.forEach(appendMsg);}catch(e){}}
@@ -1029,10 +1034,21 @@ function appendMsg(msg){const el=document.getElementById("chat-msgs");const empt
 function sendMsg(){if(!activeRide)return;const input=document.getElementById("chat-in");const message=input.value.trim();if(!message)return;input.value="";appendMsg({sender_role:"driver",message,created_at:new Date()});fetch(`${BASE}/rides/${activeRide.id}/messages`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sender_role:"driver",message})}).catch(()=>showToast("Message failed","error"));}
 
 async function loadRides(){
-  try{const res=await fetch(`${BASE}/rides`);const rides=await res.json();const mine=rides.filter(r=>r.driver_id==DRIVER_ID);
-  document.getElementById("rides-list").innerHTML=mine.length?mine.map(r=>`<div class="ride-item"><div><div class="ride-route">${r.pickup} → ${r.dropoff}</div><div class="ride-meta">#${r.id}${r.fare?" · P"+parseFloat(r.fare).toFixed(2):r.offered_fare?" · Offered P"+parseFloat(r.offered_fare).toFixed(2):""}</div></div><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></div>`).join(""):'<div class="empty">No rides yet</div>';
-  document.getElementById("s-total").textContent=mine.length;document.getElementById("s-done").textContent=mine.filter(r=>r.status==="completed").length;
-  const earn=mine.filter(r=>r.status==="completed").reduce((s,r)=>s+parseFloat(r.fare||0),0);document.getElementById("s-earn").textContent="P"+earn.toFixed(2);}catch(e){}
+  try{
+    const res=await fetch(`${BASE}/rides`);const rides=await res.json();const mine=rides.filter(r=>r.driver_id==DRIVER_ID);
+    document.getElementById("rides-list").innerHTML=mine.length?mine.map(r=>{
+      const net=r.net_fare!=null?parseFloat(r.net_fare):(parseFloat(r.fare||0)*(1-(r.ride_type==="chauffeur"?0.15:0.10)));
+      const fareLabel=r.status==="completed"?` · Net P${net.toFixed(2)}`:r.fare?` · P${parseFloat(r.fare).toFixed(2)}`:r.offered_fare?` · Offered P${parseFloat(r.offered_fare).toFixed(2)}`:"";
+      return`<div class="ride-item"><div><div class="ride-route">${r.pickup} → ${r.dropoff}</div><div class="ride-meta">#${r.id}${fareLabel}</div></div><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></div>`;
+    }).join(""):'<div class="empty">No rides yet</div>';
+    document.getElementById("s-total").textContent=mine.length;
+    document.getElementById("s-done").textContent=mine.filter(r=>r.status==="completed").length;
+    const earn=mine.filter(r=>r.status==="completed").reduce((s,r)=>{
+      const net=r.net_fare!=null?parseFloat(r.net_fare):(parseFloat(r.fare||0)*(1-(r.ride_type==="chauffeur"?0.15:0.10)));
+      return s+net;
+    },0);
+    document.getElementById("s-earn").textContent="P"+earn.toFixed(2);
+  }catch(e){}
 }
 function showToast(msg,type=""){const t=document.getElementById("toast");t.textContent=msg;t.className="toast show"+(type?" "+type:"");setTimeout(()=>t.className="toast",3500);}
 </script>
