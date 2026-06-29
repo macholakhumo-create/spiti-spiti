@@ -149,6 +149,7 @@ app.post("/auth/driver/login", async (req, res) => {
     const match = await bcrypt.compare(password, driver.password_hash);
     if (!match) return res.status(401).json({ error: "Incorrect password" });
     if (!driver.approved) return res.status(403).json({ error: "Account pending approval. Please wait for admin to approve your account." });
+    if (driver.suspended) return res.status(403).json({ error: "Your account has been suspended. Please contact support." });
     res.json({ success: true, driver: { id: driver.id, name: driver.name, phone: driver.phone, license_number: driver.license_number } });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -187,7 +188,33 @@ app.delete("/auth/drivers/:id/reject", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// SUSPEND driver
+app.patch("/auth/drivers/:id/suspend", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "UPDATE drivers SET suspended=true, available=false WHERE id=$1 RETURNING id, name, phone, suspended",
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: "Driver not found" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
+// RESTORE driver
+app.patch("/auth/drivers/:id/restore", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "UPDATE drivers SET suspended=false WHERE id=$1 RETURNING id, name, phone, suspended",
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: "Driver not found" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // ─── RIDE ROUTES ─────────────────────────────────────────────
 
 app.get("/rides", async (req, res) => {
