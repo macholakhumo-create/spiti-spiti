@@ -773,7 +773,7 @@
     document.getElementById("fare-field").style.display = svc === "chauffeur" ? "none" : "block";
     const hint = document.getElementById("fare-hint-txt");
     if (hint) hint.innerHTML = svc === "chauffeur"
-      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P80.00 · Chauffeur premium service'
+      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P150.00 · Chauffeur premium service'
       : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P70.00 · Drivers can accept or counter';
     if (svc === "chauffeur") setChauffType("zone");
   }
@@ -795,7 +795,7 @@
       priceEl.textContent = `P${hrs * HOURLY_RATE}`;
       lblEl.textContent = `${hrs} hour${hrs > 1 ? "s" : ""} · P${HOURLY_RATE}/hr`;
     } else {
-      priceEl.textContent = "P80 – P150";
+      priceEl.textContent = "P150";
       lblEl.textContent = "Fixed rate by zone · Driver confirms price";
     }
   }
@@ -911,7 +911,7 @@
     const dropoff = document.getElementById("dropoff").value.trim();
     if (!pickup || !dropoff) { showToast("Enter pickup and dropoff", "warn"); return; }
     let fare, rideType = currentService;
-    const minFare = currentService === "chauffeur" ? 150 : 150;
+    const minFare = currentService === "chauffeur" ? 150;
     if (currentService === "chauffeur") {
       if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); fare = hrs * HOURLY_RATE; }
       else { fare = 80; }
