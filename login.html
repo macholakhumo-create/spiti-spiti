@@ -9,9 +9,9 @@
   <title>Black · Login</title>
   <style>
     :root {
-      --void:      #060606;
-      --matte-1:   #0D0D0D;
-      --matte-2:   #111111;
+      --void:      #000000;
+      --matte-1:   #0A0A0A;
+      --matte-2:   #101010;
       --matte-3:   #161616;
       --matte-4:   #1C1C1C;
       --gloss-bg:  linear-gradient(160deg, #222222 0%, #141414 55%, #0D0D0D 100%);
@@ -93,6 +93,9 @@
     .field input::placeholder{color:var(--text-dim)}
     .hint{font-size:0.68rem;color:var(--text-dim);margin-top:4px}
 
+    /* FORM */
+    form{display:contents}
+
     /* BUTTON */
     .btn{
       width:100%;padding:13px;border:none;border-radius:12px;font-family:inherit;font-size:0.88rem;font-weight:700;
@@ -142,9 +145,9 @@
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="10" width="20" height="9" rx="2.5" fill="#F0F0F0"/>
       <path d="M5 10V8C5 6.3 6.3 5 8 5H16C17.7 5 19 6.3 19 8V10" stroke="#F0F0F0" stroke-width="1.8" fill="none"/>
-      <circle cx="6.5" cy="19" r="2.5" fill="#060606" stroke="#F0F0F0" stroke-width="1.5"/>
-      <circle cx="17.5" cy="19" r="2.5" fill="#060606" stroke="#F0F0F0" stroke-width="1.5"/>
-      <rect x="9" y="13" width="6" height="2" rx="1" fill="#060606" opacity="0.4"/>
+      <circle cx="6.5" cy="19" r="2.5" fill="#000000" stroke="#F0F0F0" stroke-width="1.5"/>
+      <circle cx="17.5" cy="19" r="2.5" fill="#000000" stroke="#F0F0F0" stroke-width="1.5"/>
+      <rect x="9" y="13" width="6" height="2" rx="1" fill="#000000" opacity="0.4"/>
     </svg>
   </div>
   <div class="logo">Black<span class="logo-dot">.</span></div>
@@ -172,23 +175,23 @@
     </div>
     <div class="card-sub">Sign in or create your rider account</div>
     <div class="tabs">
-      <button class="tab active" id="rider-login-tab" onclick="riderTab('login')">Login</button>
-      <button class="tab" id="rider-signup-tab" onclick="riderTab('signup')">Sign Up</button>
+      <button type="button" class="tab active" id="rider-login-tab" onclick="riderTab('login')">Login</button>
+      <button type="button" class="tab" id="rider-signup-tab" onclick="riderTab('signup')">Sign Up</button>
     </div>
     <div id="rider-error" class="error-box"></div>
     <div id="rider-success" class="success-box"></div>
-    <div id="rider-login-form">
+    <form id="rider-login-form" onsubmit="event.preventDefault(); riderLogin()">
       <div class="field"><label>Phone Number</label><input type="tel" id="rl-phone" placeholder="71234567"/></div>
       <div class="field"><label>Password</label><input type="password" id="rl-pass" placeholder="••••••••"/></div>
-      <button class="btn btn-brand" onclick="riderLogin()">Login <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-    </div>
-    <div id="rider-signup-form" style="display:none">
+      <button type="submit" class="btn btn-brand">Login <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </form>
+    <form id="rider-signup-form" style="display:none" onsubmit="event.preventDefault(); riderSignup()">
       <div class="field"><label>Full Name</label><input type="text" id="rs-name" placeholder="John Doe"/></div>
       <div class="field"><label>Phone Number</label><input type="tel" id="rs-phone" placeholder="71234567"/></div>
       <div class="field"><label>ID Number</label><input type="text" id="rs-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Password</label><input type="password" id="rs-pass" placeholder="Min 6 characters"/></div>
-      <button class="btn btn-brand" onclick="riderSignup()">Create Account <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-    </div>
+      <button type="submit" class="btn btn-brand">Create Account <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </form>
   </div>
 
   <!-- DRIVER SECTION -->
@@ -199,29 +202,29 @@
     </div>
     <div class="card-sub">Sign in or register as a driver</div>
     <div class="tabs">
-      <button class="tab active" id="driver-login-tab" onclick="driverTab('login')">Login</button>
-      <button class="tab" id="driver-signup-tab" onclick="driverTab('signup')">Register</button>
+      <button type="button" class="tab active" id="driver-login-tab" onclick="driverTab('login')">Login</button>
+      <button type="button" class="tab" id="driver-signup-tab" onclick="driverTab('signup')">Register</button>
     </div>
     <div id="driver-error" class="error-box"></div>
     <div id="driver-success" class="success-box"></div>
-    <div id="driver-login-form">
+    <form id="driver-login-form" onsubmit="event.preventDefault(); driverLogin()">
       <div class="field"><label>Phone Number</label><input type="tel" id="dl-phone" placeholder="71234567"/></div>
       <div class="field"><label>Password</label><input type="password" id="dl-pass" placeholder="••••••••"/></div>
-      <button class="btn btn-brand" onclick="driverLogin()">Login <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-    </div>
-    <div id="driver-signup-form" style="display:none">
+      <button type="submit" class="btn btn-brand">Login <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </form>
+    <form id="driver-signup-form" style="display:none" onsubmit="event.preventDefault(); driverSignup()">
       <div class="field"><label>Full Name</label><input type="text" id="ds-name" placeholder="John Doe"/></div>
       <div class="field"><label>Phone Number</label><input type="tel" id="ds-phone" placeholder="71234567"/></div>
       <div class="field"><label>ID Number</label><input type="text" id="ds-id" placeholder="123456789"/><div class="hint">Your national ID number</div></div>
       <div class="field"><label>Driver's License Number</label><input type="text" id="ds-license" placeholder="e.g. DL-12345"/><div class="hint">Must match your official license</div></div>
       <div class="field"><label>Password</label><input type="password" id="ds-pass" placeholder="Min 6 characters"/></div>
-      <button class="btn btn-brand" onclick="driverSignup()">Register as Driver <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      <button type="submit" class="btn btn-brand">Register as Driver <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
       <div class="pending-box" id="pending-box" style="display:none">
         <div class="pending-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <div class="pending-title">Application Submitted</div>
         <div class="pending-sub">Your account is pending admin approval. You will be able to log in once approved. This usually takes a few hours.</div>
       </div>
-    </div>
+    </form>
   </div>
 
 </div>
@@ -232,15 +235,17 @@
     <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     Admin Access
   </div>
-  <div class="field" style="margin-bottom:10px">
-    <label style="font-size:0.7rem;color:var(--text-mid)">Username</label>
-    <input type="text" id="admin-username" placeholder="Admin username" autocomplete="off"/>
-  </div>
-  <div class="field" style="margin-bottom:12px">
-    <label style="font-size:0.7rem;color:var(--text-mid)">Password</label>
-    <input type="password" id="admin-password" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()"/>
-  </div>
-  <button class="admin-btn" onclick="adminLogin()">Login as Admin</button>
+  <form onsubmit="event.preventDefault(); adminLogin()">
+    <div class="field" style="margin-bottom:10px">
+      <label style="font-size:0.7rem;color:var(--text-mid)">Username</label>
+      <input type="text" id="admin-username" placeholder="Admin username" autocomplete="off"/>
+    </div>
+    <div class="field" style="margin-bottom:12px">
+      <label style="font-size:0.7rem;color:var(--text-mid)">Password</label>
+      <input type="password" id="admin-password" placeholder="Admin password"/>
+    </div>
+    <button type="submit" class="admin-btn">Login as Admin</button>
+  </form>
   <div id="admin-error" style="color:var(--red);font-size:0.72rem;margin-top:8px;display:none"></div>
 </div>
 
