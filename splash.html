@@ -110,7 +110,7 @@
       animation: loop 2.6s linear infinite;
     }
     @keyframes loop {
-      0%   { left: -110px; }
+      0%   { left: -130px; }
       100% { left: calc(100vw + 20px); }
     }
 
@@ -176,45 +176,78 @@
       <div class="puff p1"></div>
       <div class="puff p2"></div>
       <div class="puff p3"></div>
-      <!-- Matte black car body, white/chrome trim -->
-      <svg width="92" height="48" viewBox="0 0 92 48" xmlns="http://www.w3.org/2000/svg">
-        <!-- Body -->
-        <rect x="6" y="20" width="80" height="20" rx="5" fill="#141414" stroke="#2A2A2A" stroke-width="1"/>
-        <!-- Roof -->
-        <path d="M24 20 Q30 6 46 5 Q64 5 64 20Z" fill="#0E0E0E" stroke="#2A2A2A" stroke-width="1"/>
-        <!-- Windshields — chrome tint -->
-        <path d="M30 19 Q34 9 46 8 Q58 8 58 19Z" fill="#1E1E1E" stroke="#3A3A3A" stroke-width="0.5" opacity="0.9"/>
-        <!-- Headlight — white glow -->
-        <rect x="79" y="23" width="6" height="5" rx="2" fill="#FFFFFF" opacity="0.9"/>
-        <rect x="79" y="23" width="6" height="5" rx="2" fill="#FFFFFF" filter="url(#glow)"/>
-        <!-- Tail light — dim red -->
-        <rect x="7" y="24" width="5" height="5" rx="2" fill="#CC2222" opacity="0.7"/>
-        <!-- Door line — glossy highlight -->
-        <line x1="46" y1="21" x2="46" y2="38" stroke="#2A2A2A" stroke-width="0.8"/>
-        <!-- Chrome roof rail -->
-        <line x1="24" y1="20" x2="64" y2="20" stroke="#3A3A3A" stroke-width="1"/>
-        <!-- Wheels -->
-        <circle cx="22" cy="40" r="8" fill="#0A0A0A" stroke="#3A3A3A" stroke-width="2"/>
-        <circle cx="22" cy="40" r="3" fill="#1A1A1A" stroke="#4A4A4A" stroke-width="1.5"/>
-        <circle cx="68" cy="40" r="8" fill="#0A0A0A" stroke="#3A3A3A" stroke-width="2"/>
-        <circle cx="68" cy="40" r="3" fill="#1A1A1A" stroke="#4A4A4A" stroke-width="1.5"/>
-        <!-- Chrome bumper line -->
-        <line x1="7" y1="34" x2="84" y2="34" stroke="#2A2A2A" stroke-width="0.8"/>
+      <!-- Matte black luxury sedan with long hood + shine, facing right -->
+      <svg width="116" height="48" viewBox="0 0 116 48" xmlns="http://www.w3.org/2000/svg">
         <defs>
+          <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#5A5A5A" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#5A5A5A" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="rim" cx="38%" cy="34%" r="70%">
+            <stop offset="0%" stop-color="#EAEAEA"/>
+            <stop offset="55%" stop-color="#8A8A8A"/>
+            <stop offset="100%" stop-color="#2A2A2A"/>
+          </radialGradient>
           <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
+        <!-- Tail light (left) -->
+        <rect x="5" y="27" width="4" height="5" rx="2" fill="#CC2222" opacity="0.7"/>
+        <!-- Body — cabin + long flat hood out front -->
+        <path d="M6 34
+                 C6 29 9 27 14 26
+                 L30 25
+                 C36 18 46 15 56 15
+                 L68 15
+                 C76 15 82 17 87 21
+                 L96 26
+                 L108 29
+                 C112 30 114 31 114 33
+                 C114 35 112 36 109 36.5
+                 L100 37 L10 38
+                 C7 38 6 37 6 35 Z"
+              fill="#141414" stroke="#2A2A2A" stroke-width="1"/>
+        <!-- Hood top shine -->
+        <path d="M87 22 L96 26.5 L107 29.2 C110 29.8 112 30.6 112.5 31.8 L96 28 L88 23.5 Z" fill="url(#shine)" opacity="0.55"/>
+        <!-- Hood crease line -->
+        <path d="M87 21 L96 25.5 L108 28.5" fill="none" stroke="#3A3A3A" stroke-width="0.6" opacity="0.8"/>
+        <!-- Greenhouse glass -->
+        <path d="M32 25 C37 19 45 17 54 16 L66 16 C73 17 79 19 84 24 Z"
+              fill="#1E1E1E" stroke="#3A3A3A" stroke-width="0.5" opacity="0.9"/>
+        <!-- B-pillar -->
+        <line x1="58" y1="16" x2="58" y2="25" stroke="#0E0E0E" stroke-width="1"/>
+        <!-- Chrome window surround -->
+        <path d="M32 25 C37 19 45 17 54 16 L66 16 C73 17 79 19 84 24"
+              fill="none" stroke="#3A3A3A" stroke-width="1"/>
+        <!-- Cabin shoulder shine -->
+        <path d="M20 27 C40 23 70 23 86 25 L86 26.5 C70 24.5 40 24.5 20 28.5 Z" fill="url(#shine)" opacity="0.4"/>
+        <!-- Chrome belt line -->
+        <line x1="14" y1="28" x2="95" y2="29" stroke="#3A3A3A" stroke-width="0.8"/>
+        <!-- Front grille hint -->
+        <line x1="107" y1="32" x2="112" y2="33.5" stroke="#2A2A2A" stroke-width="0.8"/>
+        <!-- Headlight (right) — on the nose, white glow -->
+        <rect x="106" y="29.5" width="7" height="4" rx="2" fill="#FFFFFF" opacity="0.95"/>
+        <rect x="106" y="29.5" width="7" height="4" rx="2" fill="#FFFFFF" filter="url(#glow)"/>
+        <!-- Wheels — silver chrome with spokes -->
+        <circle cx="28" cy="40" r="8" fill="#0A0A0A" stroke="#1A1A1A" stroke-width="1.5"/>
+        <circle cx="28" cy="40" r="5.5" fill="url(#rim)"/>
+        <circle cx="28" cy="40" r="1.8" fill="#161616"/>
+        <g stroke="#C8C8C8" stroke-width="0.7" opacity="0.8"><line x1="28" y1="35" x2="28" y2="45"/><line x1="23" y1="40" x2="33" y2="40"/><line x1="24.5" y1="36.5" x2="31.5" y2="43.5"/><line x1="24.5" y1="43.5" x2="31.5" y2="36.5"/></g>
+        <circle cx="84" cy="40" r="8" fill="#0A0A0A" stroke="#1A1A1A" stroke-width="1.5"/>
+        <circle cx="84" cy="40" r="5.5" fill="url(#rim)"/>
+        <circle cx="84" cy="40" r="1.8" fill="#161616"/>
+        <g stroke="#C8C8C8" stroke-width="0.7" opacity="0.8"><line x1="84" y1="35" x2="84" y2="45"/><line x1="79" y1="40" x2="89" y2="40"/><line x1="80.5" y1="36.5" x2="87.5" y2="43.5"/><line x1="80.5" y1="43.5" x2="87.5" y2="36.5"/></g>
+        <!-- Chrome lower trim -->
+        <line x1="9" y1="35" x2="105" y2="36" stroke="#2A2A2A" stroke-width="0.8"/>
       </svg>
     </div>
   </div>
 
   <div class="brand-mark">
     <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Car icon white on glossy black -->
-      <rect x="4" y="14" width="28" height="14" rx="3" fill="white" opacity="0.95"/>
-      <path d="M8 14 Q11 6 18 6 Q26 6 26 14Z" fill="white" opacity="0.7"/>
-      <circle cx="10" cy="28" r="3.5" fill="#080808" stroke="white" stroke-width="1.5"/>
-      <circle cx="26" cy="28" r="3.5" fill="#080808" stroke="white" stroke-width="1.5"/>
-      <rect x="26" y="17" width="4" height="4" rx="1" fill="#080808"/>
+      <path d="M3 22 C3 19 5 18 8 17 L13 16 C16 12 21 11 25 11 L28 11 C31 12 33 14 34 17 L34 20 C34 22 33 23 31 23 L5 23 C4 23 3 22 3 21 Z" fill="white" opacity="0.95"/>
+      <path d="M14 16 C17 13 21 12 25 12 C28 13 30 14 31 16 Z" fill="white" opacity="0.55"/>
+      <circle cx="11" cy="23" r="3.5" fill="#888888" stroke="white" stroke-width="1.5"/>
+      <circle cx="27" cy="23" r="3.5" fill="#888888" stroke="white" stroke-width="1.5"/>
     </svg>
   </div>
 
