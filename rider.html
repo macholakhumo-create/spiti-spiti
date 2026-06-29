@@ -105,6 +105,15 @@
     /* CHAUFFEUR OPTIONS */
     .chauffeur-opts{display:none;margin-bottom:14px}
     .chauffeur-opts.visible{display:block}
+    .chauff-type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .chauff-type{padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--matte-3);cursor:pointer;text-align:center;transition:all 0.2s}
+    .chauff-type.active{border-color:var(--border-gl);background:var(--matte-4);box-shadow:inset 0 1px 0 var(--gloss-highlight)}
+    .chauff-type-icon{margin-bottom:4px;display:flex;align-items:center;justify-content:center;color:var(--text-dim)}
+    .chauff-type-label{font-size:0.72rem;font-weight:700;color:var(--text-mid)}
+    .chauff-type.active .chauff-type-label{color:var(--text)}
+    .chauff-type.active .chauff-type-icon{color:var(--text)}
+    .chauff-type-price{font-size:0.6rem;color:var(--text-dim);margin-top:2px}
+    .chauff-type.active .chauff-type-price{color:var(--silver)}
     .hours-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
     .hours-row label{font-size:0.7rem;color:var(--text-mid);white-space:nowrap}
     .hours-row input{flex:1;background:var(--matte-3);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:inherit;font-size:0.85rem;outline:none}
@@ -151,7 +160,6 @@
 
     /* OFFERS */
     .offers-section{margin-bottom:12px;display:none}
-    .offers-section.visible{display:block}
     .offers-head{font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--chrome);margin-bottom:8px;display:flex;align-items:center;gap:5px}
     .offer-card{background:var(--matte-3);border:1px solid var(--border-hi);border-radius:12px;padding:12px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;animation:slideIn 0.25s ease}
     @keyframes slideIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
@@ -436,13 +444,27 @@
       </div>
 
       <div class="chauffeur-opts" id="chauffeur-opts">
-        <div class="hours-row">
-          <label>Hours needed:</label>
-          <input type="number" id="hours-input" min="1" max="12" value="2" oninput="updateChauffPrice()"/>
+        <div class="chauff-type-row">
+          <div class="chauff-type active" id="ct-zone" onclick="setChauffType('zone')">
+            <div class="chauff-type-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="10" r="3"/><path d="M12 21C12 21 5 14 5 10a7 7 0 0 1 14 0c0 4-7 11-7 11z"/></svg></div>
+            <div class="chauff-type-label">By Zone</div>
+            <div class="chauff-type-price">Fixed rate</div>
+          </div>
+          <div class="chauff-type" id="ct-hourly" onclick="setChauffType('hourly')">
+            <div class="chauff-type-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="chauff-type-label">Hourly Hire</div>
+            <div class="chauff-type-price">P300/hr</div>
+          </div>
         </div>
-        <div class="chauff-price-display">
+        <div id="hourly-input" style="display:none">
+          <div class="hours-row">
+            <label>Hours needed:</label>
+            <input type="number" id="hours-input" min="1" max="12" value="2" oninput="updateChauffPrice()"/>
+          </div>
+        </div>
+        <div class="chauff-price-display" id="chauff-price-display" style="display:none">
           <div class="chauff-price-num" id="chauff-price-num">P300</div>
-          <div class="chauff-price-lbl" id="chauff-price-lbl">P150/hr · Estimated fare</div>
+          <div class="chauff-price-lbl" id="chauff-price-lbl">Estimated fare</div>
         </div>
       </div>
 
@@ -734,6 +756,7 @@
     document.getElementById('payMenu').classList.remove('open');
   }
 
+  // Close dropdown when clicking outside
   document.addEventListener('click', function(e) {
     if (!document.getElementById('payDrop').contains(e.target)) {
       payDropOpen = false;
@@ -748,18 +771,33 @@
     document.getElementById("tab-chauffeur").classList.toggle("active", svc === "chauffeur");
     document.getElementById("chauffeur-opts").classList.toggle("visible", svc === "chauffeur");
     document.getElementById("fare-field").style.display = svc === "chauffeur" ? "none" : "block";
-    document.getElementById("offers-section").classList.toggle("visible", svc === "ride");
     const hint = document.getElementById("fare-hint-txt");
     if (hint) hint.innerHTML = svc === "chauffeur"
-      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>P150/hr · Premium hourly service'
+      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P80.00 · Chauffeur premium service'
       : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Minimum P70.00 · Drivers can accept or counter';
-    if (svc === "chauffeur") updateChauffPrice();
+    if (svc === "chauffeur") setChauffType("zone");
+  }
+
+  function setChauffType(type) {
+    chauffType = type;
+    document.getElementById("ct-zone").classList.toggle("active", type === "zone");
+    document.getElementById("ct-hourly").classList.toggle("active", type === "hourly");
+    document.getElementById("hourly-input").style.display = type === "hourly" ? "flex" : "none";
+    document.getElementById("chauff-price-display").style.display = "block";
+    updateChauffPrice();
   }
 
   function updateChauffPrice() {
-    const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2);
-    document.getElementById("chauff-price-num").textContent = `P${hrs * HOURLY_RATE}`;
-    document.getElementById("chauff-price-lbl").textContent = `P${HOURLY_RATE}/hr · ${hrs} hour${hrs > 1 ? "s" : ""}`;
+    const priceEl = document.getElementById("chauff-price-num");
+    const lblEl = document.getElementById("chauff-price-lbl");
+    if (chauffType === "hourly") {
+      const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2);
+      priceEl.textContent = `P${hrs * HOURLY_RATE}`;
+      lblEl.textContent = `${hrs} hour${hrs > 1 ? "s" : ""} · P${HOURLY_RATE}/hr`;
+    } else {
+      priceEl.textContent = "P80 – P150";
+      lblEl.textContent = "Fixed rate by zone · Driver confirms price";
+    }
   }
 
   window.addEventListener("load", () => {
@@ -856,7 +894,7 @@
   const socket = io(BASE, { transports: ["websocket", "polling"] });
   socket.on("connect", () => { document.getElementById("dot").classList.add("live"); socket.emit("join-role", { role: "rider", userId: RIDER_ID }); loadHistory(); });
   socket.on("disconnect", () => document.getElementById("dot").classList.remove("live"));
-  socket.on("driver-offer", (offer) => { if (currentService === "chauffeur") return; offers[offer.driverId] = offer; renderOffers(); showToast(`New offer: P${parseFloat(offer.fare_offer).toFixed(2)}`, "warn"); });
+  socket.on("driver-offer", (offer) => { offers[offer.driverId] = offer; renderOffers(); showToast(`New offer: P${parseFloat(offer.fare_offer).toFixed(2)}`, "warn"); });
   socket.on("ride-updated", (ride) => {
     if (!activeRide || ride.id !== activeRide.id) return;
     activeRide = ride; updateProgress(ride.status);
@@ -873,10 +911,10 @@
     const dropoff = document.getElementById("dropoff").value.trim();
     if (!pickup || !dropoff) { showToast("Enter pickup and dropoff", "warn"); return; }
     let fare, rideType = currentService;
-    const minFare = currentService === "chauffeur" ? 150 : 70;
+    const minFare = currentService === "chauffeur" ? 80 : 70;
     if (currentService === "chauffeur") {
-      const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2);
-      fare = hrs * HOURLY_RATE;
+      if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); fare = hrs * HOURLY_RATE; }
+      else { fare = 80; }
     } else {
       fare = parseFloat(document.getElementById("offered-fare").value);
       if (isNaN(fare) || fare < minFare) { showToast(`Enter fare (min P${minFare})`, "warn"); return; }
@@ -889,7 +927,7 @@
       document.getElementById("w-pickup").textContent = pickup;
       document.getElementById("w-dropoff").textContent = dropoff;
       document.getElementById("w-fare").textContent = `P${fare.toFixed(2)}`;
-      document.getElementById("w-fare-lbl").textContent = currentService === "chauffeur" ? "Premium Chauffeur Hourly" : "Your offered fare";
+      document.getElementById("w-fare-lbl").textContent = currentService === "chauffeur" ? `Chauffeur · ${chauffType === "hourly" ? "Hourly hire" : "Zone pricing"}` : "Your offered fare";
       showToast("Posted! Waiting for drivers...", "warn"); loadHistory();
     } catch(e) { showToast("Failed to post ride", "error"); }
   }
@@ -898,8 +936,8 @@
     const list = Object.values(offers);
     const section = document.getElementById("offers-section");
     const el = document.getElementById("offers-list");
-    if (!list.length) { section.classList.remove("visible"); return; }
-    section.classList.add("visible");
+    if (!list.length) { section.style.display = "none"; return; }
+    section.style.display = "block";
     const myFare = parseFloat(document.getElementById("w-fare").textContent.replace("P","")) || 70;
     const starSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
     el.innerHTML = list.map(o => {
