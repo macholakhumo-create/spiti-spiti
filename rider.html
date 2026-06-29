@@ -911,7 +911,7 @@
     const dropoff = document.getElementById("dropoff").value.trim();
     if (!pickup || !dropoff) { showToast("Enter pickup and dropoff", "warn"); return; }
     let fare, rideType = currentService;
-    const minFare = currentService === "chauffeur" ? 80 : 70;
+    const minFare = currentService === "chauffeur" ? 150 : 150;
     if (currentService === "chauffeur") {
       if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); fare = hrs * HOURLY_RATE; }
       else { fare = 80; }
