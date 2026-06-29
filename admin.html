@@ -2,141 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Spiti-Spiti">
-  <title>Spiti-Spiti Admin</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Black Admin">
+  <title>Black · Admin</title>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e8e8f0; min-height: 100vh; display: flex; }
-    .sidebar { width: 220px; background: #111118; border-right: 1px solid #1e1e2e; display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
-    .sidebar-brand { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.04em; padding: 0 20px 20px; border-bottom: 1px solid #1e1e2e; display: flex; justify-content: space-between; align-items: center; }
-    .sidebar-brand span { color: #f59e0b; }
-    .sidebar-nav { padding: 16px 0; flex: 1; }
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; font-size: 0.82rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
-    .nav-item:hover { color: #e8e8f0; background: #16161d; }
-    .nav-item.active { color: #f59e0b; border-left-color: #f59e0b; background: #1a1a10; }
-    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
-    .sidebar-footer { padding: 16px 20px; border-top: 1px solid #1e1e2e; }
-    .conn-badge { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; color: #555; margin-bottom: 10px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: all 0.3s; flex-shrink: 0; }
-    .dot.live { background: #22c55e; box-shadow: 0 0 8px #22c55e88; }
-    .logout-btn { width: 100%; padding: 8px; background: none; border: 1px solid #2a2a3a; color: #555; font-family: 'Inter', sans-serif; font-size: 0.72rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-    .logout-btn:hover { border-color: #ef4444; color: #ef4444; }
-    .main { margin-left: 220px; flex: 1; padding: 32px; min-height: 100vh; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-    .page-title { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; }
-    .page-sub { font-size: 0.8rem; color: #555; margin-top: 3px; }
-    .refresh-btn { background: #16161d; border: 1px solid #2a2a3a; color: #888; padding: 8px 16px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
-    .refresh-btn:hover { border-color: #f59e0b; color: #f59e0b; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-    .stat-card { background: #16161d; border: 1px solid #1e1e2e; border-radius: 14px; padding: 20px; position: relative; overflow: hidden; }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-    .stat-card.amber::before { background: #f59e0b; }
-    .stat-card.green::before { background: #22c55e; }
-    .stat-card.blue::before  { background: #6c63ff; }
-    .stat-card.red::before   { background: #ef4444; }
-    .stat-card.purple::before { background: #a855f7; }
-    .stat-icon { font-size: 1.4rem; margin-bottom: 12px; }
-    .stat-num { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
-    .stat-card.amber .stat-num  { color: #f59e0b; }
-    .stat-card.green .stat-num  { color: #22c55e; }
-    .stat-card.blue  .stat-num  { color: #818cf8; }
-    .stat-card.red   .stat-num  { color: #ef4444; }
-    .stat-card.purple .stat-num { color: #a855f7; }
-    .stat-label { font-size: 0.72rem; color: #555; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-    .card { background: #16161d; border: 1px solid #1e1e2e; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-    .card-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #f59e0b; }
-    .card-count { font-size: 0.72rem; color: #444; background: #0f0f13; padding: 3px 10px; border-radius: 20px; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    th { text-align: left; padding: 10px 14px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #444; border-bottom: 1px solid #1e1e2e; }
-    td { padding: 12px 14px; border-bottom: 1px solid #111118; color: #ccc; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #111118; }
-    .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
-    .badge-requested   { background: #1e293b; color: #94a3b8; }
-    .badge-accepted    { background: #14532d; color: #22c55e; }
-    .badge-in_progress { background: #451a03; color: #f59e0b; }
-    .badge-completed   { background: #1e1b4b; color: #818cf8; }
-    .badge-cancelled   { background: #2d1515; color: #ef4444; }
-    .badge-online      { background: #14532d; color: #22c55e; }
-    .badge-offline     { background: #1e1e2e; color: #555; }
-    .badge-pending     { background: #1e293b; color: #94a3b8; }
-    .badge-picked_up   { background: #451a03; color: #f59e0b; }
-    .badge-in_transit  { background: #1e1b4b; color: #a855f7; }
-    .badge-delivered   { background: #14532d; color: #22c55e; }
-    .action-btn { padding: 5px 12px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: 1px solid #2a2a3a; background: #0f0f13; color: #888; font-family: 'Inter', sans-serif; transition: all 0.2s; margin-right: 4px; }
-    .action-btn:hover { border-color: #f59e0b; color: #f59e0b; }
-    .action-btn.danger:hover  { border-color: #ef4444; color: #ef4444; }
-    .action-btn.success:hover { border-color: #22c55e; color: #22c55e; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .field { display: flex; flex-direction: column; gap: 5px; }
-    .field label { font-size: 0.72rem; color: #555; }
-    .field input, .field select, .field textarea { background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px; padding: 10px 12px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.83rem; outline: none; transition: border-color 0.2s; resize: none; }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: #f59e0b; }
-    .field select option { background: #16161d; }
-    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
-    .btn:hover { opacity: 0.85; }
-    .btn-amber { background: #f59e0b; color: #000; }
-    .btn-green { background: #22c55e; color: #fff; }
-    .btn-red   { background: #ef4444; color: #fff; }
-    .btn-ghost { background: #1e1e2e; color: #888; border: 1px solid #2a2a3a; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: #16161d; border: 1px solid #2a2a3a; border-radius: 16px; padding: 28px; width: 500px; max-width: 90vw; max-height: 90vh; overflow-y: auto; }
-    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-    .inline-select { background: #0f0f13; border: 1px solid #2a2a3a; color: #ccc; padding: 4px 8px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.72rem; outline: none; cursor: pointer; }
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: #000; flex-shrink: 0; }
-    .avatar-lg { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #000; flex-shrink: 0; }
-    .empty { text-align: center; color: #333; font-size: 0.83rem; padding: 30px; }
-    .toast { position: fixed; bottom: 24px; right: 24px; background: #22c55e; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
-    .toast.show  { opacity: 1; }
-    .toast.error { background: #ef4444; }
-    .toast.warn  { background: #f59e0b; color: #000; }
-    .pending-card { background: #16161d; border: 1px solid #f59e0b33; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
-    .pending-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #f59e0b; }
-    @media (max-width: 900px) {
-      .sidebar { width: 60px; }
-      .nav-item span { display: none; }
-      .main { margin-left: 60px; padding: 20px; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-      .grid-2 { grid-template-columns: 1fr; }
+    :root {
+      --void:#060606;--matte-1:#0D0D0D;--matte-2:#111111;--matte-3:#161616;--matte-4:#1C1C1C;
+      --gloss-bg:linear-gradient(160deg,#222222 0%,#141414 55%,#0D0D0D 100%);
+      --gloss-btn:linear-gradient(180deg,#282828 0%,#141414 100%);
+      --border:#1E1E1E;--border-hi:#2A2A2A;--border-gl:#3A3A3A;
+      --text:#F0F0F0;--text-mid:#888888;--text-dim:#3A3A3A;
+      --white:#FFFFFF;--chrome:#C8C8C8;--silver:#888888;
+      --green:#22C55E;--red:#EF4444;--amber:#F59E0B;--blue:#818CF8;--purple:#A855F7;
+      --gloss-highlight:rgba(255,255,255,0.10);
+      --gloss-shadow:0 2px 12px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.9);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--void); color:var(--text); min-height:100vh; display:flex; }
+
+    /* SIDEBAR */
+    .sidebar { width:230px; background:rgba(6,6,6,0.96); backdrop-filter:blur(20px); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:22px 0; position:fixed; top:0; left:0; height:100vh; z-index:100; }
+    .sidebar-brand { font-size:1.15rem; font-weight:800; letter-spacing:-0.05em; color:var(--text); padding:0 20px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+    .brand-mark { width:28px; height:28px; background:var(--gloss-bg); border:1px solid var(--border-hi); border-top-color:var(--border-gl); border-radius:8px; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 1px 0 var(--gloss-highlight),var(--gloss-shadow); flex-shrink:0; }
+    .brand-mark svg { width:15px; height:15px; }
+    .brand-dot { width:5px; height:5px; border-radius:50%; background:var(--white); box-shadow:0 0 5px rgba(255,255,255,0.4); margin-left:1px; }
+    .sidebar-nav { padding:16px 0; flex:1; }
+    .nav-item { display:flex; align-items:center; gap:11px; padding:11px 20px; font-size:0.82rem; font-weight:500; color:var(--text-mid); cursor:pointer; transition:all 0.2s; border-left:3px solid transparent; }
+    .nav-item:hover { color:var(--text); background:var(--matte-2); }
+    .nav-item.active { color:var(--chrome); border-left-color:var(--chrome); background:var(--matte-3); }
+    .nav-item svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; flex-shrink:0; }
+    .sidebar-footer { padding:16px 20px; border-top:1px solid var(--border); }
+    .conn-badge { display:flex; align-items:center; gap:8px; font-size:0.72rem; color:var(--text-mid); margin-bottom:10px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--border-hi); transition:all 0.3s; flex-shrink:0; }
+    .dot.live { background:var(--green); box-shadow:0 0 8px rgba(34,197,94,0.5); }
+    .logout-btn { width:100%; padding:9px; background:var(--matte-3); border:1px solid var(--border); color:var(--text-mid); font-family:inherit; font-size:0.72rem; border-radius:9px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .logout-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2; }
+    .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+    /* MAIN */
+    .main { margin-left:230px; flex:1; padding:30px; min-height:100vh; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+    .page-title { font-size:1.4rem; font-weight:800; letter-spacing:-0.04em; }
+    .page-sub { font-size:0.8rem; color:var(--text-mid); margin-top:3px; }
+    .refresh-btn { background:var(--matte-3); border:1px solid var(--border); color:var(--text-mid); padding:9px 16px; border-radius:10px; font-size:0.75rem; cursor:pointer; font-family:inherit; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+    .refresh-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; }
+    .refresh-btn:hover { border-color:var(--border-gl); color:var(--chrome); }
+    .page { display:none; }
+    .page.active { display:block; }
+
+    /* STATS */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    .stat-card { background:var(--gloss-bg); border:1px solid var(--border-hi); border-top-color:var(--border-gl); border-radius:14px; padding:18px; box-shadow:inset 0 1px 0 var(--gloss-highlight); position:relative; overflow:hidden; }
+    .stat-icon { width:30px; height:30px; border-radius:8px; background:var(--matte-4); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+    .stat-icon svg { width:15px; height:15px; stroke:var(--chrome); fill:none; stroke-width:2; }
+    .stat-num { font-size:1.9rem; font-weight:800; letter-spacing:-0.04em; line-height:1; margin-bottom:4px; color:var(--chrome); }
+    .stat-label { font-size:0.7rem; color:var(--text-mid); }
+
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+    .card { background:var(--matte-2); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:18px; }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .card-title { font-size:0.68rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--chrome); }
+    .card-count { font-size:0.7rem; color:var(--text-mid); background:var(--matte-4); border:1px solid var(--border); padding:3px 10px; border-radius:20px; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    th { text-align:left; padding:10px 14px; font-size:0.65rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); border-bottom:1px solid var(--border); }
+    td { padding:12px 14px; border-bottom:1px solid var(--matte-1); color:var(--text); vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--matte-1); }
+
+    .badge { padding:3px 10px; border-radius:20px; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .badge-requested,.badge-pending { background:var(--matte-4); color:var(--text-mid); border:1px solid var(--border); }
+    .badge-accepted,.badge-delivered,.badge-online { background:rgba(34,197,94,0.10); color:var(--green); border:1px solid rgba(34,197,94,0.2); }
+    .badge-in_progress,.badge-picked_up { background:rgba(245,158,11,0.10); color:var(--amber); border:1px solid rgba(245,158,11,0.2); }
+    .badge-completed { background:rgba(129,140,248,0.10); color:var(--blue); border:1px solid rgba(129,140,248,0.2); }
+    .badge-in_transit { background:rgba(168,85,247,0.10); color:var(--purple); border:1px solid rgba(168,85,247,0.2); }
+    .badge-cancelled,.badge-suspended { background:rgba(239,68,68,0.10); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+    .badge-offline { background:var(--matte-4); color:var(--text-dim); border:1px solid var(--border); }
+
+    .action-btn { padding:5px 12px; border-radius:8px; font-size:0.7rem; font-weight:600; cursor:pointer; border:1px solid var(--border); background:var(--matte-3); color:var(--text-mid); font-family:inherit; transition:all 0.2s; margin-right:4px; }
+    .action-btn:hover { border-color:var(--border-gl); color:var(--chrome); }
+    .action-btn.danger:hover { border-color:var(--red); color:var(--red); }
+    .action-btn.success:hover { border-color:var(--green); color:var(--green); }
+    .action-btn.warn:hover { border-color:var(--amber); color:var(--amber); }
+
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .field { display:flex; flex-direction:column; gap:5px; }
+    .field label { font-size:0.7rem; color:var(--text-mid); }
+    .field input,.field select,.field textarea { background:var(--matte-3); border:1px solid var(--border); border-radius:9px; padding:10px 12px; color:var(--text); font-family:inherit; font-size:0.83rem; outline:none; transition:border-color 0.2s; resize:none; }
+    .field input:focus,.field select:focus,.field textarea:focus { border-color:var(--border-gl); }
+    .field select option { background:var(--matte-3); }
+
+    .btn { padding:10px 20px; border-radius:10px; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s; border:1px solid var(--border-hi); }
+    .btn-primary { background:var(--gloss-btn); color:var(--text); border-top-color:var(--border-gl); box-shadow:inset 0 1px 0 var(--gloss-highlight); }
+    .btn-primary:hover { border-color:var(--chrome); }
+    .btn-ghost { background:var(--matte-3); color:var(--text-mid); border-color:var(--border); }
+    .btn-ghost:hover { color:var(--text); }
+
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:500; display:none; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--matte-2); border:1px solid var(--border-hi); border-radius:18px; padding:26px; width:500px; max-width:90vw; max-height:90vh; overflow-y:auto; box-shadow:var(--gloss-shadow); }
+    .modal-title { font-size:1rem; font-weight:800; margin-bottom:18px; letter-spacing:-0.02em; }
+    .modal-actions { display:flex; gap:10px; margin-top:18px; justify-content:flex-end; }
+
+    .inline-select { background:var(--matte-3); border:1px solid var(--border); color:var(--text); padding:5px 9px; border-radius:8px; font-family:inherit; font-size:0.72rem; outline:none; cursor:pointer; }
+    .avatar { width:32px; height:32px; border-radius:50%; background:var(--gloss-bg); border:1px solid var(--border-hi); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; color:var(--text); flex-shrink:0; box-shadow:inset 0 1px 0 var(--gloss-highlight); }
+    .avatar-lg { width:40px; height:40px; border-radius:50%; background:var(--gloss-bg); border:1px solid var(--border-hi); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.9rem; color:var(--text); flex-shrink:0; box-shadow:inset 0 1px 0 var(--gloss-highlight); }
+    .empty { text-align:center; color:var(--text-dim); font-size:0.82rem; padding:28px; }
+    .toast { position:fixed; bottom:24px; right:24px; background:var(--matte-3); border:1px solid var(--border-gl); color:var(--text); padding:12px 20px; border-radius:10px; font-size:0.82rem; font-weight:600; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:999; }
+    .toast.show { opacity:1; }
+    .toast.error { background:#1A0606; border-color:var(--red); color:var(--red); }
+    .toast.warn { background:var(--matte-4); border-color:var(--border-gl); color:var(--chrome); }
+
+    .pending-card { background:var(--matte-2); border:1px solid rgba(245,158,11,0.2); border-radius:16px; padding:20px; margin-bottom:18px; }
+    .pending-title { font-size:0.68rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--amber); }
+
+    @media (max-width:900px) {
+      .sidebar { width:60px; }
+      .nav-item span,.sidebar-brand span { display:none; }
+      .main { margin-left:60px; padding:18px; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .grid-2 { grid-template-columns:1fr; }
     }
 
-    /* ── ADMIN LOGIN OVERLAY ── */
-    .login-overlay { position: fixed; inset: 0; background: #0a0a0f; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-    .login-overlay.hidden { display: none; }
-    .login-box { background: #111118; border: 1px solid #2a2a3a; border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 380px; }
-    .login-logo { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.04em; color: #e8e8f0; margin-bottom: 6px; }
-    .login-logo span { color: #f59e0b; }
-    .login-tagline { font-size: 0.78rem; color: #444; margin-bottom: 32px; }
-    .login-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #f59e0b; margin-bottom: 20px; }
-    .login-field { margin-bottom: 14px; }
-    .login-field label { display: block; font-size: 0.7rem; color: #555; margin-bottom: 5px; }
-    .login-field input { width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px; padding: 11px 14px; color: #e8e8f0; font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
-    .login-field input:focus { border-color: #f59e0b; }
-    .login-btn { width: 100%; padding: 12px; background: #f59e0b; color: #000; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity 0.2s; }
-    .login-btn:hover { opacity: 0.88; }
-    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .login-error { color: #ef4444; font-size: 0.72rem; margin-top: 10px; min-height: 18px; text-align: center; }
+    /* LOGIN */
+    .login-overlay { position:fixed; inset:0; background:var(--void); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .login-overlay.hidden { display:none; }
+    .login-box { background:var(--matte-2); border:1px solid var(--border-hi); border-radius:20px; padding:38px 34px; width:100%; max-width:380px; box-shadow:var(--gloss-shadow); }
+    .login-logo { font-size:1.6rem; font-weight:800; letter-spacing:-0.05em; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:4px; }
+    .login-logo .brand-dot { width:7px; height:7px; }
+    .login-tagline { font-size:0.78rem; color:var(--text-dim); margin-bottom:30px; }
+    .login-title { font-size:0.68rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--chrome); margin-bottom:18px; }
+    .login-field { margin-bottom:14px; }
+    .login-field label { display:block; font-size:0.7rem; color:var(--text-mid); margin-bottom:5px; }
+    .login-field input { width:100%; background:var(--matte-3); border:1px solid var(--border); border-radius:9px; padding:11px 14px; color:var(--text); font-family:inherit; font-size:0.85rem; outline:none; transition:border-color 0.2s; }
+    .login-field input:focus { border-color:var(--border-gl); }
+    .login-btn { width:100%; padding:12px; background:var(--gloss-btn); color:var(--text); border:1px solid var(--border-hi); border-top-color:var(--border-gl); box-shadow:inset 0 1px 0 var(--gloss-highlight); border-radius:10px; font-family:inherit; font-size:0.85rem; font-weight:700; cursor:pointer; margin-top:6px; transition:all 0.2s; }
+    .login-btn:hover { border-color:var(--chrome); }
+    .login-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .login-error { color:var(--red); font-size:0.72rem; margin-top:10px; min-height:18px; text-align:center; }
   </style>
 </head>
 <body>
 
-
 <div class="login-overlay" id="login-overlay">
   <div class="login-box">
-    <div class="login-logo">Spiti-Spiti<span>.</span></div>
+    <div class="login-logo">Black<div class="brand-dot"></div></div>
     <div class="login-tagline">Admin Dashboard</div>
     <div class="login-title">Sign In</div>
     <div class="login-field">
@@ -147,27 +161,30 @@
       <label>Password</label>
       <input type="password" id="adm-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
     </div>
-    <button class="login-btn" id="adm-login-btn" onclick="doAdminLogin()">Sign In →</button>
+    <button class="login-btn" id="adm-login-btn" onclick="doAdminLogin()">Sign In</button>
     <div class="login-error" id="adm-error"></div>
   </div>
 </div>
 
 <div class="sidebar">
-  <div class="sidebar-brand">Spiti-Spiti<span>.</span></div>
+  <div class="sidebar-brand">
+    <div class="brand-mark"><svg viewBox="0 0 14 14"><path d="M1 9 C1 7.8 1.8 7.3 2.8 7 L4.8 6 C6 4.4 8 4 9.5 4 L10.5 4 C11.7 4.3 12.5 5 13 6.2 L13 8 C13 8.7 12.6 9 11.8 9 L1.8 9 C1.3 9 1 8.8 1 8.2 Z" fill="white"/><circle cx="4" cy="9.2" r="1.5" fill="white"/><circle cx="10" cy="9.2" r="1.5" fill="white"/></svg></div>
+    <span>Black<span class="brand-dot" style="display:inline-block;vertical-align:middle"></span></span>
+  </div>
   <nav class="sidebar-nav">
-    <div class="nav-item active" onclick="showPage('overview', this)"><span class="nav-icon">📊</span><span>Overview</span></div>
-    <div class="nav-item" onclick="showPage('rides', this)"><span class="nav-icon">🚗</span><span>Rides</span></div>
-    <div class="nav-item" onclick="showPage('deliveries', this)"><span class="nav-icon">📦</span><span>Deliveries</span></div>
-    <div class="nav-item" onclick="showPage('drivers', this)"><span class="nav-icon">👤</span><span>Drivers</span></div>
-    <div class="nav-item" onclick="showPage('fleet', this)"><span class="nav-icon">🚙</span><span>Fleet</span></div>
-    <div class="nav-item" onclick="showPage('revenue', this)"><span class="nav-icon">💰</span><span>Revenue</span></div>
+    <div class="nav-item active" onclick="showPage('overview', this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg><span>Overview</span></div>
+    <div class="nav-item" onclick="showPage('rides', this)"><svg viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="10" rx="2"/><polygon points="16 9 20 9 23 12 23 17 16 17 16 9"/><circle cx="5" cy="17" r="2"/><circle cx="18" cy="17" r="2"/></svg><span>Rides</span></div>
+    <div class="nav-item" onclick="showPage('deliveries', this)"><svg viewBox="0 0 24 24"><path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg><span>Deliveries</span></div>
+    <div class="nav-item" onclick="showPage('drivers', this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Drivers</span></div>
+    <div class="nav-item" onclick="showPage('fleet', this)"><svg viewBox="0 0 24 24"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg><span>Fleet</span></div>
+    <div class="nav-item" onclick="showPage('revenue', this)"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Revenue</span></div>
   </nav>
   <div class="sidebar-footer">
     <div class="conn-badge">
       <div class="dot" id="dot"></div>
       <span id="conn-label">Connecting...</span>
     </div>
-    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    <button class="logout-btn" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
   </div>
 </div>
 
@@ -177,13 +194,13 @@
   <div class="page active" id="page-overview">
     <div class="topbar">
       <div><div class="page-title">Overview</div><div class="page-sub" id="last-updated">Loading...</div></div>
-      <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+      <button class="refresh-btn" onclick="loadAll()"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
     </div>
     <div class="stats-grid">
-      <div class="stat-card amber"><div class="stat-icon">🚗</div><div class="stat-num" id="stat-total-rides">0</div><div class="stat-label">Total Rides</div></div>
-      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num" id="stat-completed">0</div><div class="stat-label">Completed Rides</div></div>
-      <div class="stat-card purple"><div class="stat-icon">📦</div><div class="stat-num" id="stat-deliveries">0</div><div class="stat-label">Deliveries</div></div>
-      <div class="stat-card blue"><div class="stat-icon">👤</div><div class="stat-num" id="stat-drivers">0</div><div class="stat-label">Total Drivers</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="1" y="7" width="15" height="10" rx="2"/><polygon points="16 9 20 9 23 12 23 17 16 17 16 9"/><circle cx="5" cy="17" r="2"/><circle cx="18" cy="17" r="2"/></svg></div><div class="stat-num" id="stat-total-rides">0</div><div class="stat-label">Total Rides</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-num" id="stat-completed">0</div><div class="stat-label">Completed Rides</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg></div><div class="stat-num" id="stat-deliveries">0</div><div class="stat-label">Deliveries</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="stat-num" id="stat-drivers">0</div><div class="stat-label">Total Drivers</div></div>
     </div>
     <div class="grid-2">
       <div class="card">
@@ -223,7 +240,7 @@
           <option value="in_progress">In Progress</option>
           <option value="completed">Completed</option>
         </select>
-        <button class="refresh-btn" onclick="loadRides()">↻ Refresh</button>
+        <button class="refresh-btn" onclick="loadRides()"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
       </div>
     </div>
     <div class="card">
@@ -241,15 +258,15 @@
     <div class="topbar">
       <div><div class="page-title">Deliveries</div><div class="page-sub">Manage all package deliveries</div></div>
       <div style="display:flex;gap:10px">
-        <button class="refresh-btn" onclick="loadDeliveries()">↻ Refresh</button>
-        <button class="btn btn-amber" onclick="openModal('add-delivery-modal')">+ New Delivery</button>
+        <button class="refresh-btn" onclick="loadDeliveries()"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
+        <button class="btn btn-primary" onclick="openModal('add-delivery-modal')">+ New Delivery</button>
       </div>
     </div>
-    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-card amber"><div class="stat-icon">📦</div><div class="stat-num" id="del-total">0</div><div class="stat-label">Total</div></div>
-      <div class="stat-card blue"><div class="stat-icon">🔄</div><div class="stat-num" id="del-transit">0</div><div class="stat-label">In Transit</div></div>
-      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num" id="del-delivered">0</div><div class="stat-label">Delivered</div></div>
-      <div class="stat-card red"><div class="stat-icon">⏳</div><div class="stat-num" id="del-pending">0</div><div class="stat-label">Pending</div></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="stat-num" id="del-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div><div class="stat-num" id="del-transit">0</div><div class="stat-label">In Transit</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-num" id="del-delivered">0</div><div class="stat-label">Delivered</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-num" id="del-pending">0</div><div class="stat-label">Pending</div></div>
     </div>
     <div class="card">
       <div class="table-wrap">
@@ -265,13 +282,12 @@
   <div class="page" id="page-drivers">
     <div class="topbar">
       <div><div class="page-title">Drivers</div><div class="page-sub">Manage your driver fleet</div></div>
-      <button class="btn btn-amber" onclick="openModal('add-driver-modal')">+ Add Driver</button>
+      <button class="btn btn-primary" onclick="openModal('add-driver-modal')">+ Add Driver</button>
     </div>
 
-    <!-- PENDING APPROVAL -->
     <div class="pending-card">
       <div class="card-header">
-        <div class="pending-title">⏳ Pending Approval</div>
+        <div class="pending-title">Pending Approval</div>
         <div class="card-count" id="pending-count">0</div>
       </div>
       <div class="table-wrap">
@@ -282,7 +298,6 @@
       </div>
     </div>
 
-    <!-- APPROVED DRIVERS -->
     <div class="card">
       <div class="card-header">
         <div class="card-title">Approved Drivers</div>
@@ -301,12 +316,12 @@
   <div class="page" id="page-fleet">
     <div class="topbar">
       <div><div class="page-title">Fleet Management</div><div class="page-sub">Manage vehicles and assignments</div></div>
-      <button class="btn btn-amber" onclick="openModal('add-vehicle-modal')">+ Add Vehicle</button>
+      <button class="btn btn-primary" onclick="openModal('add-vehicle-modal')">+ Add Vehicle</button>
     </div>
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="stat-card amber"><div class="stat-icon">🚙</div><div class="stat-num" id="fleet-total">0</div><div class="stat-label">Total Vehicles</div></div>
-      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-num" id="fleet-available">0</div><div class="stat-label">Available</div></div>
-      <div class="stat-card red"><div class="stat-icon">🔧</div><div class="stat-num" id="fleet-maintenance">0</div><div class="stat-label">In Maintenance</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg></div><div class="stat-num" id="fleet-total">0</div><div class="stat-label">Total Vehicles</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-num" id="fleet-available">0</div><div class="stat-label">Available</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="stat-num" id="fleet-maintenance">0</div><div class="stat-label">In Maintenance</div></div>
     </div>
     <div class="card">
       <div class="table-wrap">
@@ -322,13 +337,13 @@
   <div class="page" id="page-revenue">
     <div class="topbar">
       <div><div class="page-title">Revenue</div><div class="page-sub">Earnings overview</div></div>
-      <button class="refresh-btn" onclick="loadRevenue()">↻ Refresh</button>
+      <button class="refresh-btn" onclick="loadRevenue()"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
     </div>
     <div class="stats-grid">
-      <div class="stat-card amber"><div class="stat-icon">💰</div><div class="stat-num" id="rev-total">P0</div><div class="stat-label">Total Revenue</div></div>
-      <div class="stat-card green"><div class="stat-icon">📅</div><div class="stat-num" id="rev-today">P0</div><div class="stat-label">Today</div></div>
-      <div class="stat-card blue"><div class="stat-icon">📈</div><div class="stat-num" id="rev-avg">P0</div><div class="stat-label">Avg per Ride</div></div>
-      <div class="stat-card red"><div class="stat-icon">🏆</div><div class="stat-num" id="rev-completed">0</div><div class="stat-label">Paid Rides</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-num" id="rev-total">P0</div><div class="stat-label">Total Revenue</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-num" id="rev-today">P0</div><div class="stat-label">Today</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="23" y1="6" x2="13.5" y2="15.5" /><polyline points="17 6 23 6 23 12"/></svg></div><div class="stat-num" id="rev-avg">P0</div><div class="stat-label">Avg per Ride</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div><div class="stat-num" id="rev-completed">0</div><div class="stat-label">Paid Rides</div></div>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">Revenue by Ride</div></div>
@@ -353,7 +368,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-amber" onclick="addDriver()">Add Driver</button>
+      <button class="btn btn-primary" onclick="addDriver()">Add Driver</button>
     </div>
   </div>
 </div>
@@ -380,7 +395,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-amber" onclick="addVehicle()">Add Vehicle</button>
+      <button class="btn btn-primary" onclick="addVehicle()">Add Vehicle</button>
     </div>
   </div>
 </div>
@@ -393,7 +408,7 @@
     <div class="field"><label>Select Driver</label><select id="reassign-driver-select"></select></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-amber" onclick="confirmReassign()">Reassign</button>
+      <button class="btn btn-primary" onclick="confirmReassign()">Reassign</button>
     </div>
   </div>
 </div>
@@ -420,7 +435,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-amber" onclick="addDelivery()">Create Delivery</button>
+      <button class="btn btn-primary" onclick="addDelivery()">Create Delivery</button>
     </div>
   </div>
 </div>
@@ -431,7 +446,6 @@
   const BASE = "https://spiti-spiti-production.up.railway.app";
   let allRides = [], allDrivers = [], allVehicles = [], allDeliveries = [];
 
-  // ── ADMIN LOGIN ──────────────────────────────────────────
   async function doAdminLogin() {
     const username = document.getElementById("adm-username").value.trim();
     const password = document.getElementById("adm-password").value;
@@ -447,34 +461,27 @@
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-      if (!res.ok) { errEl.textContent = data.error || "Invalid credentials"; btn.textContent = "Sign In →"; btn.disabled = false; return; }
+      if (!res.ok) { errEl.textContent = data.error || "Invalid credentials"; btn.textContent = "Sign In"; btn.disabled = false; return; }
       localStorage.setItem("spiti_admin", JSON.stringify({ name: data.name, role: "admin" }));
       document.getElementById("login-overlay").classList.add("hidden");
       initAdmin();
     } catch(e) {
       errEl.textContent = "Cannot reach server. Check connection.";
-      btn.textContent = "Sign In →"; btn.disabled = false;
+      btn.textContent = "Sign In"; btn.disabled = false;
     }
   }
 
-  function initAdmin() {
-    connectSocket();
-    loadAll();
-  }
+  function initAdmin() { connectSocket(); loadAll(); }
 
-  // Check if already logged in
   const adminData = JSON.parse(localStorage.getItem("spiti_admin") || "null");
-  if (adminData) {
-    document.getElementById("login-overlay").classList.add("hidden");
-    // initAdmin called after socket setup below
-  }
+  if (adminData) { document.getElementById("login-overlay").classList.add("hidden"); }
 
   function logout() {
     localStorage.removeItem("spiti_admin");
     document.getElementById("adm-username").value = "";
     document.getElementById("adm-password").value = "";
     document.getElementById("adm-error").textContent = "";
-    document.getElementById("adm-login-btn").textContent = "Sign In →";
+    document.getElementById("adm-login-btn").textContent = "Sign In";
     document.getElementById("adm-login-btn").disabled = false;
     document.getElementById("login-overlay").classList.remove("hidden");
   }
@@ -499,7 +506,6 @@
     socket.on("delivery-updated", () => { loadAll(); });
   }
 
-  // Auto-init if already logged in
   if (adminData) { connectSocket(); }
 
   function showPage(name, el) {
@@ -540,7 +546,7 @@
 
       document.getElementById("live-rides-body").innerHTML = active.length ? active.map(r => `
         <tr>
-          <td style="color:#555">#${r.id}</td>
+          <td style="color:var(--text-dim)">#${r.id}</td>
           <td>${r.pickup} → ${r.dropoff}</td>
           <td><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></td>
           <td>${r.driver_id || "—"}</td>
@@ -549,24 +555,22 @@
       const online = drivers.filter(d => d.available);
       document.getElementById("online-count").textContent = online.length + " online";
       document.getElementById("driver-status-list").innerHTML = drivers.length ? drivers.map(d => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #111118">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--matte-1)">
           <div style="display:flex;align-items:center;gap:10px">
             <div class="avatar-lg">${d.name.charAt(0).toUpperCase()}</div>
             <div>
               <div style="font-size:0.83rem;font-weight:500">${d.name}</div>
-              <div style="font-size:0.7rem;color:#444">${d.phone || "No phone"}</div>
+              <div style="font-size:0.7rem;color:var(--text-dim)">${d.phone || "No phone"}</div>
             </div>
           </div>
-          <span class="badge ${d.available ? 'badge-online' : 'badge-offline'}">${d.available ? 'Online' : 'Offline'}</span>
+          <span class="badge ${d.suspended ? 'badge-suspended' : (d.available ? 'badge-online' : 'badge-offline')}">${d.suspended ? 'Suspended' : (d.available ? 'Online' : 'Offline')}</span>
         </div>`).join("") : '<div class="empty">No drivers</div>';
 
       document.getElementById("recent-deliveries-body").innerHTML = deliveries.length ? deliveries.slice(0,5).map(d => `
         <tr>
-          <td style="color:#555">#${d.id}</td>
+          <td style="color:var(--text-dim)">#${d.id}</td>
           <td>${d.sender_name || "—"}</td>
           <td>${d.recipient_name || "—"}</td>
-          <td>${d.pickup_address}</td>
-          <td>${d.dropoff_address}</td>
           <td>${d.package_description || "—"}</td>
           <td><span class="badge badge-${d.status}">${d.status.replace(/_/g," ")}</span></td>
           <td>${d.driver_name || "—"}</td>
@@ -574,25 +578,17 @@
     } catch(e) { showToast("Failed to load overview", "error"); }
   }
 
-  // ─── RIDES ────────────────────────────────────────────────
-
   async function loadRides() {
-    try {
-      const res = await fetch(`${BASE}/rides`);
-      allRides = await res.json();
-      renderRides(allRides);
-    } catch(e) {}
+    try { const res = await fetch(`${BASE}/rides`); allRides = await res.json(); renderRides(allRides); } catch(e) {}
   }
-
   function filterRides() {
     const filter = document.getElementById("status-filter").value;
     renderRides(filter ? allRides.filter(r => r.status === filter) : allRides);
   }
-
   function renderRides(rides) {
     document.getElementById("all-rides-body").innerHTML = rides.length ? rides.map(r => `
       <tr>
-        <td style="color:#555">#${r.id}</td>
+        <td style="color:var(--text-dim)">#${r.id}</td>
         <td>${r.pickup}</td>
         <td>${r.dropoff}</td>
         <td><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></td>
@@ -606,35 +602,20 @@
         </td>
       </tr>`).join("") : '<tr><td colspan="8" class="empty">No rides found</td></tr>';
   }
-
   async function updateRideStatus(id, status) {
-    try {
-      await fetch(`${BASE}/rides/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) });
-      showToast("Ride updated"); loadAll();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/rides/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) }); showToast("Ride updated"); loadAll(); } catch(e) { showToast("Failed","error"); }
   }
-
-  async function cancelRide(id) {
-    if (!confirm("Cancel ride #" + id + "?")) return;
-    await updateRideStatus(id, "cancelled");
-  }
-
+  async function cancelRide(id) { if (!confirm("Cancel ride #" + id + "?")) return; await updateRideStatus(id, "cancelled"); }
   function openReassign(rideId) {
     document.getElementById("reassign-ride-id").value = rideId;
     document.getElementById("reassign-driver-select").innerHTML = allDrivers.map(d => `<option value="${d.id}">${d.name}</option>`).join("");
     openModal("reassign-modal");
   }
-
   async function confirmReassign() {
     const rideId = document.getElementById("reassign-ride-id").value;
     const driverId = document.getElementById("reassign-driver-select").value;
-    try {
-      await fetch(`${BASE}/rides/${rideId}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId}) });
-      showToast("Driver reassigned"); closeModal(); loadAll();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/rides/${rideId}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId}) }); showToast("Driver reassigned"); closeModal(); loadAll(); } catch(e) { showToast("Failed","error"); }
   }
-
-  // ─── DELIVERIES ───────────────────────────────────────────
 
   async function loadDeliveries() {
     try {
@@ -647,16 +628,15 @@
       document.getElementById("del-pending").textContent   = allDeliveries.filter(d => d.status === "pending").length;
     } catch(e) {}
   }
-
   function renderDeliveries(deliveries) {
     document.getElementById("deliveries-body").innerHTML = deliveries.length ? deliveries.map(d => `
       <tr>
-        <td style="color:#555">#${d.id}</td>
-        <td>${d.sender_name||"—"}<br><small style="color:#444">${d.sender_phone||""}</small></td>
-        <td>${d.recipient_name||"—"}<br><small style="color:#444">${d.recipient_phone||""}</small></td>
+        <td style="color:var(--text-dim)">#${d.id}</td>
+        <td>${d.sender_name||"—"}<br><small style="color:var(--text-dim)">${d.sender_phone||""}</small></td>
+        <td>${d.recipient_name||"—"}<br><small style="color:var(--text-dim)">${d.recipient_phone||""}</small></td>
         <td>${d.pickup_address}</td>
         <td>${d.dropoff_address}</td>
-        <td>${d.package_description||"—"}<br><small style="color:#444">${d.weight?d.weight+"kg":""}</small></td>
+        <td>${d.package_description||"—"}<br><small style="color:var(--text-dim)">${d.weight?d.weight+"kg":""}</small></td>
         <td>
           <select class="inline-select" onchange="updateDeliveryStatus(${d.id},this.value)">
             <option value="pending"    ${d.status==='pending'   ?'selected':''}>Pending</option>
@@ -675,7 +655,6 @@
         <td><button class="action-btn danger" onclick="deleteDelivery(${d.id})">Delete</button></td>
       </tr>`).join("") : '<tr><td colspan="9" class="empty">No deliveries yet</td></tr>';
   }
-
   async function addDelivery() {
     const body = {
       sender_name: document.getElementById("d-sender-name").value.trim(),
@@ -688,60 +667,48 @@
       weight: document.getElementById("d-weight").value
     };
     if (!body.pickup_address || !body.dropoff_address) return showToast("Enter pickup and dropoff","error");
-    try {
-      await fetch(`${BASE}/deliveries`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
-      showToast("Delivery created!"); closeModal(); loadDeliveries();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/deliveries`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) }); showToast("Delivery created!"); closeModal(); loadDeliveries(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function updateDeliveryStatus(id, status) {
-    try {
-      await fetch(`${BASE}/deliveries/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) });
-      showToast("Delivery updated"); loadDeliveries();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/deliveries/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) }); showToast("Delivery updated"); loadDeliveries(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function assignDelivery(id, driverId) {
-    try {
-      await fetch(`${BASE}/deliveries/${id}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId||null}) });
-      showToast("Driver assigned"); loadDeliveries();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/deliveries/${id}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId||null}) }); showToast("Driver assigned"); loadDeliveries(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function deleteDelivery(id) {
     if (!confirm("Delete delivery #" + id + "?")) return;
-    try {
-      await fetch(`${BASE}/deliveries/${id}`, { method:"DELETE" });
-      showToast("Delivery deleted"); loadDeliveries();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/deliveries/${id}`, { method:"DELETE" }); showToast("Delivery deleted"); loadDeliveries(); } catch(e) { showToast("Failed","error"); }
   }
-
-  // ─── DRIVERS ──────────────────────────────────────────────
 
   async function loadDrivers() {
-    try {
-      const res = await fetch(`${BASE}/drivers`);
-      allDrivers = await res.json();
-      renderDrivers(allDrivers);
-      document.getElementById("drivers-count").textContent = allDrivers.length;
-    } catch(e) {}
+    try { const res = await fetch(`${BASE}/drivers`); allDrivers = await res.json(); renderDrivers(allDrivers); document.getElementById("drivers-count").textContent = allDrivers.length; } catch(e) {}
   }
-
   function renderDrivers(drivers) {
-    document.getElementById("drivers-body").innerHTML = drivers.length ? drivers.map(d => `
+    document.getElementById("drivers-body").innerHTML = drivers.length ? drivers.map(d => {
+      const statusBadge = d.suspended
+        ? '<span class="badge badge-suspended">Suspended</span>'
+        : `<span class="badge ${d.available?'badge-online':'badge-offline'}">${d.available?'Online':'Offline'}</span>`;
+      const suspendBtn = d.suspended
+        ? `<button class="action-btn success" onclick="restoreDriver(${d.id})">Restore</button>`
+        : `<button class="action-btn warn" onclick="suspendDriver(${d.id})">Suspend</button>`;
+      const onlineBtn = d.suspended
+        ? ''
+        : `<button class="action-btn ${d.available?'danger':'success'}" onclick="toggleDriver(${d.id},${!d.available})">${d.available?'Set Offline':'Set Online'}</button>`;
+      return `
       <tr>
-        <td style="color:#555">#${d.id}</td>
+        <td style="color:var(--text-dim)">#${d.id}</td>
         <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">${d.name.charAt(0).toUpperCase()}</div>${d.name}</div></td>
         <td>${d.phone||"—"}</td>
-        <td style="color:#f59e0b;font-size:0.78rem">${d.license_number||"—"}</td>
-        <td><span class="badge ${d.available?'badge-online':'badge-offline'}">${d.available?'Online':'Offline'}</span></td>
+        <td style="color:var(--chrome);font-size:0.78rem">${d.license_number||"—"}</td>
+        <td>${statusBadge}</td>
         <td>
-          <button class="action-btn ${d.available?'danger':'success'}" onclick="toggleDriver(${d.id},${!d.available})">${d.available?'Set Offline':'Set Online'}</button>
+          ${onlineBtn}
+          ${suspendBtn}
           <button class="action-btn danger" onclick="deleteDriver(${d.id})">Remove</button>
         </td>
-      </tr>`).join("") : '<tr><td colspan="6" class="empty">No approved drivers yet</td></tr>';
+      </tr>`;
+    }).join("") : '<tr><td colspan="6" class="empty">No approved drivers yet</td></tr>';
   }
-
   async function loadPending() {
     try {
       const res = await fetch(`${BASE}/auth/drivers/pending`);
@@ -751,35 +718,30 @@
         <tr>
           <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${d.name.charAt(0).toUpperCase()}</div>${d.name}</div></td>
           <td>${d.phone}</td>
-          <td style="color:#888;font-size:0.78rem">${d.id_number||"—"}</td>
-          <td style="color:#f59e0b;font-weight:600">${d.license_number}</td>
-          <td style="color:#444;font-size:0.72rem">${new Date(d.created_at).toLocaleDateString()}</td>
+          <td style="color:var(--text-mid);font-size:0.78rem">${d.id_number||"—"}</td>
+          <td style="color:var(--chrome);font-weight:600">${d.license_number}</td>
+          <td style="color:var(--text-dim);font-size:0.72rem">${new Date(d.created_at).toLocaleDateString()}</td>
           <td>
-            <button class="action-btn success" onclick="approveDriver(${d.id})">✓ Approve</button>
-            <button class="action-btn danger" onclick="rejectDriver(${d.id})">✕ Reject</button>
+            <button class="action-btn success" onclick="approveDriver(${d.id})">Approve</button>
+            <button class="action-btn danger" onclick="rejectDriver(${d.id})">Reject</button>
           </td>
         </tr>`).join("") : '<tr><td colspan="6" class="empty">No pending drivers</td></tr>';
     } catch(e) {}
   }
-
   async function approveDriver(id) {
-    try {
-      await fetch(`${BASE}/auth/drivers/${id}/approve`, { method:"PATCH" });
-      showToast("Driver approved! ✅");
-      loadPending();
-      loadDrivers();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/auth/drivers/${id}/approve`, { method:"PATCH" }); showToast("Driver approved"); loadPending(); loadDrivers(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function rejectDriver(id) {
     if (!confirm("Reject and delete this driver application?")) return;
-    try {
-      await fetch(`${BASE}/auth/drivers/${id}/reject`, { method:"DELETE" });
-      showToast("Driver rejected");
-      loadPending();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/auth/drivers/${id}/reject`, { method:"DELETE" }); showToast("Driver rejected"); loadPending(); } catch(e) { showToast("Failed","error"); }
   }
-
+  async function suspendDriver(id) {
+    if (!confirm("Suspend driver #" + id + "? They'll be set offline and blocked from logging in.")) return;
+    try { await fetch(`${BASE}/auth/drivers/${id}/suspend`, { method:"PATCH" }); showToast("Driver suspended","warn"); loadAll(); } catch(e) { showToast("Failed","error"); }
+  }
+  async function restoreDriver(id) {
+    try { await fetch(`${BASE}/auth/drivers/${id}/restore`, { method:"PATCH" }); showToast("Driver restored"); loadAll(); } catch(e) { showToast("Failed","error"); }
+  }
   async function addDriver() {
     const name  = document.getElementById("new-driver-name").value.trim();
     const phone = document.getElementById("new-driver-phone").value.trim();
@@ -792,23 +754,13 @@
       loadAll();
     } catch(e) { showToast("Failed","error"); }
   }
-
   async function toggleDriver(id, available) {
-    try {
-      await fetch(`${BASE}/drivers/${id}/availability`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({available}) });
-      showToast("Driver updated"); loadAll();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/drivers/${id}/availability`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({available}) }); showToast("Driver updated"); loadAll(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function deleteDriver(id) {
     if (!confirm("Remove driver #" + id + "?")) return;
-    try {
-      await fetch(`${BASE}/drivers/${id}`, { method:"DELETE" });
-      showToast("Driver removed"); loadAll();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/drivers/${id}`, { method:"DELETE" }); showToast("Driver removed"); loadAll(); } catch(e) { showToast("Failed","error"); }
   }
-
-  // ─── FLEET ────────────────────────────────────────────────
 
   async function loadFleet() {
     try {
@@ -819,8 +771,8 @@
       document.getElementById("fleet-maintenance").textContent = allVehicles.filter(v => v.status==="maintenance").length;
       document.getElementById("fleet-body").innerHTML = allVehicles.length ? allVehicles.map(v => `
         <tr>
-          <td style="color:#555">#${v.id}</td>
-          <td style="font-weight:600;color:#f59e0b">${v.plate}</td>
+          <td style="color:var(--text-dim)">#${v.id}</td>
+          <td style="font-weight:600;color:var(--chrome)">${v.plate}</td>
           <td>${v.make||"—"} ${v.model||""}</td>
           <td>${v.type||"—"}</td>
           <td>
@@ -840,7 +792,6 @@
         </tr>`).join("") : '<tr><td colspan="7" class="empty">No vehicles yet</td></tr>';
     } catch(e) { showToast("Failed to load fleet","error"); }
   }
-
   async function addVehicle() {
     const plate = document.getElementById("v-plate").value.trim();
     const make  = document.getElementById("v-make").value.trim();
@@ -856,30 +807,16 @@
       loadFleet();
     } catch(e) { showToast("Failed","error"); }
   }
-
   async function updateVehicleStatus(id, status) {
-    try {
-      await fetch(`${BASE}/vehicles/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) });
-      showToast("Vehicle updated"); loadFleet();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/vehicles/${id}/status`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status}) }); showToast("Vehicle updated"); loadFleet(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function assignVehicle(id, driverId) {
-    try {
-      await fetch(`${BASE}/vehicles/${id}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId||null}) });
-      showToast("Vehicle assigned"); loadFleet();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/vehicles/${id}/assign`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({driver_id:driverId||null}) }); showToast("Vehicle assigned"); loadFleet(); } catch(e) { showToast("Failed","error"); }
   }
-
   async function deleteVehicle(id) {
     if (!confirm("Remove vehicle #" + id + "?")) return;
-    try {
-      await fetch(`${BASE}/vehicles/${id}`, { method:"DELETE" });
-      showToast("Vehicle removed"); loadFleet();
-    } catch(e) { showToast("Failed","error"); }
+    try { await fetch(`${BASE}/vehicles/${id}`, { method:"DELETE" }); showToast("Vehicle removed"); loadFleet(); } catch(e) { showToast("Failed","error"); }
   }
-
-  // ─── REVENUE ──────────────────────────────────────────────
 
   async function loadRevenue() {
     try {
@@ -896,7 +833,7 @@
       document.getElementById("rev-completed").textContent = completed.length;
       document.getElementById("revenue-body").innerHTML = rides.length ? rides.map(r => `
         <tr>
-          <td style="color:#555">#${r.id}</td>
+          <td style="color:var(--text-dim)">#${r.id}</td>
           <td>${r.pickup} → ${r.dropoff}</td>
           <td><span class="badge badge-${r.status}">${r.status.replace(/_/g," ")}</span></td>
           <td>${r.offered_fare ? "P"+parseFloat(r.offered_fare).toFixed(2) : "—"}</td>
@@ -905,11 +842,8 @@
     } catch(e) { showToast("Failed to load revenue","error"); }
   }
 
-  // ─── UTILS ────────────────────────────────────────────────
-
   function openModal(id)  { document.getElementById(id).classList.add("open"); }
   function closeModal()   { document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open")); }
-
   function showToast(msg, type="") {
     const t = document.getElementById("toast");
     t.textContent = msg;
