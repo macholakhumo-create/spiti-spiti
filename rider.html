@@ -795,7 +795,7 @@
       priceEl.textContent = `P${hrs * HOURLY_RATE}`;
       lblEl.textContent = `${hrs} hour${hrs > 1 ? "s" : ""} · P${HOURLY_RATE}/hr`;
     } else {
-      priceEl.textContent = "P150";
+      priceEl.textContent = "P150: 150";
       lblEl.textContent = "Fixed rate by zone · Driver confirms price";
     }
   }
@@ -914,7 +914,7 @@
     const minFare = currentService === "chauffeur" ? 150;
     if (currentService === "chauffeur") {
       if (chauffType === "hourly") { const hrs = Math.max(1, parseInt(document.getElementById("hours-input").value) || 2); fare = hrs * HOURLY_RATE; }
-      else { fare = 80; }
+      else { fare = 150; }
     } else {
       fare = parseFloat(document.getElementById("offered-fare").value);
       if (isNaN(fare) || fare < minFare) { showToast(`Enter fare (min P${minFare})`, "warn"); return; }
